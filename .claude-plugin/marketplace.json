@@ -1,0 +1,17 @@
+{
+  "name": "zeo",
+  "owner": {
+    "name": "zeo"
+  },
+  "metadata": {
+    "description": "SEO and original-content toolkit for Claude Code.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "zeo",
+      "source": "./",
+      "description": "Subagents, skills, and commands for original article writing and full SEO (schema/rich results, sitemaps, GEO/AEO) across any number of sites."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "zeo",
+  "version": "0.7.0",
+  "description": "Site-agnostic toolkit of subagents, skills, and commands for bootstrapping new SEO-ready sites and producing original content: research, drafting, humanizing, on-page and technical SEO, schema.org rich results, GEO/AEO, internal linking, XML sitemaps, llms.txt, and an objective test-and-fix loop (agent-readiness, PageSpeed, rich results). Built to run across any number of sites.",
+  "keywords": [
+    "seo",
+    "content",
+    "blog",
+    "schema",
+    "rich-results",
+    "sitemap",
+    "geo",
+    "aeo",
+    "structured-data",
+    "llms-txt",
+    "pagespeed",
+    "agent-readiness"
+  ],
+  "author": {
+    "name": "seo-content-forge"
+  },
+  "agents": "./agents",
+  "skills": "./skills",
+  "commands": "./commands"
+}

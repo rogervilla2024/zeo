@@ -1,0 +1,38 @@
+{
+  "site_name": "Example Site",
+  "domain": "https://example.com",
+  "niche": "one-line description of the site's topic focus",
+  "audience": "who the site is for and what they want",
+  "brand_voice": "tone guidelines: e.g. expert but plain-spoken, no hype",
+  "languages": ["en"],
+  "default_language": "en",
+  "organization": {
+    "name": "Example Site",
+    "logo": "/logo.png",
+    "sameAs": []
+  },
+  "authors": [
+    {
+      "name": "Jane Doe",
+      "role": "Senior Editor",
+      "url": "/authors/jane-doe",
+      "sameAs": []
+    }
+  ],
+  "content": {
+    "articles_per_week": 2,
+    "min_words": 2000,
+    "pillar_topics": []
+  },
+  "seo": {
+    "title_suffix": " | Example Site",
+    "og_image": "/og-image.png",
+    "search_url_template": "https://example.com/search?q={search_term_string}"
+  },
+  "legal": {
+    "contact_email": "hello@example.com",
+    "analytics_provider": "",
+    "ad_provider": "",
+    "has_newsletter": false
+  }
+}
