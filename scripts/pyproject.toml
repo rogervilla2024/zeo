@@ -20,7 +20,7 @@ py-modules = [
     "generate_llmstxt", "generate_og_image", "generate_favicons",
     "generate_theme_css", "suggest_internal_links", "check_agent_ready",
     "check_pagespeed", "check_rich_results", "check_ai_patterns",
-    "check_originality", "check_js_budget", "export_toolkit",
+    "check_originality", "check_js_budget", "export_toolkit", "find_theme",
 ]
 packages = ["seo_content_forge"]
 

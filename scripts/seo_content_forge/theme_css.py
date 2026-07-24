@@ -24,6 +24,7 @@ _DEFAULT_PALETTE: dict[str, str] = {
 _DEFAULT_FONT: str = "system-ui, -apple-system, sans-serif"
 _DEFAULT_RADIUS: str = "8px"
 _DEFAULT_MAX_WIDTH: str = "72ch"
+_DEFAULT_SITE_WIDTH: str = "1200px"
 
 _DEFAULT_DARK: dict[str, str] = {
     "background": "#0b1220",
@@ -44,7 +45,8 @@ class ThemeTokens:
         heading_font: CSS font stack for headings.
         body_font: CSS font stack for body text.
         radius: Corner radius, e.g. ``8px``.
-        max_width: Prose measure, e.g. ``72ch``.
+        max_width: Prose measure, e.g. ``72ch`` (article text only).
+        site_width: Page shell width, e.g. ``1200px`` (header, grids).
     """
 
     palette: dict[str, str] = field(default_factory=dict)
@@ -53,6 +55,7 @@ class ThemeTokens:
     body_font: str = _DEFAULT_FONT
     radius: str = _DEFAULT_RADIUS
     max_width: str = _DEFAULT_MAX_WIDTH
+    site_width: str = _DEFAULT_SITE_WIDTH
 
 
 def from_config(config: dict[str, object]) -> ThemeTokens:
@@ -70,6 +73,7 @@ def from_config(config: dict[str, object]) -> ThemeTokens:
         body_font=str(fonts.get("body", _DEFAULT_FONT)),
         radius=str(theme.get("radius", _DEFAULT_RADIUS)),
         max_width=str(theme.get("max_width", _DEFAULT_MAX_WIDTH)),
+        site_width=str(theme.get("site_width", _DEFAULT_SITE_WIDTH)),
     )
 
 
@@ -96,6 +100,7 @@ def build_css(tokens: ThemeTokens) -> str:
   --font-body: {tokens.body_font};
   --radius: {tokens.radius};
   --max-width: {tokens.max_width};
+  --width-site: {tokens.site_width};
 }}
 
 @media (prefers-color-scheme: dark) {{
@@ -144,8 +149,12 @@ img, video {{
   z-index: 100;
 }}
 .container {{
-  max-width: var(--max-width);
+  max-width: var(--width-site);
   margin-inline: auto;
   padding-inline: 1rem;
+}}
+.prose {{
+  max-width: var(--max-width);
+  margin-inline: auto;
 }}
 """

@@ -58,6 +58,7 @@
       "body": "system-ui, -apple-system, sans-serif"
     },
     "radius": "8px",
-    "max_width": "72ch"
+    "max_width": "72ch",
+    "site_width": "1200px"
   }
 }

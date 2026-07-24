@@ -5,6 +5,11 @@
 //   python scripts/generate_theme_css.py --config site.config.json \
 //       --output src/styles/tokens.css
 //
+// Width rules: .container is the SITE shell (--width-site, 1200px
+// default) for header, grids, and cards; article BODY TEXT must be
+// wrapped in .prose (--max-width, 72ch) inside it. Never put the whole
+// page in a 72ch column - that reads as a mobile layout on desktop.
+//
 // Speed rules baked in:
 // - Zero JavaScript by default; the only inline scripts are the
 //   theme toggle (2 lines) and Speculation Rules (declarative JSON).

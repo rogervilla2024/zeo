@@ -37,7 +37,12 @@ class FetchResult:
         return 200 <= self.status < 300
 
 
-def fetch(url: str, accept: str = "*/*", timeout: float = 20.0) -> FetchResult:
+def fetch(
+    url: str,
+    accept: str = "*/*",
+    timeout: float = 20.0,
+    headers: dict[str, str] | None = None,
+) -> FetchResult:
     """Fetch a URL and return status, content type, and body text.
 
     Args:
@@ -45,15 +50,17 @@ def fetch(url: str, accept: str = "*/*", timeout: float = 20.0) -> FetchResult:
         accept: Value for the Accept request header (used for markdown
             content negotiation probing).
         timeout: Socket timeout in seconds.
+        headers: Extra request headers (e.g. Authorization).
 
     Returns:
         A :class:`FetchResult`. Network-level failures are reported as
         ``status=0`` rather than raised, so callers can treat "missing"
         and "unreachable" uniformly.
     """
-    request = urllib.request.Request(
-        url, headers={"User-Agent": _USER_AGENT, "Accept": accept}
-    )
+    request_headers = {"User-Agent": _USER_AGENT, "Accept": accept}
+    if headers:
+        request_headers.update(headers)
+    request = urllib.request.Request(url, headers=request_headers)
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             body: bytes = response.read()

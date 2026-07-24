@@ -31,7 +31,12 @@ Gather before scaffolding (ask only for what is missing):
 2. Scaffold the framework project with its official generator via Bash
    (e.g. `npm create astro@latest`, `npx create-next-app`). Choose the
    static/SSG configuration.
-3. Build the theme from the toolkit's templates (see
+3. Choose the theme path. Default when the user has no preference:
+   run the find-theme skill for the niche and propose adopting the top
+   ready-made theme (adopt-theme skill) - professional design day one.
+   Fall back to the custom path below when no theme fits or the user
+   wants a bespoke look.
+   Custom path - build the theme from the toolkit's templates (see
    `templates/theme/README.md` for the full rules):
    - generate the design tokens from the config's `theme` section:
 
@@ -99,6 +104,8 @@ Gather before scaffolding (ask only for what is missing):
    ```bash
    python scripts/check_rich_results.py --file dist/index.html
    python scripts/check_js_budget.py --dist dist
+   # then run the visual-review skill: build, screenshot at 390/768/1440,
+   # critique against the design checklist, fix, re-shoot until it passes
    python scripts/check_agent_ready.py --url https://example.com   # post-deploy
    python scripts/check_pagespeed.py --url https://example.com     # post-deploy
    ```
