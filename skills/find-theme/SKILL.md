@@ -9,7 +9,13 @@ Evaluate the whole ecosystem by metadata; clone only finalists.
 
 ## Inputs
 
-- Niche description and site type words (blog, magazine, docs, review).
+- Niche description in any language, and site type words.
+- IMPORTANT: theme metadata on GitHub is English, so before searching,
+  translate the niche into ENGLISH keywords yourself and prefer site
+  TYPE words over topic words (blog, magazine, docs, review, minimal,
+  portfolio, news). The content language of the site is irrelevant to
+  theme choice - a French site uses the same themes; language is set
+  in site.config.json, not by the theme.
 - Optional GITHUB_TOKEN in the environment for a higher API rate limit.
 
 ## Instructions
@@ -17,7 +23,7 @@ Evaluate the whole ecosystem by metadata; clone only finalists.
 1. Broad sweep and ranking (seconds, no cloning):
 
    ```bash
-   python scripts/find_theme.py --niche "the niche" \
+   python scripts/find_theme.py --niche "english niche words" \
        --keywords blog,magazine --top 6 --json finalists.json
    ```
 

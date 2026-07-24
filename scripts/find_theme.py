@@ -61,7 +61,12 @@ def _search(topic: str, pages: int) -> list[ThemeCandidate]:
 def main(argv: list[str] | None = None) -> int:
     """Entry point. Returns 0 when at least one theme is found."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--niche", required=True, help="Niche description.")
+    parser.add_argument(
+        "--niche",
+        required=True,
+        help="Niche description in ENGLISH (theme metadata is English; "
+        "translate first and prefer type words like blog/magazine/docs).",
+    )
     parser.add_argument(
         "--keywords",
         default="",
