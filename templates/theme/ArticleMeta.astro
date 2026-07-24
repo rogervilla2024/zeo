@@ -1,0 +1,51 @@
+---
+// Article byline strip: author link, visible last-updated date, and
+// reading time. The dates shown here must match datePublished and
+// dateModified in the Article JSON-LD - update both together, and only
+// when substance changed.
+//   <ArticleMeta authorName="..." authorUrl="/authors/..."
+//     published="2026-01-15" updated="2026-03-02" words={2400} />
+interface Props {
+  authorName: string;
+  authorUrl: string;
+  published: string;
+  updated?: string;
+  words?: number;
+}
+const { authorName, authorUrl, published, updated, words } = Astro.props;
+const readingMinutes = words ? Math.max(1, Math.round(words / 220)) : null;
+---
+
+<p class="article-meta">
+  By <a href={authorUrl} rel="author">{authorName}</a>
+  <span aria-hidden="true">&middot;</span>
+  <time datetime={published}>Published {published}</time>
+  {updated && updated !== published && (
+    <>
+      <span aria-hidden="true">&middot;</span>
+      <span class="updated"><time datetime={updated}>Updated {updated}</time></span>
+    </>
+  )}
+  {readingMinutes && (
+    <>
+      <span aria-hidden="true">&middot;</span>
+      <span>{readingMinutes} min read</span>
+    </>
+  )}
+</p>
+
+<style>
+  .article-meta {
+    color: var(--color-muted);
+    font-size: 0.9375rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .updated {
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    padding: 0.125rem 0.5rem;
+  }
+</style>

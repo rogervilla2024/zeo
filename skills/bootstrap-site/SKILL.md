@@ -31,14 +31,28 @@ Gather before scaffolding (ask only for what is missing):
 2. Scaffold the framework project with its official generator via Bash
    (e.g. `npm create astro@latest`, `npx create-next-app`). Choose the
    static/SSG configuration.
-3. Install the SEO head component from the toolkit's theme templates:
-   `templates/theme/SeoHead.astro` for Astro or
-   `templates/theme/next-metadata.ts` for Next.js (see
-   `templates/theme/README.md` for the rules the theme must keep). This
-   gives every page title with the configured suffix, meta description,
-   canonical, viewport, Open Graph and Twitter tags, hreflang alternates,
-   and JSON-LD injection. One h1 per page; primary content inside
-   `<main>`/`<article>`; `<html lang>` set from the page language.
+3. Build the theme from the toolkit's templates (see
+   `templates/theme/README.md` for the full rules):
+   - generate the design tokens from the config's `theme` section:
+
+     ```bash
+     python scripts/generate_theme_css.py --config site.config.json \
+         --output src/styles/tokens.css
+     ```
+
+   - install `BaseLayout.astro` (tokens, SeoHead, skip link, dark-mode
+     toggle, Speculation Rules prerendering, Footer) plus the SEO head
+     component (`SeoHead.astro` for Astro, `next-metadata.ts` for
+     Next.js)
+   - implement the layout variant named by `theme.variant`
+     (`templates/theme/variants/`: minimal, editorial, guide, review)
+   - wire the content blocks into the article template: ArticleMeta,
+     KeyTakeaways, TableOfContents, FaqAccordion, RelatedPosts (plus
+     ProsCons and VerdictBox for the review variant)
+   - add Pagefind static search (`SearchBox.astro`, `pagefind --site
+     dist` appended to the build) and an RSS feed at /rss.xml
+   One h1 per page; primary content inside `<main>`/`<article>`;
+   `<html lang>` set from the page language.
    Generate the default share card and the favicon set plus manifest
    from the site logo:
 
@@ -84,6 +98,7 @@ Gather before scaffolding (ask only for what is missing):
 
    ```bash
    python scripts/check_rich_results.py --file dist/index.html
+   python scripts/check_js_budget.py --dist dist
    python scripts/check_agent_ready.py --url https://example.com   # post-deploy
    python scripts/check_pagespeed.py --url https://example.com     # post-deploy
    ```

@@ -4,7 +4,9 @@
   "niche": "one-line description of the site's topic focus",
   "audience": "who the site is for and what they want",
   "brand_voice": "tone guidelines: e.g. expert but plain-spoken, no hype",
-  "languages": ["en"],
+  "languages": [
+    "en"
+  ],
   "default_language": "en",
   "organization": {
     "name": "Example Site",
@@ -34,5 +36,28 @@
     "analytics_provider": "",
     "ad_provider": "",
     "has_newsletter": false
+  },
+  "theme": {
+    "variant": "minimal",
+    "palette": {
+      "primary": "#0f766e",
+      "accent": "#f59e0b",
+      "background": "#ffffff",
+      "surface": "#f6f8fa",
+      "text": "#111827",
+      "muted": "#6b7280"
+    },
+    "dark_palette": {
+      "background": "#0b1220",
+      "surface": "#131c2e",
+      "text": "#e5e7eb",
+      "muted": "#9ca3af"
+    },
+    "fonts": {
+      "heading": "system-ui, -apple-system, sans-serif",
+      "body": "system-ui, -apple-system, sans-serif"
+    },
+    "radius": "8px",
+    "max_width": "72ch"
   }
 }

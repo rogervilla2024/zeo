@@ -67,12 +67,15 @@ bootstrap-site skill copies into new projects:
   languages, schema defaults) that every skill reads
 - `robots.txt` - AI-ready robots template with every major AI crawler
   named explicitly and a Sitemap directive
-- `theme/` - drop-in SEO theme components: `SeoHead.astro` (Astro) and
-  `next-metadata.ts` (Next.js App Router) covering title, description,
-  canonical, viewport, Open Graph/Twitter, hreflang, and JSON-LD
-  injection; `Breadcrumbs.astro`/`Breadcrumbs.tsx` visible breadcrumb
-  trails that pair with BreadcrumbList schema; plus the
-  framework-independent theme rules
+- `theme/` - the full theme layer: design tokens rendered from
+  site.config.json (`generate_theme_css.py`), `BaseLayout.astro` with
+  the speed patterns baked in (zero-JS default, Speculation Rules
+  prerendering, dark mode, skip link), the SEO head components
+  (`SeoHead.astro`, `next-metadata.ts`), Breadcrumbs and Footer, eight
+  zero-JS content blocks (TableOfContents, KeyTakeaways, FaqAccordion,
+  ProsCons, VerdictBox, ArticleMeta, RelatedPosts, Pagefind SearchBox),
+  and four layout variants (`variants/`: minimal, editorial, guide,
+  review) so sites sharing the skeleton do not share a look
 - `ci/seo-audit.yml` - GitHub Actions workflow for site repos: weekly
   cron runs the three checkers against the live site and opens or
   updates an issue when any suite fails, so every site polices itself
@@ -102,6 +105,10 @@ output is deterministic and standards-correct:
 - `check_originality.py` - shingle-similarity originality gate against
   the site's published articles, with example shared phrases in the
   report
+- `generate_theme_css.py` - render tokens.css (palette, dark mode,
+  fonts, radius, a11y helpers) from the config's theme section
+- `check_js_budget.py` - enforce the theme's JavaScript budget on the
+  build output (default 30 KB total; non-zero exit when over)
 - `check_agent_ready.py` - agent-readiness score (isitagentready.com
   style): robots.txt AI-bot rules, llms.txt, sitemap, server-rendered
   content, semantic HTML, structured data, markdown negotiation, html
