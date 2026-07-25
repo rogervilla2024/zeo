@@ -29,7 +29,7 @@ from pathlib import Path
 
 import orjson
 
-from seo_content_forge.llmstxt import LinkEntry, build_llms_txt
+from seo_content_forge.llmstxt import LinkEntry, build_llms_txt, looks_mojibake
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -59,6 +59,16 @@ def main(argv: list[str] | None = None) -> int:
         sections=sections,
         details=config.get("details"),
     )
+
+    if looks_mojibake(content):
+        print(
+            "Input looks double-encoded (mojibake such as A-tilde pairs "
+            "instead of accented letters). Regenerate the source JSON as "
+            "UTF-8 - on Windows, never create it via shell redirection; "
+            "write it from Python with encoding=utf-8 or an editor tool.",
+            file=sys.stderr,
+        )
+        return 1
 
     if args.output:
         args.output.write_text(content, encoding="utf-8")

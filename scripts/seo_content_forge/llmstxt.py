@@ -16,6 +16,27 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+# Byte pairs that appear when UTF-8 text is decoded as Latin-1/CP1252
+# (e.g. "u with umlaut" becomes "A-tilde 1/4"). Legitimate prose in any
+# language essentially never contains these sequences.
+_MOJIBAKE_MARKERS: tuple[str, ...] = (
+    "\u00c3\u00bc",
+    "\u00c3\u00b6",
+    "\u00c3\u00a7",
+    "\u00c4\u00b1",
+    "\u00c5\u009f",
+    "\u00c4\u009f",
+    "\u00c3\u00a9",
+    "\u00c3\u00a8",
+    "\u00c2\u00a0",
+    "\u00c3\u0083",
+)
+
+
+def looks_mojibake(text: str) -> bool:
+    """Return True when text contains double-encoded UTF-8 sequences."""
+    return any(marker in text for marker in _MOJIBAKE_MARKERS)
+
 
 @dataclass(slots=True)
 class LinkEntry:

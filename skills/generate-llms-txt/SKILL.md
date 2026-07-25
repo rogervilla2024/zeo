@@ -67,3 +67,8 @@ value pages (home, pillar pages, docs roots), not every URL.
 - Every listed URL is absolute and returns 200.
 - Sections are curated: the highest-value pages, not an exhaustive dump.
 - The file is plain markdown with no HTML.
+- Everything is UTF-8 end to end: build the source JSON from Python
+  (encoding=utf-8) or the editor tool, NEVER via shell redirection on
+  Windows (PowerShell writes UTF-16/ANSI and bakes mojibake in). The
+  CLI refuses double-encoded input; the deploy _headers file serves
+  llms.txt and robots.txt with charset=utf-8.
