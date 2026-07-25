@@ -166,6 +166,16 @@ def analyze_html(html: str) -> list[Check]:
     if og_tag:
         content = re.search(r"content=[\"']([^\"']+)[\"']", og_tag.group(0))
         og_url = content.group(1) if content else ""
+    h1_count = len(re.findall(r"(?is)<h1[\s>]", html))
+    heading_levels = sorted(
+        {int(level) for level in re.findall(r"(?is)<h([1-6])[\s>]", html)}
+    )
+    no_skips = all(
+        later - earlier <= 1
+        for earlier, later in zip(heading_levels, heading_levels[1:], strict=False)
+    )
+    svg_count = len(re.findall(r"(?is)<svg[\s>]", html))
+
     anchor_count = len(re.findall(r"(?is)<a\s[^>]*href=", html))
 
     img_tags = re.findall(r"(?is)<img\b[^>]*>", html)
@@ -281,6 +291,30 @@ def analyze_html(html: str) -> list[Check]:
             else "no og:image",
             "Add an og:image (1200x630) so shares and previews render "
             "a card; see generate_og_image.py.",
+        ),
+        _check(
+            "single-h1",
+            "machine-readability",
+            h1_count == 1,
+            f"{h1_count} h1 element(s)",
+            "Use exactly one h1 per page.",
+        ),
+        _check(
+            "heading-hierarchy",
+            "machine-readability",
+            no_skips,
+            "no skipped heading levels"
+            if no_skips
+            else f"heading levels present: {heading_levels} (a level is skipped)",
+            "Do not skip heading levels (h2 to h4); keep the outline sequential.",
+        ),
+        _check(
+            "content-images",
+            "content-accessibility",
+            text_length < 2000 or (len(img_tags) + svg_count) >= 1,
+            f"{len(img_tags)} img + {svg_count} svg for {text_length} chars of text",
+            "Long-form pages must carry at least one content image or "
+            "diagram (see the generate-article-images skill).",
         ),
         _check(
             "image-alt",

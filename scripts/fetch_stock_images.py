@@ -28,7 +28,7 @@ from PIL import Image
 from seo_content_forge.fetch import fetch
 
 _API = "https://api.pexels.com/v1/search"
-MAX_WIDTH = 1280
+MAX_WIDTH = 1600
 
 
 def slugify(text: str) -> str:

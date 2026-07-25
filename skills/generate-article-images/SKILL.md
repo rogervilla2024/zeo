@@ -37,6 +37,17 @@ An article never ships imageless. Strategy comes from site.config.json
 5. The og-image card (generate_og_image.py) is separate and still
    per-article.
 
+## Google-optimal size standards
+
+- Hero/featured: 1600x900 (16:9), the LCP element, eager +
+  fetchpriority high.
+- Content images: at least 1200px wide (Google Discover large-preview
+  eligibility; SeoHead already emits max-image-preview:large).
+- SVG diagrams: viewBox 1200x675 default.
+- og-image: 1200x630. Favicons: the standard five-size set.
+- WebP for photos (fetch_stock_images.py outputs 1600px WebP), SVG for
+  diagrams; every image with explicit width/height.
+
 ## Quality checklist
 
 - Every article has at least `images.min` images; visual-review fails

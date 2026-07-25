@@ -64,13 +64,16 @@ Gather before scaffolding (ask only for what is missing):
      dist` appended to the build) and an RSS feed at /rss.xml
    One h1 per page; primary content inside `<main>`/`<article>`;
    `<html lang>` set from the page language.
-   Generate the default share card and the favicon set plus manifest
-   from the site logo:
+   MANDATORY at every bootstrap: logo, favicon set, and og-image.
+   If the user supplied no logo, generate the monogram logo from the
+   brand name and token colors first - a site never ships without them:
 
    ```bash
+   python scripts/generate_logo.py --name "Site name" \
+       --output public/logo.png --background "#0f766e"
    python scripts/generate_og_image.py --title "Site name" \
        --site-name "example.com" --output public/og-image.png
-   python scripts/generate_favicons.py --logo logo.png --out-dir public \
+   python scripts/generate_favicons.py --logo public/logo.png --out-dir public \
        --name "Site name" --short-name "Site"
    ```
 
@@ -118,6 +121,7 @@ Gather before scaffolding (ask only for what is missing):
    ```bash
    python scripts/check_rich_results.py --file dist/index.html
    python scripts/check_js_budget.py --dist dist
+   python scripts/check_broken_links.py --dist dist
    # then run the visual-review skill: build, screenshot at 390/768/1440,
    # critique against the design checklist, fix, re-shoot until it passes
    python scripts/check_agent_ready.py --url https://example.com   # post-deploy
