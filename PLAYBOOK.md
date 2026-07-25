@@ -17,7 +17,9 @@ property, not a per-site effort.
 3. Copy `templates/ci/seo-audit.yml` into the site repo and replace
    `{{SITE_URL}}` - the site now audits itself weekly and opens an
    issue when a suite fails.
-4. Deploy, then run the live checks once:
+4. Deploy to Cloudflare Pages (templates/deploy/cloudflare.md: Git
+   integration or wrangler; _headers file in place), then run the live
+   checks once:
    `check_agent_ready.py`, `check_pagespeed.py` against the live URL.
 5. Submit the sitemap in Google Search Console and Bing Webmaster
    Tools. Ranking and query data is tracked directly in Search Console

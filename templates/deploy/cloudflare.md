@@ -1,0 +1,64 @@
+# Deploying to Cloudflare Pages (default host)
+
+Every site built with this toolkit deploys to Cloudflare Pages as a
+static build. Two ways to ship; Git integration is the default.
+
+## Option A: Git integration (recommended)
+
+1. Push the site repository to GitHub.
+2. Cloudflare dashboard: Workers and Pages -> Create -> Pages ->
+   Connect to Git -> pick the repository.
+3. Build settings for Astro:
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+   - Node version: set `NODE_VERSION` env var if the build needs a
+     specific one.
+4. Every push to main deploys automatically; other branches get
+   preview URLs.
+
+## Option B: Direct upload with wrangler
+
+```bash
+npm run build
+npx wrangler pages deploy dist --project-name <site-name>
+```
+
+First run prompts a Cloudflare login; CI can use a
+`CLOUDFLARE_API_TOKEN` (store it in the environment, never in the
+repository).
+
+## Custom domain
+
+Pages project -> Custom domains -> add the domain. With DNS already on
+Cloudflare this is one click and TLS is automatic. Keep exactly one
+canonical host: redirect `www` to the apex (or the reverse) under
+Bulk Redirects or a redirect rule, matching the `domain` in
+site.config.json.
+
+## _headers and _redirects
+
+Cloudflare Pages reads two special files from the build output:
+
+- Copy `templates/deploy/_headers` into the static assets directory
+  (`public/`) so it lands in `dist/`. It sets immutable caching for
+  hashed assets and the security headers.
+- `_redirects` (one rule per line, `source destination code`) handles
+  moved URLs: `/old-slug /new-slug 301`. Add entries whenever a slug
+  changes so link equity survives.
+
+## Post-deploy checks
+
+```bash
+python scripts/check_agent_ready.py --url https://example.com
+python scripts/check_pagespeed.py --url https://example.com
+```
+
+Then submit the sitemap in Google Search Console and Bing Webmaster
+Tools. Search Console tracking stays with the operator.
+
+## Notes
+
+- Static output needs no adapter. If a site ever needs server-side
+  routes, add `@astrojs/cloudflare` and re-run the test suite.
+- Cloudflare's CDN and early hints generally improve field CWV; the
+  JS budget and image rules still decide the outcome.

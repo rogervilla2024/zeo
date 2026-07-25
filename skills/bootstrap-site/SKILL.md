@@ -20,7 +20,8 @@ Gather before scaffolding (ask only for what is missing):
 - Framework preference. Default when unstated: a static-first framework
   (Astro or Next.js with static generation). Client-side-only rendering
   is never acceptable: it fails the server-rendered-content check.
-- Hosting target if known (Vercel, Netlify, static host).
+- Hosting target. Default: Cloudflare Pages (static build via Git
+  integration or wrangler; see templates/deploy/cloudflare.md).
 
 ## Instructions
 
@@ -111,8 +112,11 @@ Gather before scaffolding (ask only for what is missing):
    ```
 
    Fix failures per the test-site-readiness skill and re-run until green.
-10. Initialize git with a first commit and note the deploy steps for the
-    chosen host.
+10. Initialize git with a first commit. Copy templates/deploy/_headers
+    into public/ (immutable asset caching + security headers) and write
+    the deploy steps from templates/deploy/cloudflare.md: Git
+    integration (build `npm run build`, output `dist`) or
+    `npx wrangler pages deploy dist`.
 
 ## Output
 

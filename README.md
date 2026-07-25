@@ -81,6 +81,9 @@ bootstrap-site skill copies into new projects:
 - `ci/seo-audit.yml` - GitHub Actions workflow for site repos: weekly
   cron runs the three checkers against the live site and opens or
   updates an issue when any suite fails, so every site polices itself
+- `deploy/` - Cloudflare Pages deployment (the default host): setup
+  guide for Git integration and wrangler direct upload, plus a
+  `_headers` file with immutable asset caching and security headers
 - `pages/` - trust-page templates (About, Contact, Privacy Policy,
   Terms of Service, Disclaimer) the generate-trust-pages skill fills
   from site.config.json; paired with the `theme/` Footer components
