@@ -60,6 +60,23 @@ def _check(check_id: str, category: str, passed: bool, detail: str, fix: str) ->
     return Check(check_id, category, passed, detail, "" if passed else fix)
 
 
+def _star_group_disallows_all(text: str) -> bool:
+    """True when the wildcard group contains a bare "Disallow: /"."""
+    current = ""
+    for line in text.splitlines():
+        clean = line.split("#")[0].strip()
+        lowered = clean.lower()
+        if lowered.startswith("user-agent:"):
+            current = clean.split(":", 1)[1].strip()
+        elif (
+            lowered.startswith("disallow:")
+            and current == "*"
+            and clean.split(":", 1)[1].strip() == "/"
+        ):
+            return True
+    return False
+
+
 def analyze_robots(robots_txt: str | None) -> list[Check]:
     """Analyze ``robots.txt`` for presence, sitemap, and AI-bot rules.
 
@@ -88,6 +105,19 @@ def analyze_robots(robots_txt: str | None) -> list[Check]:
             has_sitemap,
             "Sitemap: directive present" if has_sitemap else "no Sitemap: directive",
             "Add 'Sitemap: <absolute sitemap URL>' to robots.txt.",
+        )
+    )
+    checks.append(
+        _check(
+            "robots-not-blocking-site",
+            "discoverability",
+            not _star_group_disallows_all(text),
+            "wildcard group does not block the whole site"
+            if not _star_group_disallows_all(text)
+            else "User-agent: * has Disallow: / - the entire site is blocked",
+            "Remove the bare 'Disallow: /' under 'User-agent: *'; it "
+            "blocks all crawling. Use noindex meta for pages that must "
+            "stay out of the index.",
         )
     )
     named = [bot for bot in AI_BOTS if re.search(rf"(?i)\b{re.escape(bot)}\b", text)]
@@ -124,6 +154,19 @@ def analyze_html(html: str) -> list[Check]:
 
     visible = re.sub(r"(?is)<(script|style|noscript)[^>]*>.*?</\1>|<[^>]+>", " ", html)
     text_length = len(" ".join(visible.split()))
+
+    canonical_tags = re.findall(r"(?is)<link[^>]*rel=[\"']canonical[\"'][^>]*>", html)
+    canonical_urls = [
+        match.group(1)
+        for tag in canonical_tags
+        if (match := re.search(r"href=[\"']([^\"']+)[\"']", tag))
+    ]
+    og_url = ""
+    og_tag = re.search(r"(?is)<meta[^>]*property=[\"']og:url[\"'][^>]*>", html)
+    if og_tag:
+        content = re.search(r"content=[\"']([^\"']+)[\"']", og_tag.group(0))
+        og_url = content.group(1) if content else ""
+    anchor_count = len(re.findall(r"(?is)<a\s[^>]*href=", html))
 
     img_tags = re.findall(r"(?is)<img\b[^>]*>", html)
     imgs_with_alt = [tag for tag in img_tags if re.search(r"(?i)\balt\s*=", tag)]
@@ -173,6 +216,43 @@ def analyze_html(html: str) -> list[Check]:
             if present(r'rel\s*=\s*["\']canonical["\']')
             else "no canonical link",
             'Add <link rel="canonical"> so agents cite one URL.',
+        ),
+        _check(
+            "canonical-single",
+            "machine-readability",
+            len(canonical_urls) <= 1,
+            f"{len(canonical_urls)} canonical link(s)",
+            "Keep exactly one canonical link; with several, engines may "
+            "ignore all of them.",
+        ),
+        _check(
+            "canonical-absolute",
+            "machine-readability",
+            not canonical_urls or canonical_urls[0].startswith("http"),
+            "canonical is absolute"
+            if not canonical_urls or canonical_urls[0].startswith("http")
+            else f"canonical is relative: {canonical_urls[0]}",
+            "Use an absolute canonical URL matching the live host.",
+        ),
+        _check(
+            "canonical-og-url-match",
+            "machine-readability",
+            not (canonical_urls and og_url)
+            or canonical_urls[0].rstrip("/") == og_url.rstrip("/"),
+            "canonical and og:url agree"
+            if not (canonical_urls and og_url)
+            or canonical_urls[0].rstrip("/") == og_url.rstrip("/")
+            else f"canonical {canonical_urls[0]} != og:url {og_url}",
+            "Point canonical and og:url at the same URL; disagreement "
+            "confuses canonical selection.",
+        ),
+        _check(
+            "crawlable-links",
+            "content-accessibility",
+            anchor_count >= 3,
+            f"{anchor_count} crawlable <a href> links",
+            "Navigation must use real <a href> links, not JavaScript "
+            "click handlers; engines follow hrefs only.",
         ),
         _check(
             "html-lang",

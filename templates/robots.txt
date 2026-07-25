@@ -5,6 +5,10 @@
 
 User-agent: *
 Allow: /
+# Crawl control only - robots.txt does not deindex. Pages that must stay
+# out of results need a noindex meta tag instead. Internal search
+# results are thin pages; keep crawlers out of them.
+Disallow: /search?
 
 # Search and answer engines
 User-agent: GPTBot

@@ -42,3 +42,16 @@ You may delegate keyword expansion to the `keyword-researcher` subagent, competi
 - [ ] Authority is routed toward priority conversion pages.
 - [ ] Roadmap is prioritized by opportunity and business value.
 - [ ] Map is site-agnostic and driven by the provided niche inputs.
+
+## Proven cluster patterns
+
+Beyond pillar+cluster, two page archetypes compound authority in most
+niches (model: single-topic authority sites):
+
+- Scenario pages: one page per concrete problem/error/situation a user
+  hits ("X not working after Y", "when X conflicts with Y"), each with
+  its fix. High intent, low competition, strong internal links to the
+  pillar.
+- Platform/variant pages: the same core task explained per platform or
+  tool the audience uses. Only where genuinely different steps exist -
+  identical content per platform would be doorway behavior.

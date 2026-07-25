@@ -23,6 +23,21 @@ Gather before starting (ask only for what is missing; infer the rest from site c
 - Target word count (default 2000-3000+; go longer for competitive terms).
 - Constraints: mandatory sub-topics, internal URLs to link, do-not-mention list, locale/language.
 
+## Batch and policy rules (non-negotiable)
+
+- Never produce more than `content.max_batch` articles (default 10) in
+  one run, regardless of what was asked. For larger requests, stop at
+  the cap, report, and continue only on explicit go-ahead. Follow the
+  `content.weekly_ramp` publishing pace from PLAYBOOK - publishing 100
+  articles onto a fresh domain at once matches Google's scaled content
+  abuse pattern even when each article passes the gates.
+- Within a batch, run check_originality.py for each new article against
+  the OTHER articles of the same batch as well as the published corpus.
+- No doorway pages: keyword variations with the same intent ("best X",
+  "top X", "X reviews") get ONE comprehensive article, never one page
+  per variation. If the requested keyword only differs in phrasing from
+  an existing article, update that article instead.
+
 ## Instructions
 
 Run the stages in order. Delegate each stage to the named subagent via the Task/Agent mechanism when available; otherwise perform the stage inline using its focus.

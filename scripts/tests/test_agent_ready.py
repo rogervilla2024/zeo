@@ -27,9 +27,11 @@ _GOOD_HTML = (
     '<meta name="viewport" content="width=device-width, initial-scale=1">'
     '<meta name="description" content="d">'
     '<meta property="og:image" content="https://example.com/og.png">'
+    '<meta property="og:url" content="https://example.com/">'
     '<link rel="canonical" href="https://example.com/">'
     '<script type="application/ld+json">{}</script>'
-    "</head><body><main><h1>Heading</h1>"
+    '</head><body><nav><a href="/a">A</a><a href="/b">B</a>'
+    '<a href="/c">C</a></nav><main><h1>Heading</h1>'
     '<img src="a.png" alt="described image"><p>'
     + ("word " * 200)
     + "</p></main></body></html>"
@@ -48,7 +50,11 @@ def test_good_robots_passes_all() -> None:
 
 
 def test_missing_robots_fails_with_fixes() -> None:
-    checks = analyze_robots(None)
+    checks = [
+        check
+        for check in analyze_robots(None)
+        if check.check_id != "robots-not-blocking-site"
+    ]
     assert not any(check.passed for check in checks)
     assert all(check.fix for check in checks)
 
@@ -95,3 +101,34 @@ def test_summarize_scores() -> None:
     assert passed == total
     assert score == 100
     assert summarize([]) == (0, 0, 0)
+
+
+def test_multiple_canonicals_fail() -> None:
+    html = _GOOD_HTML.replace(
+        '<link rel="canonical" href="https://example.com/">',
+        '<link rel="canonical" href="https://example.com/">'
+        '<link rel="canonical" href="https://example.com/other">',
+    )
+    assert not _by_id(analyze_html(html), "canonical-single").passed
+
+
+def test_relative_canonical_fails() -> None:
+    html = _GOOD_HTML.replace('href="https://example.com/"', 'href="/index.html"', 1)
+    assert not _by_id(analyze_html(html), "canonical-absolute").passed
+
+
+def test_canonical_og_mismatch_fails() -> None:
+    html = _GOOD_HTML.replace(
+        '<meta property="og:url" content="https://example.com/">',
+        '<meta property="og:url" content="https://example.com/else">',
+    )
+    assert not _by_id(analyze_html(html), "canonical-og-url-match").passed
+
+
+def test_robots_disallow_all_fails() -> None:
+    checks = analyze_robots("User-agent: *\nDisallow: /\n")
+    assert not _by_id(checks, "robots-not-blocking-site").passed
+
+
+def test_good_robots_not_blocking() -> None:
+    assert _by_id(analyze_robots(_GOOD_ROBOTS), "robots-not-blocking-site").passed

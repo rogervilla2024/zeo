@@ -73,3 +73,16 @@ property, not a per-site effort.
 - The toolkit repo is the single source of process; sites do not fork
   their own variants of skills or scripts. Improvements land here and
   every site benefits on its next session.
+
+## Policy guard (Google spam policies, mapped to our gates)
+
+- Scaled content abuse: bulk pages made for rankings. Prevented by
+  content.max_batch, the weekly_ramp pace, and the four article gates.
+- Doorway pages: near-duplicate pages per keyword variation. Prevented
+  by the one-comprehensive-article rule and the originality gate.
+- Thin/unoriginal content: prevented by word-depth targets,
+  fact-checking, and check_originality.py.
+- Site reputation abuse: hosting third-party content to trade on the
+  site's authority - out of scope by design; do not add it.
+- Every visible claim matches its schema (ratings, dates, authors);
+  schema-only data is a policy risk, not a shortcut.
