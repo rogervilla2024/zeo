@@ -102,7 +102,7 @@ Gather before scaffolding (ask only for what is missing):
    build script. Confirm robots.txt points at it.
 7. Plan the initial information architecture and write the launch
    content pack. Delegate to the build-topic-clusters skill for a
-   pillar and cluster map derived from the site.config.json niche, then
+   pillar and cluster map derived from the site.config.json niche (run the mine-questions skill per pillar topic so launch articles answer real queries), then
    create the pillar pages and navigation. From that map, select
    `content.launch_articles` topics (default 10): 1-2 pillar guides
    plus basic, beginner-intent cluster articles (the "what is",

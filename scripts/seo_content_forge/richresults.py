@@ -10,6 +10,7 @@ page ships. Google's hosted Rich Results Test remains the final arbiter.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
 
@@ -84,6 +85,7 @@ class PageStructuredData:
 
     parse_errors: list[str] = field(default_factory=list)
     results: list[ValidationResult] = field(default_factory=list)
+    consistency_errors: list[str] = field(default_factory=list)
 
     @property
     def eligible_types(self) -> list[str]:
@@ -93,8 +95,10 @@ class PageStructuredData:
     @property
     def has_blocking_errors(self) -> bool:
         """Return ``True`` if any block failed to parse or validate."""
-        return bool(self.parse_errors) or any(
-            not result.is_valid for result in self.results
+        return (
+            bool(self.parse_errors)
+            or bool(self.consistency_errors)
+            or any(not result.is_valid for result in self.results)
         )
 
 
@@ -110,7 +114,15 @@ def check_page(html: str) -> PageStructuredData:
         all, which makes it ineligible for every rich result.
     """
     report = PageStructuredData()
-    for index, block in enumerate(extract_jsonld_blocks(html), start=1):
+    visible = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>|<[^>]+>", " ", html)
+    visible = " ".join(visible.split()).lower()
+    blocks = extract_jsonld_blocks(html)
+    total_bytes = sum(len(block.encode()) for block in blocks)
+    if total_bytes > 15000:
+        report.consistency_errors.append(
+            f"JSON-LD totals {total_bytes} bytes (budget 15000); trim it"
+        )
+    for index, block in enumerate(blocks, start=1):
         try:
             parsed = orjson.loads(block)
         except orjson.JSONDecodeError as exc:
@@ -118,4 +130,21 @@ def check_page(html: str) -> PageStructuredData:
             continue
         for node in _flatten(parsed):
             report.results.append(validate_node(node))
+            if node.get("@type") == "FAQPage":
+                entities = node.get("mainEntity")
+                for entity in entities if isinstance(entities, list) else []:
+                    question = (
+                        str(entity.get("name", "")) if isinstance(entity, dict) else ""
+                    )
+                    if question and question.lower() not in visible:
+                        report.consistency_errors.append(
+                            f"FAQ question not visible on page: {question[:60]}"
+                        )
+            rating = node.get("aggregateRating")
+            if isinstance(rating, dict):
+                value = str(rating.get("ratingValue", ""))
+                if value and value not in visible:
+                    report.consistency_errors.append(
+                        f"ratingValue {value} not visible on page"
+                    )
     return report

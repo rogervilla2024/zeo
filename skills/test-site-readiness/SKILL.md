@@ -28,6 +28,8 @@ fixes and re-run the tests until they pass. Tests decide; opinions do not.
    # and against the local build output:
    python check_js_budget.py --dist dist
    python check_broken_links.py --dist dist
+   python check_media_budget.py --dist dist
+   python check_canonical_host.py --domain https://example.com  # post-deploy
    python check_rich_results.py --file dist/index.html
    ```
 

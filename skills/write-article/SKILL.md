@@ -42,7 +42,7 @@ Gather before starting (ask only for what is missing; infer the rest from site c
 
 Run the stages in order. Delegate each stage to the named subagent via the Task/Agent mechanism when available; otherwise perform the stage inline using its focus.
 
-1. Keyword and SERP research. Delegate to `keyword-researcher` for the primary keyword, related terms, questions, and search volume signals. Delegate to `serp-competitor-analyst` to analyze the top-ranking pages, their headings, depth, and content gaps. Confirm intent before proceeding.
+1. Keyword and SERP research. First run the mine-questions skill for the target keyword (site language); its output feeds the outline and the FAQ block. Delegate to `keyword-researcher` for the primary keyword, related terms, questions, and search volume signals. Delegate to `serp-competitor-analyst` to analyze the top-ranking pages, their headings, depth, and content gaps. Confirm intent before proceeding.
 2. Strategy. Delegate to `seo-content-strategist` to set the angle, unique value proposition, and how this article fits the site's topical authority.
 3. Brief. Delegate to `content-brief-architect` to produce an outline: H1, H2/H3 structure, target keyword placement, questions to answer, entities to cover, word-count targets per section, and internal-link opportunities.
 4. Draft. Delegate to `longform-writer` to write the full draft against the brief. Enforce the target length, original insight, examples, and natural keyword usage. No fabricated statistics.
@@ -53,7 +53,7 @@ Run the stages in order. Delegate each stage to the named subagent via the Task/
    ```
 
    Banned phrases are ship-blocking; structural warnings (repeated sentence openers, uniform paragraph lengths) get one more editing pass.
-6. FAQ block (mandatory). Append a "Frequently asked questions" section of 3-5 questions drawn from the People Also Ask questions and related queries surfaced in stage 1. Each answer is 40-80 words, self-contained, and extractable (direct answer in the first sentence). These questions must not duplicate content already covered under an H2; they cover the adjacent questions a reader would search next.
+6. FAQ block (mandatory). Append a "Frequently asked questions" section of 3-5 questions taken from the mine-questions output of stage 1 (real autocomplete/PAA data, in the site language). Each answer is 40-80 words, self-contained, and extractable (direct answer in the first sentence). These questions must not duplicate content already covered under an H2; they cover the adjacent questions a reader would search next.
 7. On-page SEO. Delegate to `onpage-seo-optimizer` (or invoke the optimize-onpage-seo skill) for title tag, meta description, slug, heading hierarchy, image alt text, and snippet targeting.
 8. Internal linking (mandatory - an article does not ship without it). Every article must link contextually from its body text to relevant same-site pages, and this happens at creation time, not as a later cleanup. Build or load the site's content inventory (JSON of published URLs with titles and keywords, derivable from the sitemap or content collection), then run the toolkit's smart linker:
 

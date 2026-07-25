@@ -44,6 +44,8 @@ def main(argv: list[str] | None = None) -> int:
         print("No JSON-LD found: the page is ineligible for all rich results.")
         return 1
 
+    for error in report.consistency_errors:
+        print(f"CONSISTENCY  {error}")
     for error in report.parse_errors:
         print(f"PARSE ERROR  {error}")
     for result_item in report.results:

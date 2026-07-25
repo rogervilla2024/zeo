@@ -1,0 +1,63 @@
+"""CLI to mine real user questions for a topic from autocomplete.
+
+Usage:
+    python mine_questions.py --seed "french press" --lang en
+    python mine_questions.py --seed "kahve demleme" --lang tr --json out.json
+
+Expands the seed with question prefixes, queries Google's public
+autocomplete endpoint, and prints a deduplicated on-topic question
+list. Feed the output to build-topic-clusters (launch pack topics) and
+write-article (FAQ blocks answering real queries).
+"""
+
+from __future__ import annotations
+
+import argparse
+import sys
+import urllib.parse
+from pathlib import Path
+
+import orjson
+
+from seo_content_forge.fetch import fetch
+from seo_content_forge.questions import (
+    dedupe_questions,
+    expand_queries,
+    parse_suggestions,
+)
+
+_API = "https://suggestqueries.google.com/complete/search"
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Entry point. Returns 0 when at least one question was found."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--seed", required=True, help="Topic or keyword.")
+    parser.add_argument("--lang", default="en", help="Language code (en, tr, ...).")
+    parser.add_argument("--limit", type=int, default=40)
+    parser.add_argument("--json", type=Path, help="Also write the list as JSON.")
+    args = parser.parse_args(argv)
+
+    batches: list[list[str]] = []
+    for query in expand_queries(args.seed, args.lang):
+        params = urllib.parse.urlencode(
+            {"client": "firefox", "hl": args.lang, "q": query}
+        )
+        result = fetch(f"{_API}?{params}")
+        if result.ok:
+            batches.append(parse_suggestions(result.text.encode()))
+
+    questions = dedupe_questions(batches, args.seed, limit=args.limit)
+    if not questions:
+        print("No suggestions returned; check network or seed.", file=sys.stderr)
+        return 1
+    for question in questions:
+        print(question)
+    if args.json:
+        args.json.write_bytes(orjson.dumps(questions, option=orjson.OPT_INDENT_2))
+        print(f"\nWrote {args.json}", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
