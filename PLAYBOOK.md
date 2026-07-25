@@ -12,16 +12,19 @@ property, not a per-site effort.
    llms.txt, sitemap wiring, og-image, favicon set + manifest, and the
    trust pages (About, Contact, Privacy Policy, Terms, Disclaimer via
    generate-trust-pages).
-2. Register authors (`build-author-entity`) so every byline resolves to
+2. The bootstrap includes the launch content pack: `content.launch_articles`
+   (default 10) beginner-intent articles from the cluster map, all gates
+   applied, before the site is called done.
+3. Register authors (`build-author-entity`) so every byline resolves to
    a real Person entity.
-3. Copy `templates/ci/seo-audit.yml` into the site repo and replace
+4. Copy `templates/ci/seo-audit.yml` into the site repo and replace
    `{{SITE_URL}}` - the site now audits itself weekly and opens an
    issue when a suite fails.
-4. Deploy to Cloudflare Pages (templates/deploy/cloudflare.md: Git
+5. Deploy to Cloudflare Pages (templates/deploy/cloudflare.md: Git
    integration or wrangler; _headers file in place), then run the live
    checks once:
    `check_agent_ready.py`, `check_pagespeed.py` against the live URL.
-5. Submit the sitemap in Google Search Console and Bing Webmaster
+6. Submit the sitemap in Google Search Console and Bing Webmaster
    Tools. Ranking and query data is tracked directly in Search Console
    by the operator.
 

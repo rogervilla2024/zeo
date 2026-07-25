@@ -29,6 +29,11 @@ Gather before scaffolding (ask only for what is missing):
    toolkit's `templates/site.config.example.json` and filled in with the
    gathered values. All later skills (write-article, generate-schema,
    generate-llms-txt, test-site-readiness) read site context from here.
+   HARD RULE: from this point on, the niche and every article topic come
+   EXCLUSIVELY from site.config.json. Example topics appearing in
+   toolkit docs, README samples, or the user's earlier prompts (coffee,
+   grinders, etc.) are illustrations only - generating content about
+   them when they are not this site's niche is a failure.
 2. Scaffold the framework project with its official generator via Bash
    (e.g. `npm create astro@latest`, `npx create-next-app`). Choose the
    static/SSG configuration.
@@ -92,11 +97,19 @@ Gather before scaffolding (ask only for what is missing):
 6. Wire the sitemap into the build: the framework's sitemap integration
    if solid, otherwise `scripts/generate_sitemap.py` invoked from the
    build script. Confirm robots.txt points at it.
-7. Plan the initial information architecture: delegate to the
-   build-topic-clusters skill for a pillar and cluster map from the
-   niche, then create the pillar pages and navigation. Write the first
-   pillar article with the write-article skill unless the user wants
-   structure only.
+7. Plan the initial information architecture and write the launch
+   content pack. Delegate to the build-topic-clusters skill for a
+   pillar and cluster map derived from the site.config.json niche, then
+   create the pillar pages and navigation. From that map, select
+   `content.launch_articles` topics (default 10): 1-2 pillar guides
+   plus basic, beginner-intent cluster articles (the "what is",
+   "how to", "common mistakes", "X vs Y" queries of the niche - the
+   questions every newcomer searches first). Write every one of them
+   through the full write-article pipeline with all gates (FAQ,
+   internal links between the pack's articles, AI-pattern lint,
+   originality, schema, per-article og-image), in the site's content
+   language. The site launches with a filled articles section, never a
+   single lonely post or placeholder cards.
 8. Generate `llms.txt` with the generate-llms-txt skill once the initial
    pages exist, and place it in the static assets directory.
 9. Test before calling it done. Build the site and run the offline

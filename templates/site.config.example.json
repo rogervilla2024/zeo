@@ -24,7 +24,8 @@
   "content": {
     "articles_per_week": 2,
     "min_words": 2000,
-    "pillar_topics": []
+    "pillar_topics": [],
+    "launch_articles": 10
   },
   "seo": {
     "title_suffix": " | Example Site",

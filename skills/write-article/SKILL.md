@@ -7,6 +7,12 @@ Flagship orchestration skill. It sequences specialist subagents to turn a topic 
 
 ## Inputs
 
+HARD RULE: site context (niche, audience, voice, language) comes from
+site.config.json when it exists; the target keyword must belong to that
+niche. Never take topics from example snippets in toolkit docs or
+unrelated earlier prompts - if the requested keyword contradicts the
+config niche, stop and ask.
+
 Gather before starting (ask only for what is missing; infer the rest from site context):
 
 - Domain and site name.
