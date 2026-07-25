@@ -176,6 +176,24 @@ def analyze_html(html: str) -> list[Check]:
     )
     svg_count = len(re.findall(r"(?is)<svg[\s>]", html))
 
+    modified = re.search(r'"dateModified"\s*:\s*"(\d{4}-\d{2}-\d{2})', html)
+    time_dates = re.findall(r'<time[^>]*datetime=["\'](\d{4}-\d{2}-\d{2})', html)
+    date_visible = modified is None or modified.group(1) in time_dates
+
+    generic_alts = {"image", "photo", "picture", "img", "resim", "foto"}
+    lazy_alts: list[str] = []
+    for tag in re.findall(r"(?is)<img\b[^>]*>", html):
+        alt_match = re.search(r'alt=["\']([^"\']*)["\']', tag)
+        src_match = re.search(r'src=["\']([^"\']+)["\']', tag)
+        if not alt_match or not alt_match.group(1):
+            continue
+        alt = alt_match.group(1).strip().lower()
+        stem = ""
+        if src_match:
+            stem = src_match.group(1).rsplit("/", 1)[-1].rsplit(".", 1)[0].lower()
+        if alt in generic_alts or (stem and alt.replace(" ", "-") == stem):
+            lazy_alts.append(alt)
+
     anchor_count = len(re.findall(r"(?is)<a\s[^>]*href=", html))
 
     img_tags = re.findall(r"(?is)<img\b[^>]*>", html)
@@ -315,6 +333,26 @@ def analyze_html(html: str) -> list[Check]:
             f"{len(img_tags)} img + {svg_count} svg for {text_length} chars of text",
             "Long-form pages must carry at least one content image or "
             "diagram (see the generate-article-images skill).",
+        ),
+        _check(
+            "visible-updated-date",
+            "machine-readability",
+            date_visible,
+            "dateModified matches a visible time tag"
+            if date_visible
+            else "schema dateModified has no matching visible <time> tag",
+            "Show the updated date in a <time datetime> element matching "
+            "the Article schema dateModified (see ArticleMeta).",
+        ),
+        _check(
+            "alt-quality",
+            "content-accessibility",
+            not lazy_alts,
+            "no lazy alt text"
+            if not lazy_alts
+            else f"lazy alt text found: {', '.join(lazy_alts[:3])}",
+            "Alt text must describe the image, not repeat the filename "
+            "or a generic word.",
         ),
         _check(
             "image-alt",
