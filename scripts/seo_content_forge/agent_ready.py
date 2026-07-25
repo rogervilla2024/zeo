@@ -194,6 +194,14 @@ def analyze_html(html: str) -> list[Check]:
         if alt in generic_alts or (stem and alt.replace(" ", "-") == stem):
             lazy_alts.append(alt)
 
+    title_match = re.search(r"(?is)<title[^>]*>([^<]*)</title>", html)
+    title_length = len(title_match.group(1).strip()) if title_match else 0
+    desc_match = re.search(
+        r"(?is)<meta[^>]*name=[\"']description[\"'][^>]*content=[\"']([^\"']*)",
+        html,
+    )
+    desc_length = len(desc_match.group(1).strip()) if desc_match else 0
+
     anchor_count = len(re.findall(r"(?is)<a\s[^>]*href=", html))
 
     img_tags = re.findall(r"(?is)<img\b[^>]*>", html)
@@ -309,6 +317,22 @@ def analyze_html(html: str) -> list[Check]:
             else "no og:image",
             "Add an og:image (1200x630) so shares and previews render "
             "a card; see generate_og_image.py.",
+        ),
+        _check(
+            "title-length",
+            "machine-readability",
+            title_length == 0 or 15 <= title_length <= 60,
+            f"title length {title_length} chars",
+            "Keep the title tag between 15 and 60 characters; longer "
+            "gets truncated in results, shorter wastes the slot.",
+        ),
+        _check(
+            "description-length",
+            "machine-readability",
+            desc_length == 0 or 70 <= desc_length <= 160,
+            f"meta description length {desc_length} chars",
+            "Keep the meta description between 70 and 160 characters "
+            "for a full, unclipped snippet.",
         ),
         _check(
             "single-h1",

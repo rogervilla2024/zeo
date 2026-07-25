@@ -25,7 +25,15 @@ fixes and re-run the tests until they pass. Tests decide; opinions do not.
    python check_agent_ready.py --url https://example.com
    python check_pagespeed.py --url https://example.com
    python check_rich_results.py --url https://example.com/target-page
+   # and against the local build output:
+   python check_js_budget.py --dist dist
+   python check_broken_links.py --dist dist
+   python check_rich_results.py --file dist/index.html
    ```
+
+   For article content also run the content gates where drafts are
+   available: check_ai_patterns.py and check_originality.py. Finish
+   with the visual-review skill when layout changed.
 
    Each prints a report and exits non-zero on failure, so the exit codes
    tell you which suites need work.

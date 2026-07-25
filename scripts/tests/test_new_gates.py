@@ -65,3 +65,23 @@ def test_lazy_alt_text_fails() -> None:
 
 def test_descriptive_alt_passes() -> None:
     assert _by_id(analyze_html(_GOOD_HTML), "alt-quality").passed
+
+
+def test_title_length_bounds() -> None:
+    long_title = _GOOD_HTML.replace(
+        "<title>A sensible test page title</title>", f"<title>{'x' * 80}</title>"
+    )
+    assert not _by_id(analyze_html(long_title), "title-length").passed
+    good = _GOOD_HTML.replace(
+        "<title>A sensible test page title</title>",
+        "<title>A sensible page title</title>",
+    )
+    assert _by_id(analyze_html(good), "title-length").passed
+
+
+def test_description_length_bounds() -> None:
+    assert _by_id(analyze_html(_GOOD_HTML), "description-length").passed
+    short = _GOOD_HTML.replace("A descriptive summary of this page ", "x").replace(
+        "that is long enough to fill a search snippet nicely.", ""
+    )
+    assert not _by_id(analyze_html(short), "description-length").passed

@@ -23,9 +23,10 @@ Sitemap: https://example.com/sitemap.xml
 """
 
 _GOOD_HTML = (
-    '<html lang="en"><head><title>T</title>'
+    '<html lang="en"><head><title>A sensible test page title</title>'
     '<meta name="viewport" content="width=device-width, initial-scale=1">'
-    '<meta name="description" content="d">'
+    '<meta name="description" content="A descriptive summary of this page '
+    'that is long enough to fill a search snippet nicely.">'
     '<meta property="og:image" content="https://example.com/og.png">'
     '<meta property="og:url" content="https://example.com/">'
     '<link rel="canonical" href="https://example.com/">'
