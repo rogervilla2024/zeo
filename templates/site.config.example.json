@@ -68,5 +68,11 @@
     "radius": "8px",
     "max_width": "72ch",
     "site_width": "1200px"
+  },
+  "images": {
+    "strategy": "svg-first",
+    "min": 2,
+    "max": 4,
+    "stock_provider": "pexels"
   }
 }

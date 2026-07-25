@@ -55,6 +55,8 @@ done because it builds; it is done when its screenshots pass review.
   color appears sparingly but visibly.
 - Mobile: no horizontal scroll, tap targets comfortable, nav usable.
 - Nothing overlaps, wraps awkwardly, or renders as unstyled HTML.
+- The article page shows real images (diagrams or photos) in the body;
+  an imageless article body is an automatic fail.
 
 ## Output
 
