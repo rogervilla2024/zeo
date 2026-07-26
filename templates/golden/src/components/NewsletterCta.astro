@@ -1,0 +1,106 @@
+---
+// Newsletter CTA block: a plain zero-JS HTML form. No client script,
+// no third-party embed - the form POSTs to a tiny endpoint you host
+// (see templates/deploy/newsletter-worker.md for a complete
+// Cloudflare Workers handler with honeypot and redirect).
+//
+// Renders nothing until site.config.json switches it on:
+//
+//   "newsletter": { "enabled": true, "action": "/api/subscribe" }
+//
+// Keep legal.has_newsletter in sync so the privacy page discloses the
+// signup (generate-trust-pages). The hidden "website" field is a spam
+// honeypot: humans never see it, bots fill it, the worker drops those
+// submissions.
+import config from "../../site.config.json";
+
+interface Props {
+  title?: string;
+  description?: string;
+  buttonLabel?: string;
+}
+
+const {
+  title = "Get new articles by email",
+  description = "One email when we publish. No spam, unsubscribe anytime.",
+  buttonLabel = "Subscribe",
+} = Astro.props;
+const newsletter = config.newsletter ?? { enabled: false, action: "" };
+---
+
+{newsletter.enabled && newsletter.action && (
+  <aside class="newsletter-cta" aria-label="Newsletter signup">
+    <h2>{title}</h2>
+    <p>{description}</p>
+    <form method="post" action={newsletter.action}>
+      <label for="newsletter-email">Email address</label>
+      <input
+        id="newsletter-email"
+        type="email"
+        name="email"
+        required
+        autocomplete="email"
+        placeholder="you@example.com"
+      />
+      <input
+        type="text"
+        name="website"
+        tabindex="-1"
+        autocomplete="off"
+        class="hp-field"
+        aria-hidden="true"
+      />
+      <button type="submit">{buttonLabel}</button>
+    </form>
+  </aside>
+)}
+
+<style>
+  .newsletter-cta {
+    margin: 2.5rem 0;
+    padding: 1.5rem;
+    border: 1px solid var(--color-muted);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+  .newsletter-cta h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.125rem;
+  }
+  .newsletter-cta p {
+    margin: 0 0 1rem;
+    font-size: 0.9rem;
+  }
+  .newsletter-cta form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .newsletter-cta label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .newsletter-cta input[type="email"] {
+    flex: 1 1 14rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-muted);
+    border-radius: var(--radius);
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+  .newsletter-cta .hp-field {
+    position: absolute;
+    left: -9999px;
+  }
+  .newsletter-cta button {
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--color-primary);
+    color: var(--color-background);
+    cursor: pointer;
+  }
+</style>
