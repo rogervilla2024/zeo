@@ -1,10 +1,14 @@
-"""Test for the offline gate score card runner."""
+"""Tests for the gate score card runner (offline and live)."""
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
-from seo_report import run_gates
+import pytest
+
+import seo_report
+from seo_report import gate_commands, main, run_gates
 
 
 def test_run_gates_on_minimal_dist(tmp_path: Path) -> None:
@@ -20,3 +24,66 @@ def test_run_gates_on_minimal_dist(tmp_path: Path) -> None:
     assert results["js-budget"] is True
     assert results["broken-links"] is True
     assert results["media-budget"] is True
+    assert "agent-ready" not in results
+
+
+def test_gate_commands_offline_only(tmp_path: Path) -> None:
+    commands = gate_commands(tmp_path / "dist")
+    assert [name for name, _ in commands] == [
+        "rich-results",
+        "js-budget",
+        "broken-links",
+        "media-budget",
+    ]
+    for _, argv in commands:
+        assert not any("{dist}" in part or "{live}" in part for part in argv)
+
+
+def test_gate_commands_with_live_url(tmp_path: Path) -> None:
+    commands = dict(gate_commands(tmp_path / "dist", "https://example.com"))
+    assert len(commands) == 6
+    assert commands["agent-ready"] == [
+        "check_agent_ready.py",
+        "--url",
+        "https://example.com",
+    ]
+    assert commands["canonical-host"] == [
+        "check_canonical_host.py",
+        "--domain",
+        "https://example.com",
+    ]
+
+
+def test_main_live_records_history(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    fake = {
+        "rich-results": True,
+        "js-budget": True,
+        "broken-links": True,
+        "media-budget": True,
+        "agent-ready": True,
+        "canonical-host": False,
+    }
+    monkeypatch.setattr(seo_report, "run_gates", lambda dist, live=None: fake)
+    history = tmp_path / ".seo-history.json"
+    code = main(
+        [
+            "--dist",
+            str(tmp_path),
+            "--history",
+            str(history),
+            "--live",
+            "https://example.com",
+        ]
+    )
+    assert code == 1
+    printed = capsys.readouterr().out
+    assert "Score: 5/6 gates (4 offline + 2 live)" in printed
+    assert "FAIL  canonical-host" in printed
+    saved = json.loads(history.read_text())
+    assert saved[-1]["live_url"] == "https://example.com"
+    assert saved[-1]["results"]["canonical-host"] is False
+    assert saved[-1]["score"] == 5

@@ -1,11 +1,14 @@
-"""CLI to run the full offline gate battery and emit a score card.
+"""CLI to run the full gate battery and emit a score card.
 
 Usage:
     python seo_report.py --dist dist --history .seo-history.json
+    python seo_report.py --dist dist --live https://example.com
 
-Runs every offline checker against the build output, prints a one-page
-pass/fail card, appends the result to a JSON history file, and shows
-the delta against the previous run. Exits 1 when any gate fails.
+Runs every offline checker against the build output - plus the live
+gates (agent-readiness, canonical host) against the deployed site when
+--live is given - prints a one-page pass/fail card, appends the result
+to a JSON history file, and shows the delta against the previous run.
+Exits 1 when any gate fails.
 """
 
 from __future__ import annotations
@@ -23,17 +26,43 @@ GATES: tuple[tuple[str, list[str]], ...] = (
     ("broken-links", ["check_broken_links.py", "--dist", "{dist}"]),
     ("media-budget", ["check_media_budget.py", "--dist", "{dist}"]),
 )
+LIVE_GATES: tuple[tuple[str, list[str]], ...] = (
+    ("agent-ready", ["check_agent_ready.py", "--url", "{live}"]),
+    ("canonical-host", ["check_canonical_host.py", "--domain", "{live}"]),
+)
 
 
-def run_gates(dist: Path) -> dict[str, bool]:
-    """Run every offline gate; True means passed."""
-    results: dict[str, bool] = {}
-    for name, template in GATES:
-        command = [sys.executable] + [
-            part.replace("{dist}", str(dist)) for part in template
+def gate_commands(
+    dist: Path, live_url: str | None = None
+) -> list[tuple[str, list[str]]]:
+    """Resolve the gate command lines for a run.
+
+    Args:
+        dist: Build output directory substituted into the offline
+            gates.
+        live_url: Deployed site URL; adds the live gates when given.
+
+    Returns:
+        ``(gate name, argv)`` pairs in run order (offline first).
+    """
+    commands = [
+        (name, [part.replace("{dist}", str(dist)) for part in template])
+        for name, template in GATES
+    ]
+    if live_url:
+        commands += [
+            (name, [part.replace("{live}", live_url) for part in template])
+            for name, template in LIVE_GATES
         ]
+    return commands
+
+
+def run_gates(dist: Path, live_url: str | None = None) -> dict[str, bool]:
+    """Run every gate; True means passed."""
+    results: dict[str, bool] = {}
+    for name, command in gate_commands(dist, live_url):
         completed = subprocess.run(
-            command, capture_output=True, cwd=Path(__file__).parent
+            [sys.executable] + command, capture_output=True, cwd=Path(__file__).parent
         )
         results[name] = completed.returncode == 0
     return results
@@ -44,15 +73,27 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dist", required=True, type=Path)
     parser.add_argument("--history", type=Path, help="JSON file to append results to.")
+    parser.add_argument(
+        "--live",
+        metavar="URL",
+        help="Deployed site URL; also runs the live gates "
+        "(agent-ready, canonical-host).",
+    )
     args = parser.parse_args(argv)
 
-    results = run_gates(args.dist)
+    results = run_gates(args.dist, args.live)
     passed = sum(results.values())
     print("SEO score card")
     print("=" * 30)
     for name, ok in results.items():
         print(f"{'PASS' if ok else 'FAIL':4}  {name}")
-    print(f"\nScore: {passed}/{len(results)} offline gates")
+    if args.live:
+        print(
+            f"\nScore: {passed}/{len(results)} gates "
+            f"({len(GATES)} offline + {len(LIVE_GATES)} live)"
+        )
+    else:
+        print(f"\nScore: {passed}/{len(results)} offline gates")
 
     if args.history:
         history: list[dict[str, object]] = []
@@ -67,7 +108,10 @@ def main(argv: list[str] | None = None) -> int:
             ]
             if changed:
                 print(f"Changed since last run: {', '.join(changed)}")
-        history.append({"results": results, "score": passed})
+        record: dict[str, object] = {"results": results, "score": passed}
+        if args.live:
+            record["live_url"] = args.live
+        history.append(record)
         args.history.write_bytes(orjson.dumps(history, option=orjson.OPT_INDENT_2))
         print(f"History updated: {args.history}")
 
