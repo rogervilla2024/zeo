@@ -91,6 +91,9 @@ remembering to do it.
 - JavaScript budget: content pages ship near-zero JS; the build is
   gated by `scripts/check_js_budget.py` (default 30 KB total). New
   scripts must earn their bytes; prefer native HTML behavior.
+  Pagefind is the one sanctioned exception: its assets live under
+  `dist/pagefind/`, load only on the /search page, and are excluded
+  from the budget by default (`--include-pagefind` counts them).
 - Fonts: default to the system stacks in the tokens. A webfont, if
   added, is self-hosted woff2, preloaded, `font-display: swap`.
 - The site ships an RSS feed at `/rss.xml` (BaseLayout advertises it);
