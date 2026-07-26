@@ -150,5 +150,10 @@ def test_software_application_rating_and_offer() -> None:
 
 
 def test_new_builders_registered() -> None:
-    for key in ("localbusiness", "jobposting", "course", "softwareapp"):
-        assert key in BUILDERS
+    for key, builder in (
+        ("localbusiness", local_business),
+        ("jobposting", job_posting),
+        ("course", course),
+        ("softwareapp", software_application),
+    ):
+        assert BUILDERS[key] is builder

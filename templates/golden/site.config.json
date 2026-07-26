@@ -37,7 +37,7 @@
   "seo": {
     "title_suffix": " | Example Site",
     "og_image": "/og-image.png",
-    "search_url_template": "https://example.com/search?q={search_term_string}"
+    "search_url_template": "/search?q={search_term_string}"
   },
   "legal": {
     "contact_email": "hello@example.com",
@@ -49,7 +49,6 @@
     "enabled": false,
     "client_id": "",
     "slots": [
-      "in-article",
       "article-end"
     ]
   },

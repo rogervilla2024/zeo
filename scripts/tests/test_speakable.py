@@ -78,4 +78,4 @@ def test_validate_accepts_speakable_list_and_string_selector() -> None:
 
 
 def test_speakable_registered() -> None:
-    assert "speakable" in BUILDERS
+    assert BUILDERS["speakable"] is speakable

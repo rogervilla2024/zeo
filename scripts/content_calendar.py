@@ -32,7 +32,8 @@ def _load_pace(config_path: Path | None) -> tuple[int, list[int]]:
     if config_path is None:
         return per_week, ramp
     config = orjson.loads(config_path.read_bytes())
-    content = config.get("content", {}) if isinstance(config, dict) else {}
+    raw_content = config.get("content") if isinstance(config, dict) else None
+    content = raw_content if isinstance(raw_content, dict) else {}
     raw_per_week = content.get("articles_per_week")
     if isinstance(raw_per_week, int) and raw_per_week > 0:
         per_week = raw_per_week
@@ -73,7 +74,7 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError, orjson.JSONDecodeError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
-    if args.per_week:
+    if args.per_week is not None:
         per_week = args.per_week
 
     start = args.start or date.today()

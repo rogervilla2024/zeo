@@ -92,7 +92,11 @@ def article_freshness(html: str) -> tuple[str, str] | None:
         Article node.
     """
     for node in _nodes(html):
-        if node.get("@type") not in ARTICLE_TYPES:
+        raw_type = node.get("@type")
+        node_types = raw_type if isinstance(raw_type, list) else [raw_type]
+        if not any(
+            entry in ARTICLE_TYPES for entry in node_types if isinstance(entry, str)
+        ):
             continue
         modified = node.get("dateModified") or node.get("datePublished")
         if not isinstance(modified, str) or not modified:

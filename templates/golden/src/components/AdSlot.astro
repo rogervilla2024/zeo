@@ -1,12 +1,13 @@
 ---
 // AdSense-readiness slot: an empty, layout-stable ad container.
 //
-// The theme ships ad-ready, not ad-bearing: slots reserve their space
-// from day one (no layout shift when ads go live) but render nothing
-// until site.config.json switches them on:
+// The theme ships ad-ready, not ad-bearing: a slot renders nothing at
+// all until site.config.json switches it on; once enabled, the
+// container reserves min-height space so the layout does not shift
+// while the pasted ad unit loads:
 //
 //   "ads": { "enabled": true, "client_id": "ca-pub-XXXX",
-//            "slots": ["in-article", "article-end"] }
+//            "slots": ["article-end"] }
 //
 // Going live is a config change plus pasting the provider's <ins>
 // unit inside the container below and adding the loader script once

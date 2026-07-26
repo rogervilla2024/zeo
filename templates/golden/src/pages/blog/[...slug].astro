@@ -26,6 +26,10 @@ const { Content, headings } = await render(post);
 const canonical = new URL(`/blog/${post.id}/`, config.domain).href;
 const published = post.data.pubDate.toISOString();
 const updated = (post.data.updatedDate ?? post.data.pubDate).toISOString();
+// Full ISO datetimes go to the JSON-LD; the visible byline gets
+// date-only strings (also valid for <time datetime>).
+const publishedDate = published.slice(0, 10);
+const updatedDate = updated.slice(0, 10);
 const ogImage = post.data.image ?? config.seo.og_image;
 
 const related = (await getCollection("blog"))
@@ -113,8 +117,8 @@ const faqSchema = post.data.faq.length
     <ArticleMeta
       authorName={post.data.author}
       authorUrl={post.data.authorUrl}
-      published={published}
-      updated={updated}
+      published={publishedDate}
+      updated={updatedDate}
       words={post.body ? post.body.split(/\s+/).length : undefined}
     />
     {post.data.takeaways.length > 0 && (

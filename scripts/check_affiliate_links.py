@@ -17,6 +17,7 @@ the check passes with a note.
 from __future__ import annotations
 
 import argparse
+import http.client
 import sys
 import urllib.error
 import urllib.request
@@ -29,15 +30,23 @@ from seo_content_forge.affiliates import AffiliateTable, parse_table, scan_dist
 
 def probe(url: str, timeout: float = 20.0) -> int:
     """Final HTTP status for a URL, following redirects; 0 on failure."""
-    request = urllib.request.Request(
-        url, headers={"User-Agent": "Mozilla/5.0 (compatible; seo-content-forge)"}
-    )
     try:
+        request = urllib.request.Request(
+            url, headers={"User-Agent": "Mozilla/5.0 (compatible; seo-content-forge)"}
+        )
         with urllib.request.urlopen(request, timeout=timeout) as response:
             return int(response.status)
     except urllib.error.HTTPError as exc:
         return int(exc.code)
-    except (urllib.error.URLError, TimeoutError, OSError):
+    except (
+        urllib.error.URLError,
+        http.client.HTTPException,
+        TimeoutError,
+        OSError,
+        ValueError,
+    ):
+        # Unreachable, malformed response, or an un-probeable URL: all
+        # report as dead rather than aborting the remaining probes.
         return 0
 
 

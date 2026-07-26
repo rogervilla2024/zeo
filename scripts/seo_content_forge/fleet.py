@@ -68,14 +68,18 @@ def site_report(name: str, runs: list[dict[str, object]]) -> SiteReport:
     """
     if not runs:
         raise ValueError(f"{name}: history is empty")
-    results = runs[-1].get("results")
+    latest = runs[-1]
+    if not isinstance(latest, dict):
+        raise ValueError(f"{name}: latest run is not a mapping")
+    results = latest.get("results")
     if not isinstance(results, dict) or not results:
         raise ValueError(f"{name}: latest run has no results mapping")
     gates = {str(gate): bool(ok) for gate, ok in results.items()}
     scores = [
-        sum(run_results.values())
+        sum(bool(ok) for ok in run_results.values())
         for run in runs
-        if isinstance(run_results := run.get("results"), dict)
+        if isinstance(run, dict)
+        and isinstance(run_results := run.get("results"), dict)
     ]
     return SiteReport(name=name, gates=gates, scores=scores)
 

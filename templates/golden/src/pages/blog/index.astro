@@ -1,7 +1,10 @@
 ---
 // Blog index: plain chronological list per the minimal variant spec.
+// The visible breadcrumb trail mirrors the BreadcrumbList JSON-LD -
+// Google only shows the rich result when the two agree.
 import { getCollection } from "astro:content";
 import config from "../../../site.config.json";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const posts = (await getCollection("blog")).sort(
@@ -31,6 +34,7 @@ const breadcrumb = {
 >
   <a slot="header" href="/">{config.site_name}</a>
   <section class="prose">
+    <Breadcrumbs items={[{ name: "Home", url: "/" }, { name: "Blog" }]} />
     <h1>Blog</h1>
     <ul>
       {posts.map((post) => (

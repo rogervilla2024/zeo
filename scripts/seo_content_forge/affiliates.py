@@ -12,7 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 
 @dataclass(slots=True)
@@ -72,6 +72,8 @@ def parse_table(data: object) -> AffiliateTable:
         url = str(entry.get("url", "")).strip()
         if not link_id or not url:
             raise ValueError(f"links[{index}] needs both id and url")
+        if not url.lower().startswith(("http://", "https://")):
+            raise ValueError(f"links[{index}]: url must start with http(s)://")
         if link_id in seen:
             raise ValueError(f"duplicate link id {link_id!r}")
         seen.add(link_id)
@@ -109,8 +111,17 @@ def page_anchors(html: str) -> list[tuple[str, str]]:
 
 
 def _host(url: str) -> str:
-    host = urlparse(url).netloc.lower()
+    # hostname (unlike netloc) lowercases and strips port and userinfo.
+    host = urlsplit(url).hostname or ""
     return host.removeprefix("www.")
+
+
+def is_external(href: str) -> bool:
+    """True for absolute http(s) and protocol-relative hrefs."""
+    scheme = urlsplit(href).scheme.lower()
+    if scheme in ("http", "https"):
+        return True
+    return not scheme and href.startswith("//")
 
 
 def is_affiliate(href: str, table: AffiliateTable) -> bool:
@@ -174,7 +185,7 @@ def scan_dist(dist: Path, table: AffiliateTable) -> list[Violation]:
         html = page.read_text(encoding="utf-8", errors="replace")
         relative = str(page.relative_to(dist))
         for href, rel in page_anchors(html):
-            if not href.startswith(("http://", "https://")):
+            if not is_external(href):
                 continue
             if not is_affiliate(href, table):
                 continue

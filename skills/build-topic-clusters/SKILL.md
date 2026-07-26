@@ -68,7 +68,12 @@ quarterly) so seasonal winners are published early enough to rank.
    holds them for the right week automatically; evergreen work fills
    the weeks in between.
 5. Output a 12-month seasonal table alongside the cluster map: month,
-   peak, target page, publish-by date, refresh-or-new.
+   peak, target page, target publish week (the `not_before` value),
+   refresh-or-new. Note that `not_before` is an earliest-allowed
+   floor, not a deadline: when weekly capacity is tight the planner
+   may land an item later, so check the rendered calendar for
+   seasonal items drifting past their publish window and re-order
+   priorities if one does.
 
 ## Proven cluster patterns
 

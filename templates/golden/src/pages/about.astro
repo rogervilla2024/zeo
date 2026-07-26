@@ -9,7 +9,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 <BaseLayout
   title="About"
   description={`Who is behind ${config.site_name} and how we work.`}
-  canonical={new URL("/about", config.domain).href}
+  canonical={new URL("/about/", config.domain).href}
   lang={config.default_language}
 >
   <a slot="header" href="/">{config.site_name}</a>

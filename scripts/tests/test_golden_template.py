@@ -79,18 +79,14 @@ def test_package_json_is_zero_js_static_build() -> None:
     assert "astro" in package["dependencies"]
 
 
+_BINARY_SUFFIXES = {".png", ".ico", ".jpg", ".jpeg", ".webp", ".svg", ".woff2"}
+
+
 def test_golden_files_are_ascii() -> None:
+    checked = 0
     for path in GOLDEN.rglob("*"):
-        if path.is_file() and path.suffix in {
-            ".astro",
-            ".css",
-            ".gitignore",
-            ".js",
-            ".json",
-            ".md",
-            ".mjs",
-            ".ts",
-            ".txt",
-        }:
+        if path.is_file() and path.suffix not in _BINARY_SUFFIXES:
             content = path.read_bytes()
             assert content.isascii(), f"{path} contains non-ASCII bytes"
+            checked += 1
+    assert checked > 20, "ASCII sweep unexpectedly skipped most files"

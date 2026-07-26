@@ -41,6 +41,32 @@ def test_site_report_rejects_empty_history() -> None:
         site_report("blog", [{"score": 0}])
 
 
+def test_site_report_rejects_non_dict_latest_and_skips_corrupt_runs() -> None:
+    with pytest.raises(ValueError, match="not a mapping"):
+        site_report("blog", ["oops"])  # type: ignore[list-item]
+    corrupt: list[dict[str, object]] = [
+        {"results": {"a": True}},
+        "corrupt-run",  # type: ignore[list-item]
+        {"results": {"a": False}},
+    ]
+    report = site_report("blog", corrupt)
+    assert report.scores == [1, 0]
+
+
+def test_main_skips_history_with_corrupt_latest_run(tmp_path: Path) -> None:
+    bad = tmp_path / "bad" / ".seo-history.json"
+    bad.parent.mkdir(parents=True)
+    bad.write_text(json.dumps(["oops"]))
+    _write_history(
+        tmp_path / "good" / ".seo-history.json",
+        [{"results": {"a": True}, "score": 1}],
+    )
+    output = tmp_path / "fleet.html"
+    code = main(["--scan", str(tmp_path), "--output", str(output)])
+    assert code == 1
+    assert "good" in output.read_text()
+
+
 def test_gate_columns_first_appearance_order() -> None:
     first = site_report("a", [{"results": {"x": True, "y": True}}])
     second = site_report("b", [{"results": {"y": False, "z": True}}])

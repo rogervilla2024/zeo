@@ -64,6 +64,17 @@ def test_find_stale_sorts_oldest_first_and_warns(tmp_path: Path) -> None:
     assert warnings == ["bad.html: unparseable date 'soon'"]
 
 
+def test_article_freshness_accepts_list_valued_type() -> None:
+    node = {
+        "@context": "https://schema.org",
+        "@type": ["BlogPosting", "Article"],
+        "url": "https://e.com/multi/",
+        "dateModified": "2025-01-01",
+    }
+    html = f'<script type="application/ld+json">{json.dumps(node)}</script>'
+    assert article_freshness(html) == ("https://e.com/multi/", "2025-01-01")
+
+
 def test_find_stale_boundary_is_inclusive(tmp_path: Path) -> None:
     (tmp_path / "edge.html").write_text(
         _article_html("https://e.com/edge/", "2026-01-26")
@@ -139,6 +150,27 @@ def test_main_dry_run_then_apply(tmp_path: Path) -> None:
     )
     saved = json.loads(queue.read_text())
     assert len(saved["queue"]) == 1
+
+
+def test_main_malformed_queue_exits_2(tmp_path: Path) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    (dist / "old.html").write_text(_article_html("https://e.com/old/", "2025-01-01"))
+    queue = tmp_path / "content-queue.json"
+    queue.write_text("not json")
+    code = main(
+        [
+            "--dist",
+            str(dist),
+            "--now",
+            "2026-07-26",
+            "--queue",
+            str(queue),
+            "--apply",
+        ]
+    )
+    assert code == 2
+    assert queue.read_text() == "not json"
 
 
 def test_main_nothing_stale(tmp_path: Path) -> None:

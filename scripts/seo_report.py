@@ -45,8 +45,11 @@ def gate_commands(
     Returns:
         ``(gate name, argv)`` pairs in run order (offline first).
     """
+    # The gate subprocesses run with cwd=scripts/, so a relative --dist
+    # must be resolved against the invoker's cwd first.
+    resolved = str(dist.resolve())
     commands = [
-        (name, [part.replace("{dist}", str(dist)) for part in template])
+        (name, [part.replace("{dist}", resolved) for part in template])
         for name, template in GATES
     ]
     if live_url:
@@ -80,6 +83,10 @@ def main(argv: list[str] | None = None) -> int:
         "(agent-ready, canonical-host).",
     )
     args = parser.parse_args(argv)
+
+    if not args.dist.is_dir():
+        print(f"{args.dist} is not a directory", file=sys.stderr)
+        return 2
 
     results = run_gates(args.dist, args.live)
     passed = sum(results.values())

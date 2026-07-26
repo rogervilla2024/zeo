@@ -20,6 +20,11 @@ const organization = {
     ? { sameAs: config.organization.sameAs }
     : {}),
 };
+// The template may be a path (recommended: "/search?q=...") or a full
+// URL; paths resolve against the domain so they can never go stale.
+const searchTemplate = config.seo.search_url_template.startsWith("http")
+  ? config.seo.search_url_template
+  : new URL(config.seo.search_url_template, config.domain).href;
 const website = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -29,7 +34,7 @@ const website = {
     "@type": "SearchAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: config.seo.search_url_template,
+      urlTemplate: searchTemplate,
     },
     "query-input": "required name=search_term_string",
   },
