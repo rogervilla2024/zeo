@@ -41,11 +41,11 @@ and orchestrate the subagents:
 
 - `write-article` (flagship, full pipeline), `humanize-content`,
   `fact-check`, `optimize-onpage-seo`, `audit-technical-seo`,
-  `build-topic-clusters`, `optimize-geo-aeo`, `generate-schema`,
-  `generate-sitemap`, `generate-llms-txt`, `test-site-readiness`,
-  `bootstrap-site`, `optimize-images`, `build-author-entity`,
-  `translate-article`, `refresh-content`, `generate-trust-pages`,
-  `find-theme`, `adopt-theme`, `visual-review`
+  `build-topic-clusters`, `content-calendar`, `optimize-geo-aeo`,
+  `generate-schema`, `generate-sitemap`, `generate-llms-txt`,
+  `test-site-readiness`, `bootstrap-site`, `optimize-images`,
+  `build-author-entity`, `translate-article`, `refresh-content`,
+  `generate-trust-pages`, `find-theme`, `adopt-theme`, `visual-review`
 
 Four gates are mandatory for every article: an FAQ block (3-5
 PAA-derived questions mirrored in FAQPage schema), contextual in-body
@@ -133,6 +133,10 @@ output is deterministic and standards-correct:
   prioritized opportunities (optional PAGESPEED_API_KEY via .env)
 - `check_rich_results.py` - extract and validate all JSON-LD on a live
   page or local HTML file (offline rich-results test)
+- `content_calendar.py` - map `content-queue.json` onto dated weeks by
+  priority, capped by `content.weekly_ramp` and
+  `content.articles_per_week`; markdown calendar out, `--apply` writes
+  the week assignments back
 - `fleet_report.py` - fold every site's `.seo-history.json` (written by
   `seo_report.py`) into one self-contained HTML dashboard: per-site
   gate matrix, score deltas, and trend; exits non-zero when any site
