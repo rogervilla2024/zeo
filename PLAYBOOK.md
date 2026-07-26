@@ -22,8 +22,9 @@ property, not a per-site effort.
    issue when a suite fails.
 5. Deploy to Cloudflare Pages (templates/deploy/cloudflare.md: Git
    integration or wrangler; _headers file in place), then run the live
-   checks once:
-   `check_agent_ready.py`, `check_pagespeed.py` against the live URL.
+   checks once: `seo_report.py --dist dist --live https://domain`
+   (adds the agent-ready and canonical-host gates to the card) plus
+   `check_pagespeed.py` against the live URL.
 6. Submit the sitemap in Google Search Console and Bing Webmaster
    Tools. Ranking and query data is tracked directly in Search Console
    by the operator.

@@ -59,9 +59,14 @@ here, and the test keeps the two in sync.
    on `/search`.
 
 9. Deploy (Cloudflare Pages; `public/_headers` ships the caching and
-   security headers) and run the live checks:
-   `check_agent_ready.py`, `check_pagespeed.py`,
-   `check_canonical_host.py`.
+   security headers) and re-run the card with the live gates included,
+   plus PageSpeed:
+
+   ```bash
+   python scripts/seo_report.py --dist dist \
+       --live https://example.com --history .seo-history.json
+   python scripts/check_pagespeed.py --url https://example.com
+   ```
 
 ## What is inside
 

@@ -147,6 +147,10 @@ output is deterministic and standards-correct:
   `seo_report.py`) into one self-contained HTML dashboard: per-site
   gate matrix, score deltas, and trend; exits non-zero when any site
   is red
+- `seo_report.py` - one-page score card over the whole gate battery
+  with JSON history and deltas per run; offline gates by default,
+  plus the live gates (agent-ready, canonical-host) with
+  `--live https://domain` after deploy
 - `check_affiliate_links.py` - enforce the affiliate policy from the
   central `affiliates.json` table: every affiliate anchor needs
   `rel="sponsored"` and a table entry; `--live` probes managed URLs
