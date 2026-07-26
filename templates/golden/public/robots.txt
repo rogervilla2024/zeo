@@ -1,0 +1,48 @@
+# AI-ready robots.txt template.
+# Replace {{SITE_URL}} with the site's absolute URL before deploying.
+# Every major AI crawler is named explicitly so access is a decision,
+# not an accident. Flip any Allow to Disallow to opt that bot out.
+
+User-agent: *
+Allow: /
+# Crawl control only - robots.txt does not deindex. Pages that must stay
+# out of results need a noindex meta tag instead. Internal search
+# results are thin pages; keep crawlers out of them.
+Disallow: /search?
+
+# Search and answer engines
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Model-training-only crawlers
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: {{SITE_URL}}/sitemap.xml

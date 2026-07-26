@@ -1,0 +1,44 @@
+---
+// Blog index: plain chronological list per the minimal variant spec.
+import { getCollection } from "astro:content";
+import config from "../../../site.config.json";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: config.domain },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Blog",
+      item: new URL("/blog/", config.domain).href,
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Blog"
+  description={`All articles from ${config.site_name}.`}
+  canonical={new URL("/blog/", config.domain).href}
+  lang={config.default_language}
+  jsonLd={[breadcrumb]}
+>
+  <a slot="header" href="/">{config.site_name}</a>
+  <section class="prose">
+    <h1>Blog</h1>
+    <ul>
+      {posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          <p>{post.data.description}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

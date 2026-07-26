@@ -1,0 +1,84 @@
+---
+// Base layout for sites scaffolded by this toolkit. Composes the SEO
+// head, tokens.css, the speed patterns, and the trust footer. Copy into
+// src/layouts/BaseLayout.astro. Generate tokens.css first:
+//   python scripts/generate_theme_css.py --config site.config.json \
+//       --output src/styles/tokens.css
+//
+// Width rules: .container is the SITE shell (--width-site, 1200px
+// default) for header, grids, and cards; article BODY TEXT must be
+// wrapped in .prose (--max-width, 72ch) inside it. Never put the whole
+// page in a 72ch column - that reads as a mobile layout on desktop.
+//
+// Speed rules baked in:
+// - Zero JavaScript by default; the only inline scripts are the
+//   theme toggle (2 lines) and Speculation Rules (declarative JSON).
+// - The LCP (hero) image on any page must use fetchpriority="high"
+//   and never loading="lazy"; all below-fold images lazy-load.
+// - Fonts: default token stacks are system fonts (zero requests). If
+//   a webfont is added, self-host it, preload the woff2 here, and set
+//   font-display: swap.
+import "../styles/tokens.css";
+import SeoHead from "../components/SeoHead.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  lang?: string;
+  ogImage?: string;
+  ogType?: "website" | "article";
+  hreflang?: { lang: string; href: string }[];
+  jsonLd?: object[];
+  noindex?: boolean;
+}
+
+const { lang = "en", ...seo } = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <SeoHead {...seo} />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
+    <script is:inline>
+      // Apply the stored theme before paint to avoid a flash.
+      const stored = localStorage.getItem("theme");
+      if (stored) document.documentElement.dataset.theme = stored;
+    </script>
+    <script type="speculationrules" is:inline set:html={JSON.stringify({
+      prerender: [{ where: { href_matches: "/*" }, eagerness: "moderate" }],
+    })} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="container">
+      <slot name="header" />
+      <button
+        id="theme-toggle"
+        type="button"
+        aria-label="Toggle dark mode"
+        style="float: right; background: none; border: 1px solid var(--color-muted); border-radius: var(--radius); padding: 0.25rem 0.5rem; cursor: pointer; color: var(--color-text);"
+      >Theme</button>
+    </header>
+    <main id="main" class="container">
+      <slot />
+    </main>
+    <Footer />
+    <script is:inline>
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        const root = document.documentElement;
+        const next = root.dataset.theme === "dark" ? "light" : "dark";
+        root.dataset.theme = next;
+        localStorage.setItem("theme", next);
+      });
+    </script>
+  </body>
+</html>

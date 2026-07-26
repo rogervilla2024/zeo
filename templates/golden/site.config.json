@@ -1,0 +1,78 @@
+{
+  "site_name": "Example Site",
+  "domain": "https://example.com",
+  "niche": "one-line description of the site's topic focus",
+  "audience": "who the site is for and what they want",
+  "brand_voice": "tone guidelines: e.g. expert but plain-spoken, no hype",
+  "languages": [
+    "en"
+  ],
+  "default_language": "en",
+  "organization": {
+    "name": "Example Site",
+    "logo": "/logo.png",
+    "sameAs": []
+  },
+  "authors": [
+    {
+      "name": "Jane Doe",
+      "role": "Senior Editor",
+      "url": "/authors/jane-doe",
+      "sameAs": []
+    }
+  ],
+  "content": {
+    "articles_per_week": 2,
+    "min_words": 2000,
+    "pillar_topics": [],
+    "launch_articles": 10,
+    "max_batch": 10,
+    "weekly_ramp": [
+      10,
+      15,
+      20,
+      30
+    ]
+  },
+  "seo": {
+    "title_suffix": " | Example Site",
+    "og_image": "/og-image.png",
+    "search_url_template": "https://example.com/search?q={search_term_string}"
+  },
+  "legal": {
+    "contact_email": "hello@example.com",
+    "analytics_provider": "",
+    "ad_provider": "",
+    "has_newsletter": false
+  },
+  "theme": {
+    "variant": "minimal",
+    "palette": {
+      "primary": "#0f766e",
+      "accent": "#f59e0b",
+      "background": "#ffffff",
+      "surface": "#f6f8fa",
+      "text": "#111827",
+      "muted": "#6b7280"
+    },
+    "dark_palette": {
+      "background": "#0b1220",
+      "surface": "#131c2e",
+      "text": "#e5e7eb",
+      "muted": "#9ca3af"
+    },
+    "fonts": {
+      "heading": "system-ui, -apple-system, sans-serif",
+      "body": "system-ui, -apple-system, sans-serif"
+    },
+    "radius": "8px",
+    "max_width": "72ch",
+    "site_width": "1200px"
+  },
+  "images": {
+    "strategy": "svg-first",
+    "min": 2,
+    "max": 4,
+    "stock_provider": "pexels"
+  }
+}

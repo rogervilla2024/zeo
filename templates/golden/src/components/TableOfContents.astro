@@ -1,0 +1,45 @@
+---
+// Table of contents with anchor links. Google surfaces these anchors
+// as jump links in results. Pass Astro's markdown headings:
+//   <TableOfContents headings={headings.filter((h) => h.depth === 2)} />
+interface Heading {
+  slug: string;
+  text: string;
+}
+interface Props {
+  headings: Heading[];
+  title?: string;
+}
+const { headings, title = "On this page" } = Astro.props;
+---
+
+{headings.length > 1 && (
+  <nav class="toc" aria-label="Table of contents">
+    <strong>{title}</strong>
+    <ol>
+      {headings.map((heading) => (
+        <li><a href={`#${heading.slug}`}>{heading.text}</a></li>
+      ))}
+    </ol>
+  </nav>
+)}
+
+<style>
+  .toc {
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    font-size: 0.9375rem;
+  }
+  .toc ol {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+  }
+  .toc a {
+    text-decoration: none;
+  }
+  .toc a:hover {
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,22 @@
+---
+// Static search page backed by Pagefind (run `npm run search:index`
+// after the build). Noindexed: internal search results are thin pages,
+// and robots.txt already keeps crawlers out of /search?.
+import config from "../../site.config.json";
+import SearchBox from "../components/SearchBox.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Search"
+  description={`Search ${config.site_name}.`}
+  canonical={new URL("/search", config.domain).href}
+  lang={config.default_language}
+  noindex={true}
+>
+  <a slot="header" href="/">{config.site_name}</a>
+  <section class="prose">
+    <h1>Search</h1>
+    <SearchBox />
+  </section>
+</BaseLayout>

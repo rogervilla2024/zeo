@@ -1,0 +1,24 @@
+---
+// Trust page stub. Run the generate-trust-pages skill to replace the
+// placeholders from templates/pages/about.md before launch; the Footer
+// links here sitewide, so the page must exist from the first build.
+import config from "../../site.config.json";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="About"
+  description={`Who is behind ${config.site_name} and how we work.`}
+  canonical={new URL("/about", config.domain).href}
+  lang={config.default_language}
+>
+  <a slot="header" href="/">{config.site_name}</a>
+  <section class="prose">
+    <h1>About {config.site_name}</h1>
+    <p>
+      {"{{MISSION_ONE_SENTENCE}}"} - fill this page from
+      templates/pages/about.md with the generate-trust-pages skill.
+      Do not publish with placeholders left in.
+    </p>
+  </section>
+</BaseLayout>

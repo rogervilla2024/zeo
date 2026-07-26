@@ -1,0 +1,132 @@
+---
+// Article template: minimal-variant page order (Breadcrumbs, h1,
+// ArticleMeta, KeyTakeaways, TableOfContents, body, FaqAccordion,
+// RelatedPosts) with Article + BreadcrumbList (+ FAQPage) JSON-LD that
+// mirrors the visible content, as the toolkit's gates require.
+import { getCollection, render } from "astro:content";
+import config from "../../../site.config.json";
+import ArticleMeta from "../../components/ArticleMeta.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import FaqAccordion from "../../components/FaqAccordion.astro";
+import KeyTakeaways from "../../components/KeyTakeaways.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import TableOfContents from "../../components/TableOfContents.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+
+const canonical = new URL(`/blog/${post.id}/`, config.domain).href;
+const published = post.data.pubDate.toISOString();
+const updated = (post.data.updatedDate ?? post.data.pubDate).toISOString();
+const ogImage = post.data.image ?? config.seo.og_image;
+
+const related = (await getCollection("blog"))
+  .filter((other) => other.id !== post.id)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3)
+  .map((other) => ({
+    title: other.data.title,
+    url: `/blog/${other.id}/`,
+    description: other.data.description,
+  }));
+
+const article = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
+  url: canonical,
+  description: post.data.description,
+  image: [new URL(ogImage, config.domain).href],
+  author: {
+    "@type": "Person",
+    name: post.data.author,
+    url: new URL(post.data.authorUrl, config.domain).href,
+  },
+  publisher: {
+    "@type": "Organization",
+    name: config.organization.name,
+    logo: {
+      "@type": "ImageObject",
+      url: new URL(config.organization.logo, config.domain).href,
+    },
+  },
+  datePublished: published,
+  dateModified: updated,
+};
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: config.domain },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Blog",
+      item: new URL("/blog/", config.domain).href,
+    },
+    { "@type": "ListItem", position: 3, name: post.data.title, item: canonical },
+  ],
+};
+const faqSchema = post.data.faq.length
+  ? [
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: post.data.faq.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: { "@type": "Answer", text: item.answer },
+        })),
+      },
+    ]
+  : [];
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  canonical={canonical}
+  lang={config.default_language}
+  ogImage={ogImage}
+  ogType="article"
+  jsonLd={[article, breadcrumb, ...faqSchema]}
+>
+  <a slot="header" href="/">{config.site_name}</a>
+  <article class="prose">
+    <Breadcrumbs
+      items={[
+        { name: "Home", url: "/" },
+        { name: "Blog", url: "/blog/" },
+        { name: post.data.title },
+      ]}
+    />
+    <h1>{post.data.title}</h1>
+    <ArticleMeta
+      authorName={post.data.author}
+      authorUrl={post.data.authorUrl}
+      published={published}
+      updated={updated}
+      words={post.body ? post.body.split(/\s+/).length : undefined}
+    />
+    {post.data.takeaways.length > 0 && (
+      <KeyTakeaways points={post.data.takeaways} />
+    )}
+    {headings.filter((h) => h.depth === 2).length >= 4 && (
+      <TableOfContents
+        headings={headings
+          .filter((h) => h.depth === 2)
+          .map((h) => ({ slug: h.slug, text: h.text }))}
+      />
+    )}
+    <Content />
+    {post.data.faq.length > 0 && <FaqAccordion items={post.data.faq} />}
+    {related.length > 0 && <RelatedPosts posts={related} />}
+  </article>
+</BaseLayout>

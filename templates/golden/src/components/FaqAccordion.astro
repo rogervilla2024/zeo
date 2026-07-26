@@ -1,0 +1,42 @@
+---
+// FAQ accordion using native <details> (zero JavaScript). The visible
+// questions/answers MUST match the FAQPage JSON-LD passed to the head;
+// build both from the same data:
+//   <FaqAccordion items={faqs} />  +  faq_page(faqs) via build_jsonld.py
+interface FaqItem {
+  question: string;
+  answer: string;
+}
+interface Props {
+  items: FaqItem[];
+  title?: string;
+}
+const { items, title = "Frequently asked questions" } = Astro.props;
+---
+
+<section class="faq" aria-label={title}>
+  <h2>{title}</h2>
+  {items.map((item) => (
+    <details>
+      <summary>{item.question}</summary>
+      <p>{item.answer}</p>
+    </details>
+  ))}
+</section>
+
+<style>
+  .faq details {
+    border: 1px solid var(--color-surface);
+    border-radius: var(--radius);
+    margin-bottom: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface);
+  }
+  .faq summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .faq p {
+    margin: 0.75rem 0 0;
+  }
+</style>

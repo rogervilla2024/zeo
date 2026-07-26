@@ -1,0 +1,52 @@
+---
+// Pros and cons block for review/comparison content. Pair with
+// Product/Review schema where a rating is shown.
+//   <ProsCons pros={["Fast"]} cons={["Pricey"]} />
+interface Props {
+  pros: string[];
+  cons: string[];
+  prosTitle?: string;
+  consTitle?: string;
+}
+const { pros, cons, prosTitle = "Pros", consTitle = "Cons" } = Astro.props;
+---
+
+<div class="pros-cons">
+  <div class="col pros">
+    <strong>{prosTitle}</strong>
+    <ul>{pros.map((item) => <li>{item}</li>)}</ul>
+  </div>
+  <div class="col cons">
+    <strong>{consTitle}</strong>
+    <ul>{cons.map((item) => <li>{item}</li>)}</ul>
+  </div>
+</div>
+
+<style>
+  .pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  @media (max-width: 600px) {
+    .pros-cons {
+      grid-template-columns: 1fr;
+    }
+  }
+  .col {
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+  }
+  .pros {
+    border-top: 4px solid var(--color-primary);
+  }
+  .cons {
+    border-top: 4px solid var(--color-accent);
+  }
+  .col ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+  }
+</style>

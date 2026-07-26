@@ -1,0 +1,43 @@
+---
+// Static full-text search via Pagefind (zero backend). Setup in the
+// site project:
+//   npm i -D pagefind && add to package.json build:
+//     "build": "astro build && pagefind --site dist"
+// Then place this component on /search and point the WebSite schema's
+// SearchAction at /search?q={search_term_string} so the markup matches
+// a real search page.
+interface Props {
+  placeholder?: string;
+}
+const { placeholder = "Search this site" } = Astro.props;
+---
+
+<div id="search" class="search-box" data-placeholder={placeholder}></div>
+
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+<script src="/pagefind/pagefind-ui.js" is:inline></script>
+<script is:inline>
+  window.addEventListener("DOMContentLoaded", () => {
+    const el = document.getElementById("search");
+    new PagefindUI({
+      element: "#search",
+      showSubResults: true,
+      translations: { placeholder: el.dataset.placeholder },
+    });
+    const params = new URLSearchParams(location.search);
+    const query = params.get("q");
+    if (query) {
+      const input = el.querySelector("input");
+      if (input) {
+        input.value = query;
+        input.dispatchEvent(new Event("input"));
+      }
+    }
+  });
+</script>
+
+<style>
+  .search-box {
+    margin: 1.5rem 0;
+  }
+</style>

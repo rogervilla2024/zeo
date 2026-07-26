@@ -67,6 +67,11 @@ bootstrap-site skill copies into new projects:
 
 - `site.config.example.json` - the per-site context file (niche, voice,
   languages, schema defaults) that every skill reads
+- `golden/` - the stored perfect `/new-site` output: a complete
+  minimal-variant Astro site that passes the offline gates by
+  construction, so a new site is a copy of this directory plus a
+  site.config.json change; its theme copies are kept byte-identical to
+  `theme/` by `tests/test_golden_template.py`
 - `robots.txt` - AI-ready robots template with every major AI crawler
   named explicitly and a Sitemap directive
 - `theme/` - the full theme layer: design tokens rendered from

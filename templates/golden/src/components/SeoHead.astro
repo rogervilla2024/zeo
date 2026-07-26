@@ -1,0 +1,85 @@
+---
+// SEO head component for Astro sites scaffolded by seo-content-forge.
+// Copy into src/components/SeoHead.astro and place site.config.json at
+// the project root. Use inside the <head> of your base layout:
+//
+//   <SeoHead
+//     title={frontmatter.title}
+//     description={frontmatter.description}
+//     canonical={new URL(Astro.url.pathname, config.domain).href}
+//     jsonLd={[articleNode, breadcrumbNode]}
+//   />
+//
+// Sitewide values (title suffix, og image, domain, languages) come from
+// site.config.json; per-page values come from props.
+import config from "../../site.config.json";
+
+interface HreflangAlternate {
+  lang: string;
+  href: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  ogImage?: string;
+  ogType?: "website" | "article";
+  hreflang?: HreflangAlternate[];
+  jsonLd?: object[];
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonical,
+  ogImage = config.seo.og_image,
+  ogType = "website",
+  hreflang = [],
+  jsonLd = [],
+  noindex = false,
+} = Astro.props;
+
+const fullTitle = `${title}${config.seo.title_suffix}`;
+const absoluteOgImage = ogImage.startsWith("http")
+  ? ogImage
+  : new URL(ogImage, config.domain).href;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex ? (
+  <meta name="robots" content="noindex, nofollow" />
+) : (
+  <meta name="robots" content="max-image-preview:large" />
+)}
+
+<meta property="og:type" content={ogType} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={absoluteOgImage} />
+<meta property="og:site_name" content={config.site_name} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={absoluteOgImage} />
+
+{hreflang.map((alt) => (
+  <link rel="alternate" hreflang={alt.lang} href={alt.href} />
+))}
+{hreflang.length > 0 && (
+  <link
+    rel="alternate"
+    hreflang="x-default"
+    href={hreflang.find((a) => a.lang === config.default_language)?.href ??
+      canonical}
+  />
+)}
+
+{jsonLd.map((node) => (
+  <script type="application/ld+json" set:html={JSON.stringify(node)} />
+))}
