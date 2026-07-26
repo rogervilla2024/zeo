@@ -87,4 +87,5 @@ def test_builders_registry_is_complete() -> None:
         "jobposting",
         "course",
         "softwareapp",
+        "speakable",
     }

@@ -32,6 +32,7 @@ _REQUIRED: dict[str, tuple[str, ...]] = {
     "JobPosting": ("title", "description", "datePosted", "hiringOrganization"),
     "Course": ("name", "description"),
     "SoftwareApplication": ("name", "offers"),
+    "WebPage": ("name", "url"),
 }
 _RECOMMENDED: dict[str, tuple[str, ...]] = {
     "Article": ("image", "dateModified", "publisher", "description"),
@@ -79,6 +80,42 @@ class ValidationResult:
         return not self.errors
 
 
+def _selector_list_ok(value: object) -> bool:
+    """True for a non-empty string or non-empty list of strings."""
+    if isinstance(value, str):
+        return bool(value)
+    return (
+        isinstance(value, list)
+        and bool(value)
+        and all(isinstance(entry, str) and entry for entry in value)
+    )
+
+
+def _check_speakable(value: object) -> list[str]:
+    """Structural errors for a node's ``speakable`` property.
+
+    Args:
+        value: The ``speakable`` payload - one SpeakableSpecification
+            object or a list of them.
+
+    Returns:
+        Blocking problems; empty when the specification is well-formed.
+    """
+    specs = value if isinstance(value, list) else [value]
+    errors: list[str] = []
+    for spec in specs:
+        if not isinstance(spec, dict):
+            errors.append("speakable: entry is not an object")
+            continue
+        if spec.get("@type") != "SpeakableSpecification":
+            errors.append('speakable: @type must be "SpeakableSpecification"')
+        if not _selector_list_ok(spec.get("cssSelector")) and not _selector_list_ok(
+            spec.get("xpath")
+        ):
+            errors.append("speakable: needs a non-empty cssSelector or xpath")
+    return errors
+
+
 def validate_node(node: dict[str, object]) -> ValidationResult:
     """Validate a single JSON-LD node.
 
@@ -98,6 +135,9 @@ def validate_node(node: dict[str, object]) -> ValidationResult:
     if not isinstance(raw_type, str) or not raw_type:
         errors.append("@type is missing")
         return ValidationResult("unknown", errors, warnings)
+
+    if "speakable" in node:
+        errors.extend(_check_speakable(node["speakable"]))
 
     if raw_type not in _REQUIRED:
         warnings.append(f"@type {raw_type!r} has no rich-result rule set; skipping")
