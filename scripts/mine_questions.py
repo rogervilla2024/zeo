@@ -29,6 +29,33 @@ from seo_content_forge.questions import (
 _API = "https://suggestqueries.google.com/complete/search"
 
 
+def suggest_url(query: str, lang: str) -> str:
+    """The autocomplete request URL for one query.
+
+    ``ie``/``oe`` pin both directions to UTF-8: without ``oe=utf-8``
+    the endpoint answers some languages in a legacy charset (e.g.
+    ISO-8859-9 for ``hl=tr``), which corrupts every non-ASCII
+    character downstream.
+
+    Args:
+        query: The expanded autocomplete query.
+        lang: Interface language code, e.g. ``tr``.
+
+    Returns:
+        The full request URL.
+    """
+    params = urllib.parse.urlencode(
+        {
+            "client": "firefox",
+            "hl": lang,
+            "ie": "utf-8",
+            "oe": "utf-8",
+            "q": query,
+        }
+    )
+    return f"{_API}?{params}"
+
+
 def main(argv: list[str] | None = None) -> int:
     """Entry point. Returns 0 when at least one question was found."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -40,12 +67,9 @@ def main(argv: list[str] | None = None) -> int:
 
     batches: list[list[str]] = []
     for query in expand_queries(args.seed, args.lang):
-        params = urllib.parse.urlencode(
-            {"client": "firefox", "hl": args.lang, "q": query}
-        )
-        result = fetch(f"{_API}?{params}")
+        result = fetch(suggest_url(query, args.lang))
         if result.ok:
-            batches.append(parse_suggestions(result.text.encode()))
+            batches.append(parse_suggestions(result.text))
 
     questions = dedupe_questions(batches, args.seed, limit=args.limit)
     if not questions:

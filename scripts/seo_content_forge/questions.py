@@ -10,6 +10,8 @@ fetching.
 
 from __future__ import annotations
 
+import unicodedata
+
 import orjson
 
 QUESTION_PREFIXES: dict[str, tuple[str, ...]] = {
@@ -34,7 +36,7 @@ def expand_queries(seed: str, lang: str) -> list[str]:
     return queries
 
 
-def parse_suggestions(payload: bytes) -> list[str]:
+def parse_suggestions(payload: bytes | str) -> list[str]:
     """Parse a Google Suggest response into suggestion strings."""
     try:
         data = orjson.loads(payload)
@@ -45,9 +47,32 @@ def parse_suggestions(payload: bytes) -> list[str]:
     return []
 
 
+def _fold(text: str) -> str:
+    """Casefold and strip diacritics for accent-insensitive matching.
+
+    Turkish seeds and suggestions mix accented and ASCII spellings
+    ("sarımsak" vs "sarimsak"); matching on the folded form keeps the
+    topic filter working in both directions. Dotless i (U+0131) does
+    not decompose under NFKD, so it is mapped explicitly.
+
+    Args:
+        text: Text to fold; used for comparison only, never for output.
+
+    Returns:
+        Lowercased text with combining marks removed.
+    """
+    folded = text.casefold().replace("ı", "i")
+    decomposed = unicodedata.normalize("NFKD", folded)
+    return "".join(ch for ch in decomposed if not unicodedata.combining(ch))
+
+
 def dedupe_questions(batches: list[list[str]], seed: str, limit: int = 40) -> list[str]:
-    """Merge suggestion batches: on-topic, deduplicated, order-stable."""
-    seed_words = [word for word in seed.lower().split() if len(word) > 2]
+    """Merge suggestion batches: on-topic, deduplicated, order-stable.
+
+    The on-topic filter compares accent-folded forms, so a seed word
+    matches suggestions regardless of diacritic spelling differences.
+    """
+    seed_words = [_fold(word) for word in seed.split() if len(word) > 2]
     seen: set[str] = set()
     merged: list[str] = []
     for batch in batches:
@@ -55,7 +80,8 @@ def dedupe_questions(batches: list[list[str]], seed: str, limit: int = 40) -> li
             normalized = " ".join(suggestion.lower().split())
             if normalized in seen or len(normalized) < 8:
                 continue
-            if seed_words and not any(word in normalized for word in seed_words):
+            folded = _fold(normalized)
+            if seed_words and not any(word in folded for word in seed_words):
                 continue
             seen.add(normalized)
             merged.append(normalized)
