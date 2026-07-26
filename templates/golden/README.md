@@ -45,18 +45,16 @@ here, and the test keeps the two in sync.
 7. Generate `llms.txt` (generate-llms-txt skill) and the sitemap
    (`scripts/generate_sitemap.py`, or point robots.txt at the sitemap
    your framework integration emits) into `public/`.
-8. Build and gate:
+8. Build, index search, and gate:
 
    ```bash
-   npm install && npm run build
+   npm install && npm run build && npm run search:index
    python scripts/seo_report.py --dist dist --history .seo-history.json
    ```
 
-   Optional static search: `npm run search:index` renders the Pagefind
-   index into `dist/pagefind/`. Run it after `seo_report.py`, or raise
-   `check_js_budget.py --max-kb` accordingly - Pagefind's UI script is
-   the one sanctioned exception to the zero-JS default and loads only
-   on `/search`.
+   `search:index` renders the Pagefind index into `dist/pagefind/` -
+   the one sanctioned exception to the zero-JS default (it loads only
+   on `/search` and is excluded from the JS budget gate).
 
 9. Deploy (Cloudflare Pages; `public/_headers` ships the caching and
    security headers) and re-run the card with the live gates included,
