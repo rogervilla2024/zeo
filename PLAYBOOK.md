@@ -31,7 +31,10 @@ property, not a per-site effort.
 ## Weekly, per site
 
 1. Produce content at the cadence in site.config.json
-   (`content.articles_per_week`) with `/write-blog`. The pipeline
+   (`content.articles_per_week`) with `/write-blog`, working from the
+   week's slice of the content calendar (content-calendar skill;
+   `content-queue.json` is the backlog, `content_calendar.py` maps it
+   to weeks under the ramp rules). The pipeline
    enforces, per article:
    - FAQ block (3-5 PAA-derived questions + FAQPage schema)
    - contextual in-body internal links (`suggest_internal_links.py`,
