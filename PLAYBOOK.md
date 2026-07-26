@@ -58,7 +58,10 @@ property, not a per-site effort.
    before polishing green ones.
 2. Review Search Console for pages with declining clicks or position
    (the operator exports or pastes the data) and queue the worst ones
-   for `refresh-content`.
+   for `refresh-content`. Independently of the data, run
+   `queue_refresh_candidates.py --dist dist --apply`: every article
+   not substantively updated in 6 months goes into the refresh queue,
+   so nothing decays unnoticed between Search Console reviews.
 3. Check internal-link health after the month's growth: orphaned new
    pages get reverse links (`internal-link-strategist`).
 

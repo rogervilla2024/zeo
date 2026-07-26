@@ -32,8 +32,10 @@ optional `keyword`, `url` (refresh items), `source`, and `week_of`
 1. Build or update the queue. Seed `new` items from the
    build-topic-clusters roadmap (priority follows the roadmap wave;
    keyword from the cluster map). Add `refresh` items for decaying
-   pages. Never delete `done` items - they are the record the
-   originality and interlinking passes rely on.
+   pages: `queue_refresh_candidates.py --dist dist --apply` queues
+   every article not updated in 6 months, plus whatever Search
+   Console data flags. Never delete `done` items - they are the
+   record the originality and interlinking passes rely on.
 2. Run the planner and review the calendar with the user:
 
    ```bash

@@ -137,6 +137,10 @@ output is deterministic and standards-correct:
   priority, capped by `content.weekly_ramp` and
   `content.articles_per_week`; markdown calendar out, `--apply` writes
   the week assignments back
+- `queue_refresh_candidates.py` - scan the build output for articles
+  whose Article JSON-LD freshness date is older than the cutoff
+  (default 6 months) and, with `--apply`, append them to
+  content-queue.json as refresh items
 - `fleet_report.py` - fold every site's `.seo-history.json` (written by
   `seo_report.py`) into one self-contained HTML dashboard: per-site
   gate matrix, score deltas, and trend; exits non-zero when any site
