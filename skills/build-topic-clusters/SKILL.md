@@ -43,6 +43,33 @@ You may delegate keyword expansion to the `keyword-researcher` subagent, competi
 - [ ] Roadmap is prioritized by opportunity and business value.
 - [ ] Map is site-agnostic and driven by the provided niche inputs.
 
+## Seasonal content planner
+
+Every niche has a yearly rhythm; plan it once per year (and re-check
+quarterly) so seasonal winners are published early enough to rank.
+
+1. Map the niche's year. For each month, list the recurring demand
+   peaks that touch the niche: seasons and weather, holidays and
+   gifting moments, buying cycles (sales events, model-year releases),
+   the sport/school/tax/travel calendar, and annual "best X for
+   <year>" refresh moments. Only include peaks with a real search
+   pattern in the site's locale - a generic holiday list is noise.
+2. Turn each peak into pages: usually one seasonal cluster article per
+   peak (plus a refresh task for last year's page when one exists -
+   update in place, never a new near-duplicate page per year; keep the
+   URL evergreen, without a year, so authority compounds).
+3. Work back from the peak: schedule publication 6-8 weeks before
+   demand rises so the page has time to be crawled, indexed, and rank.
+   That publish date, not the peak date, is the planning input.
+4. Feed the calendar: append the seasonal pages to
+   `content-queue.json` with `source: "seasonal-map"`, a priority in
+   line with their business value, and `not_before` set to the
+   publish date from step 3. The content-calendar skill's planner
+   holds them for the right week automatically; evergreen work fills
+   the weeks in between.
+5. Output a 12-month seasonal table alongside the cluster map: month,
+   peak, target page, publish-by date, refresh-or-new.
+
 ## Proven cluster patterns
 
 Beyond pillar+cluster, two page archetypes compound authority in most

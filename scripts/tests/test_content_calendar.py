@@ -73,6 +73,42 @@ def test_schedule_overflow_beyond_horizon() -> None:
     assert overflow[0].status == "queued"
 
 
+def test_schedule_not_before_holds_seasonal_items() -> None:
+    items = [
+        QueueItem(topic="seasonal", priority=1, not_before="2026-08-15"),
+        QueueItem(topic="evergreen", priority=2),
+    ]
+    plans, overflow = schedule(items, date(2026, 8, 3), 1, [], weeks=3)
+    # Week 1 (Aug 3-9) ends before Aug 15; week 2 (Aug 10-16) reaches it.
+    assert [item.topic for item in plans[0].items] == ["evergreen"]
+    assert [item.topic for item in plans[1].items] == ["seasonal"]
+    assert plans[1].items[0].week_of == "2026-08-10"
+    assert overflow == []
+
+
+def test_schedule_not_before_beyond_horizon_overflows() -> None:
+    items = [QueueItem(topic="next year", not_before="2027-01-01")]
+    plans, overflow = schedule(items, date(2026, 8, 3), 5, [], weeks=4)
+    assert all(not plan.items for plan in plans)
+    assert [item.topic for item in overflow] == ["next year"]
+    assert items[0].status == "queued"
+
+
+def test_parse_queue_validates_not_before() -> None:
+    items = parse_queue([{"topic": "x", "not_before": "2026-12-01"}])
+    assert items[0].not_before == "2026-12-01"
+    assert items[0].to_json()["not_before"] == "2026-12-01"
+    with pytest.raises(ValueError, match="not_before"):
+        parse_queue([{"topic": "x", "not_before": "December"}])
+
+
+def test_render_markdown_shows_seasonal_window() -> None:
+    items = [QueueItem(topic="gift guide", priority=1, not_before="2026-08-03")]
+    plans, overflow = schedule(items, date(2026, 8, 3), 1, [], weeks=1)
+    text = render_markdown(plans, overflow)
+    assert "- [new] gift guide (window opens 2026-08-03)" in text
+
+
 def test_render_markdown_lists_weeks_and_overflow() -> None:
     items = [
         QueueItem(topic="a", priority=1),
