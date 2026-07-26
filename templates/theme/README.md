@@ -46,6 +46,12 @@ remembering to do it.
     rule; feed it same-cluster pages
   - `SearchBox.astro` - Pagefind static search; makes the WebSite
     SearchAction real (point it at /search?q={search_term_string})
+  - `NewsletterCta.astro` - newsletter signup as a plain zero-JS HTML
+    form with a honeypot field; renders only when `newsletter.enabled`
+    is true in site.config.json and POSTs to `newsletter.action`
+    (matching Cloudflare Workers endpoint in
+    `templates/deploy/newsletter-worker.md`; keep legal.has_newsletter
+    in sync for the privacy disclosure)
   - `AdSlot.astro` - AdSense-readiness slot: reserves layout-stable
     space per named slot but renders nothing until `ads.enabled` in
     site.config.json is true and the slot name is listed in

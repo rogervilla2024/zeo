@@ -53,6 +53,10 @@
       "article-end"
     ]
   },
+  "newsletter": {
+    "enabled": false,
+    "action": "/api/subscribe"
+  },
   "theme": {
     "variant": "minimal",
     "palette": {
