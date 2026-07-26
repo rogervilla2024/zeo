@@ -46,6 +46,13 @@ remembering to do it.
     rule; feed it same-cluster pages
   - `SearchBox.astro` - Pagefind static search; makes the WebSite
     SearchAction real (point it at /search?q={search_term_string})
+  - `AdSlot.astro` - AdSense-readiness slot: reserves layout-stable
+    space per named slot but renders nothing until `ads.enabled` in
+    site.config.json is true and the slot name is listed in
+    `ads.slots`. Going live is a config flip plus pasting the ad unit
+    (and disclosing the provider via legal.ad_provider on the privacy
+    page). Never place a slot above the h1 or between the h1 and the
+    first paragraph.
 
 ## Rules the theme must keep (framework-independent)
 

@@ -5,6 +5,7 @@
 // mirrors the visible content, as the toolkit's gates require.
 import { getCollection, render } from "astro:content";
 import config from "../../../site.config.json";
+import AdSlot from "../../components/AdSlot.astro";
 import ArticleMeta from "../../components/ArticleMeta.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import FaqAccordion from "../../components/FaqAccordion.astro";
@@ -126,6 +127,7 @@ const faqSchema = post.data.faq.length
       />
     )}
     <Content />
+    <AdSlot name="article-end" />
     {post.data.faq.length > 0 && <FaqAccordion items={post.data.faq} />}
     {related.length > 0 && <RelatedPosts posts={related} />}
   </article>

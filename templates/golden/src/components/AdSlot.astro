@@ -1,0 +1,49 @@
+---
+// AdSense-readiness slot: an empty, layout-stable ad container.
+//
+// The theme ships ad-ready, not ad-bearing: slots reserve their space
+// from day one (no layout shift when ads go live) but render nothing
+// until site.config.json switches them on:
+//
+//   "ads": { "enabled": true, "client_id": "ca-pub-XXXX",
+//            "slots": ["in-article", "article-end"] }
+//
+// Going live is a config change plus pasting the provider's <ins>
+// unit inside the container below and adding the loader script once
+// in BaseLayout. Keep legal.ad_provider in sync so the privacy page
+// discloses the provider (generate-trust-pages). Placement rules:
+// never above the page h1, never between the h1 and the first
+// paragraph, and keep content-to-ad ratio high - one slot per screen
+// of content at most.
+import config from "../../site.config.json";
+
+interface Props {
+  name: string;
+  minHeight?: string;
+}
+
+const { name, minHeight = "280px" } = Astro.props;
+const ads = config.ads ?? { enabled: false, client_id: "", slots: [] };
+const active = ads.enabled && ads.slots.includes(name);
+---
+
+{active && (
+  <div
+    class="ad-slot"
+    data-ad-client={ads.client_id}
+    data-ad-slot={name}
+    style={`min-height: ${minHeight};`}
+  >
+    <!-- Paste the ad unit for this slot here, e.g. AdSense
+         <ins class="adsbygoogle" ...> with the matching slot id.
+         Until then the reserved space keeps the layout stable. -->
+  </div>
+)}
+
+<style>
+  .ad-slot {
+    margin: 2rem 0;
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+</style>

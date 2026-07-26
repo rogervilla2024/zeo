@@ -45,6 +45,14 @@
     "ad_provider": "",
     "has_newsletter": false
   },
+  "ads": {
+    "enabled": false,
+    "client_id": "",
+    "slots": [
+      "in-article",
+      "article-end"
+    ]
+  },
   "theme": {
     "variant": "minimal",
     "palette": {
