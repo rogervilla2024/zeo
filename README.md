@@ -147,6 +147,9 @@ output is deterministic and standards-correct:
   `seo_report.py`) into one self-contained HTML dashboard: per-site
   gate matrix, score deltas, and trend; exits non-zero when any site
   is red
+- `check_toolkit_version.py` - warn when this toolkit clone is behind
+  upstream (commit count, plugin version, optional HEAD age), so
+  process improvements actually reach every site
 - `export_toolkit.py` - lift this directory into its own standalone git
   repository (`--dest`, optional `--remote`)
 
