@@ -24,8 +24,10 @@ drives the weekly loop from it.
 `content-queue.json` holds `{"queue": [...]}` where each item has:
 `topic` (required), `type` (`new` or `refresh`), `priority` (lower
 schedules earlier), `status` (`queued`, `scheduled`, `done`),
-optional `keyword`, `url` (refresh items), `source`, and `week_of`
-(set by the planner).
+optional `keyword`, `url` (refresh items), `source`, `week_of` (set
+by the planner), and `not_before` (earliest publish date - seasonal
+items from the build-topic-clusters seasonal planner set this, and
+the planner holds them until a week whose window reaches that date).
 
 ## Instructions
 

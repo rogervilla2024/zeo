@@ -32,9 +32,12 @@ class QueueItem:
         keyword: Primary target keyword, if already chosen.
         url: Existing page URL (refresh items).
         source: Where the item came from (cluster-map, refresh-queue,
-            manual).
+            seasonal-map, manual).
         week_of: ISO date of the scheduled week's first day, set by the
             planner.
+        not_before: Earliest allowed publish date (ISO). Seasonal items
+            set this so they land in their window, not just next in
+            line.
     """
 
     topic: str
@@ -45,6 +48,7 @@ class QueueItem:
     url: str = ""
     source: str = "manual"
     week_of: str = ""
+    not_before: str = ""
 
     def to_json(self) -> dict[str, object]:
         """Serialize for content-queue.json, dropping empty fields."""
@@ -57,6 +61,7 @@ class QueueItem:
             "url": self.url,
             "source": self.source,
             "week_of": self.week_of,
+            "not_before": self.not_before,
         }
         return {key: value for key, value in raw.items() if value != ""}
 
@@ -108,11 +113,19 @@ def parse_queue(data: object) -> list[QueueItem]:
             url=str(entry.get("url", "")),
             source=str(entry.get("source", "manual")),
             week_of=str(entry.get("week_of", "")),
+            not_before=str(entry.get("not_before", "")),
         )
         if item.item_type not in VALID_TYPES:
             raise ValueError(f"queue item {index}: unknown type {item.item_type!r}")
         if item.status not in VALID_STATUSES:
             raise ValueError(f"queue item {index}: unknown status {item.status!r}")
+        if item.not_before:
+            try:
+                date.fromisoformat(item.not_before)
+            except ValueError:
+                raise ValueError(
+                    f"queue item {index}: not_before must be YYYY-MM-DD"
+                ) from None
         items.append(item)
     return items
 
@@ -146,7 +159,9 @@ def schedule(
 
     Only items with status ``"queued"`` are placed; scheduled and done
     items are left untouched. Placed items get status ``"scheduled"``
-    and their ``week_of`` date set.
+    and their ``week_of`` date set. An item with ``not_before`` waits
+    for the first week whose window (start through start plus six
+    days) reaches that date - the seasonal-planner hook.
 
     Args:
         items: The full queue (mutated in place for placed items).
@@ -170,17 +185,23 @@ def schedule(
         key=lambda item: item.priority,
     )
     overflow: list[QueueItem] = []
-    plan_iter = iter(plans)
-    current = next(plan_iter, None)
     for item in pending:
-        while current is not None and len(current.items) >= current.capacity:
-            current = next(plan_iter, None)
-        if current is None:
+        earliest = date.fromisoformat(item.not_before) if item.not_before else None
+        target = next(
+            (
+                plan
+                for plan in plans
+                if len(plan.items) < plan.capacity
+                and (earliest is None or plan.start + timedelta(days=6) >= earliest)
+            ),
+            None,
+        )
+        if target is None:
             overflow.append(item)
             continue
         item.status = "scheduled"
-        item.week_of = current.start.isoformat()
-        current.items.append(item)
+        item.week_of = target.start.isoformat()
+        target.items.append(item)
     return plans, overflow
 
 
@@ -197,7 +218,8 @@ def render_markdown(plans: list[WeekPlan], overflow: list[QueueItem]) -> str:
         for item in plan.items:
             marker = "refresh" if item.item_type == "refresh" else "new"
             detail = f" - {item.url}" if item.url else ""
-            lines.append(f"- [{marker}] {item.topic}{detail}")
+            window = f" (window opens {item.not_before})" if item.not_before else ""
+            lines.append(f"- [{marker}] {item.topic}{detail}{window}")
         lines.append("")
     if overflow:
         lines.append(f"## Overflow ({len(overflow)} items beyond the horizon)")
