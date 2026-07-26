@@ -54,6 +54,48 @@ def test_gate_commands_with_live_url(tmp_path: Path) -> None:
     ]
 
 
+def test_gate_commands_resolves_relative_dist(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    commands = dict(gate_commands(Path("dist")))
+    assert commands["js-budget"] == [
+        "check_js_budget.py",
+        "--dist",
+        str((tmp_path / "dist").resolve()),
+    ]
+
+
+def test_main_offline_history_delta(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    runs = iter(
+        [
+            {"rich-results": True, "js-budget": True},
+            {"rich-results": True, "js-budget": False},
+        ]
+    )
+    monkeypatch.setattr(seo_report, "run_gates", lambda dist, live=None: next(runs))
+    history = tmp_path / ".seo-history.json"
+    assert main(["--dist", str(tmp_path), "--history", str(history)]) == 0
+    first = capsys.readouterr().out
+    assert "Score: 2/2 offline gates" in first
+    assert "Changed since last run" not in first
+
+    assert main(["--dist", str(tmp_path), "--history", str(history)]) == 1
+    second = capsys.readouterr().out
+    assert "Changed since last run: js-budget" in second
+    saved = json.loads(history.read_text())
+    assert [entry["score"] for entry in saved] == [2, 1]
+    assert "live_url" not in saved[-1]
+
+
+def test_main_missing_dist_exits_2(tmp_path: Path) -> None:
+    assert main(["--dist", str(tmp_path / "nope")]) == 2
+
+
 def test_main_live_records_history(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

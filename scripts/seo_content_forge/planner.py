@@ -158,10 +158,14 @@ def schedule(
     """Assign queued items to weeks by priority, respecting capacity.
 
     Only items with status ``"queued"`` are placed; scheduled and done
-    items are left untouched. Placed items get status ``"scheduled"``
-    and their ``week_of`` date set. An item with ``not_before`` waits
-    for the first week whose window (start through start plus six
-    days) reaches that date - the seasonal-planner hook.
+    items are left untouched, but items already scheduled into the
+    horizon are seeded into their weeks first so they consume capacity
+    and appear in the calendar - re-planning an updated queue can
+    never stack new work into a week the ramp already filled. Placed
+    items get status ``"scheduled"`` and their ``week_of`` date set.
+    An item with ``not_before`` waits for the first week whose window
+    (start through start plus six days) reaches that date - the
+    seasonal-planner hook.
 
     Args:
         items: The full queue (mutated in place for placed items).
@@ -180,6 +184,18 @@ def schedule(
         )
         for index in range(weeks)
     ]
+    horizon_end = start + timedelta(weeks=weeks)
+    for item in items:
+        if item.status != "scheduled" or not item.week_of:
+            continue
+        try:
+            scheduled_for = date.fromisoformat(item.week_of)
+        except ValueError:
+            continue
+        if not start <= scheduled_for < horizon_end:
+            continue
+        index = (scheduled_for - start).days // 7
+        plans[index].items.append(item)
     pending = sorted(
         (item for item in items if item.status == "queued"),
         key=lambda item: item.priority,

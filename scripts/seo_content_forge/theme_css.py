@@ -20,6 +20,10 @@ _DEFAULT_PALETTE: dict[str, str] = {
     "surface": "#f6f8fa",
     "text": "#111827",
     "muted": "#6b7280",
+    # Text placed on primary-colored surfaces (buttons). The page
+    # background is not guaranteed to contrast with primary, and in
+    # dark mode it usually does not.
+    "on-primary": "#ffffff",
 }
 _DEFAULT_FONT: str = "system-ui, -apple-system, sans-serif"
 _DEFAULT_RADIUS: str = "8px"

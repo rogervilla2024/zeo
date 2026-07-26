@@ -36,16 +36,17 @@ Subagents (`agents/`, 15) - focused specialists the main agent delegates to:
 - `site-bootstrap-architect` - scaffolds brand-new SEO-ready sites that
   pass the checks from day one
 
-Skills (`skills/`, 20) - workflows that auto-trigger from natural language
+Skills (`skills/`, 23) - workflows that auto-trigger from natural language
 and orchestrate the subagents:
 
 - `write-article` (flagship, full pipeline), `humanize-content`,
   `fact-check`, `optimize-onpage-seo`, `audit-technical-seo`,
-  `build-topic-clusters`, `content-calendar`, `optimize-geo-aeo`,
-  `generate-schema`, `generate-sitemap`, `generate-llms-txt`,
-  `test-site-readiness`, `bootstrap-site`, `optimize-images`,
-  `build-author-entity`, `translate-article`, `refresh-content`,
-  `generate-trust-pages`, `find-theme`, `adopt-theme`, `visual-review`
+  `build-topic-clusters`, `content-calendar`, `mine-questions`,
+  `optimize-geo-aeo`, `generate-schema`, `generate-sitemap`,
+  `generate-llms-txt`, `test-site-readiness`, `bootstrap-site`,
+  `optimize-images`, `generate-article-images`, `build-author-entity`,
+  `translate-article`, `refresh-content`, `generate-trust-pages`,
+  `find-theme`, `adopt-theme`, `visual-review`
 
 Four gates are mandatory for every article: an FAQ block (3-5
 PAA-derived questions mirrored in FAQPage schema), contextual in-body
@@ -71,16 +72,17 @@ bootstrap-site skill copies into new projects:
   minimal-variant Astro site that passes the offline gates by
   construction, so a new site is a copy of this directory plus a
   site.config.json change; its theme copies are kept byte-identical to
-  `theme/` by `tests/test_golden_template.py`
+  `theme/` by `scripts/tests/test_golden_template.py`
 - `robots.txt` - AI-ready robots template with every major AI crawler
   named explicitly and a Sitemap directive
 - `theme/` - the full theme layer: design tokens rendered from
   site.config.json (`generate_theme_css.py`), `BaseLayout.astro` with
   the speed patterns baked in (zero-JS default, Speculation Rules
   prerendering, dark mode, skip link), the SEO head components
-  (`SeoHead.astro`, `next-metadata.ts`), Breadcrumbs and Footer, eight
+  (`SeoHead.astro`, `next-metadata.ts`), Breadcrumbs and Footer, eleven
   zero-JS content blocks (TableOfContents, KeyTakeaways, FaqAccordion,
-  ProsCons, VerdictBox, ArticleMeta, RelatedPosts, Pagefind SearchBox),
+  ProsCons, VerdictBox, ArticleMeta, RelatedPosts, Pagefind SearchBox,
+  AdSlot, NewsletterCta, AffiliateLink),
   and four layout variants (`variants/`: minimal, editorial, guide,
   review) so sites sharing the skeleton do not share a look
 - `ci/seo-audit.yml` - GitHub Actions workflow for site repos: weekly
@@ -161,7 +163,7 @@ output is deterministic and standards-correct:
 - `export_toolkit.py` - lift this directory into its own standalone git
   repository (`--dest`, optional `--remote`)
 
-The three `check_*` scripts exit non-zero on failure, so the
+Every `check_*` script exits non-zero on failure, so the
 `test-site-readiness` skill (or `/seo-test`) runs them, fixes the site's
 code based on the failures, and re-tests until green.
 

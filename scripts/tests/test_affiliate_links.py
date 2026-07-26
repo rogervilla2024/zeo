@@ -8,9 +8,10 @@ from pathlib import Path
 import pytest
 
 import check_affiliate_links
-from check_affiliate_links import main
+from check_affiliate_links import main, probe
 from seo_content_forge.affiliates import (
     is_affiliate,
+    is_external,
     page_anchors,
     parse_table,
     scan_dist,
@@ -38,8 +39,17 @@ def test_parse_table_valid_and_invalid() -> None:
         parse_table([])
     with pytest.raises(ValueError, match="id and url"):
         parse_table({"links": [{"id": "x"}]})
+    with pytest.raises(ValueError, match="http"):
+        parse_table({"links": [{"id": "a", "url": "amzn.to/x"}]})
     with pytest.raises(ValueError, match="duplicate"):
-        parse_table({"links": [{"id": "a", "url": "u"}, {"id": "a", "url": "v"}]})
+        parse_table(
+            {
+                "links": [
+                    {"id": "a", "url": "https://e.com/u"},
+                    {"id": "a", "url": "https://e.com/v"},
+                ]
+            }
+        )
 
 
 def test_is_affiliate_by_url_prefix_and_domain() -> None:
@@ -48,8 +58,20 @@ def test_is_affiliate_by_url_prefix_and_domain() -> None:
     assert is_affiliate("https://amzn.to/3xYz", table)
     assert is_affiliate("https://www.amzn.to/3xYz", table)
     assert is_affiliate("https://sub.amzn.to/3xYz", table)
+    assert is_affiliate("https://amzn.to:443/3xYz", table)
+    assert is_affiliate("https://user@amzn.to/3xYz", table)
+    assert is_affiliate("//amzn.to/3xYz", table)
     assert not is_affiliate("https://merchant.example/other", table)
     assert not is_affiliate("/blog/post/", table)
+
+
+def test_is_external_covers_scheme_variants() -> None:
+    assert is_external("https://a.b/")
+    assert is_external("HTTPS://a.b/")
+    assert is_external("//a.b/x")
+    assert not is_external("/blog/")
+    assert not is_external("mailto:x@a.b")
+    assert not is_external("#top")
 
 
 def test_page_anchors_reads_href_and_rel() -> None:
@@ -84,6 +106,33 @@ def test_scan_dist_flags_missing_rel_and_unregistered(tmp_path: Path) -> None:
     violations = scan_dist(tmp_path, table)
     problems = {(v.page, v.problem) for v in violations}
     assert problems == {("bad.html", "missing-rel"), ("bad.html", "unregistered")}
+
+
+def test_scan_dist_catches_protocol_relative_and_uppercase(tmp_path: Path) -> None:
+    table = parse_table(TABLE)
+    _write_page(
+        tmp_path,
+        "tricky.html",
+        '<a href="//amzn.to/3xYz">protocol relative</a>'
+        '<a href="HTTPS://amzn.to/3xYz">uppercase scheme</a>',
+    )
+    violations = scan_dist(tmp_path, table)
+    assert {v.problem for v in violations} >= {"missing-rel"}
+    assert len([v for v in violations if v.problem == "missing-rel"]) == 2
+
+
+def test_probe_reports_unprobeable_url_as_dead() -> None:
+    assert probe("amzn.to/xyz") == 0
+
+
+def test_main_malformed_table_exits_2(tmp_path: Path) -> None:
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    table = tmp_path / "affiliates.json"
+    table.write_text("not json")
+    assert main(["--dist", str(dist), "--table", str(table)]) == 2
+    table.write_text(json.dumps({"links": [{}]}))
+    assert main(["--dist", str(dist), "--table", str(table)]) == 2
 
 
 def test_main_missing_table_passes(tmp_path: Path) -> None:

@@ -10,6 +10,7 @@ stale clone quietly diverges from the standard.
 
 from __future__ import annotations
 
+import re
 import subprocess
 from datetime import date
 from pathlib import Path
@@ -47,7 +48,11 @@ def _manifest_version(raw: bytes) -> str | None:
 
 
 def parse_version(version: str) -> tuple[int, ...]:
-    """Parse ``"0.17.0"`` into ``(0, 17, 0)``; non-numeric parts are 0.
+    """Parse ``"0.17.0"`` into ``(0, 17, 0)``.
+
+    Only the leading digit run of each dot-part counts (``"3-rc1"``
+    reads as 3, ``"v2"`` as 2), so a pre-release suffix can never sort
+    a version above its final release.
 
     Args:
         version: Dotted version string.
@@ -57,8 +62,8 @@ def parse_version(version: str) -> tuple[int, ...]:
     """
     parts: list[int] = []
     for part in version.strip().split("."):
-        digits = "".join(ch for ch in part if ch.isdigit())
-        parts.append(int(digits) if digits else 0)
+        match = re.search(r"\d+", part)
+        parts.append(int(match.group()) if match else 0)
     return tuple(parts)
 
 

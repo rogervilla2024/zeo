@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -22,6 +23,9 @@ from seo_content_forge.version_check import (
 
 needs_git = pytest.mark.skipif(shutil.which("git") is None, reason="git not found")
 
+# Pinned so commit-age assertions never depend on the wall clock.
+_COMMIT_DATE = "2026-01-01T12:00:00+00:00"
+
 
 def _git(root: Path, *args: str) -> None:
     subprocess.run(
@@ -29,12 +33,15 @@ def _git(root: Path, *args: str) -> None:
         check=True,
         capture_output=True,
         env={
+            **os.environ,
             "GIT_AUTHOR_NAME": "t",
             "GIT_AUTHOR_EMAIL": "t@e.com",
             "GIT_COMMITTER_NAME": "t",
             "GIT_COMMITTER_EMAIL": "t@e.com",
+            "GIT_AUTHOR_DATE": _COMMIT_DATE,
+            "GIT_COMMITTER_DATE": _COMMIT_DATE,
             "HOME": str(root),
-            "PATH": "/usr/bin:/bin:/usr/local/bin",
+            "GIT_CONFIG_NOSYSTEM": "1",
         },
     )
 
@@ -59,7 +66,8 @@ def _make_upstream_and_clone(tmp_path: Path) -> tuple[Path, Path]:
 
 def test_parse_version_handles_junk() -> None:
     assert parse_version("0.17.0") == (0, 17, 0)
-    assert parse_version("1.2.3-rc1") == (1, 2, 31)
+    # A pre-release suffix must never sort above the final release.
+    assert parse_version("1.2.3-rc1") == (1, 2, 3)
     assert parse_version("v2.0") == (2, 0)
     assert parse_version("") == (0,)
     assert parse_version("0.9.0") < parse_version("0.10.0")
@@ -86,7 +94,7 @@ def test_behind_ahead_and_upstream_version(tmp_path: Path) -> None:
     _git(clone, "fetch", "-q", "origin")
     assert behind_ahead(clone, ref) == (1, 0)
     assert upstream_version(clone, ref) == "0.2.0"
-    assert head_age_days(clone, date.today() + timedelta(days=3)) == 3
+    assert head_age_days(clone, date(2026, 1, 4)) == 3
 
 
 @needs_git
@@ -105,6 +113,21 @@ def test_main_flags_stale_clone(
     assert code == 1
     assert "behind" in printed
     assert "upstream plugin version is 0.2.0" in printed
+
+
+@needs_git
+def test_main_max_age_days(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    _, clone = _make_upstream_and_clone(tmp_path)
+    # HEAD is pinned to 2026-01-01, far past any small limit.
+    code = main(["--root", str(clone), "--no-fetch", "--max-age-days", "5"])
+    printed = capsys.readouterr().out
+    assert code == 1
+    assert "days old (limit 5)" in printed
+    assert (
+        main(["--root", str(clone), "--no-fetch", "--max-age-days", "1000000"]) == 0
+    )
 
 
 def test_main_remote_version_and_bad_root(tmp_path: Path) -> None:

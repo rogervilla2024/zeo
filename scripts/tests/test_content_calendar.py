@@ -73,6 +73,37 @@ def test_schedule_overflow_beyond_horizon() -> None:
     assert overflow[0].status == "queued"
 
 
+def test_schedule_seeds_already_scheduled_items_into_capacity() -> None:
+    items = [
+        QueueItem(
+            topic="already planned",
+            status="scheduled",
+            week_of="2026-08-03",
+        ),
+        QueueItem(topic="new refresh", priority=1),
+    ]
+    plans, overflow = schedule(items, date(2026, 8, 3), 2, [1, 2], weeks=2)
+    # Week 1's ramp cap of 1 is already consumed by the scheduled item,
+    # so re-planning must push the new item to week 2, not stack them.
+    assert [item.topic for item in plans[0].items] == ["already planned"]
+    assert [item.topic for item in plans[1].items] == ["new refresh"]
+    assert items[1].week_of == "2026-08-10"
+    assert overflow == []
+    text = render_markdown(plans, overflow)
+    assert "- [new] already planned" in text
+    assert "(1/1 slots)" in text
+
+
+def test_schedule_ignores_out_of_horizon_scheduled_items() -> None:
+    items = [
+        QueueItem(topic="past", status="scheduled", week_of="2026-07-01"),
+        QueueItem(topic="future", status="scheduled", week_of="2027-01-04"),
+        QueueItem(topic="fresh", priority=1),
+    ]
+    plans, _ = schedule(items, date(2026, 8, 3), 1, [], weeks=2)
+    assert [item.topic for item in plans[0].items] == ["fresh"]
+
+
 def test_schedule_not_before_holds_seasonal_items() -> None:
     items = [
         QueueItem(topic="seasonal", priority=1, not_before="2026-08-15"),
@@ -165,3 +196,40 @@ def test_main_rejects_malformed_queue(tmp_path: Path) -> None:
     queue = tmp_path / "content-queue.json"
     queue.write_text(json.dumps([{"topic": ""}]))
     assert main(["--queue", str(queue), "--start", "2026-08-03"]) == 2
+
+
+def test_main_tolerates_null_content_section(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    queue = tmp_path / "content-queue.json"
+    queue.write_text(json.dumps([{"topic": "a"}]))
+    config = tmp_path / "site.config.json"
+    config.write_text(json.dumps({"content": None}))
+    code = main(
+        ["--queue", str(queue), "--config", str(config), "--start", "2026-08-03"]
+    )
+    assert code == 0
+    assert "- [new] a" in capsys.readouterr().out
+
+
+def test_main_per_week_zero_overflows_everything(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    queue = tmp_path / "content-queue.json"
+    queue.write_text(json.dumps([{"topic": "a"}, {"topic": "b"}]))
+    code = main(
+        [
+            "--queue",
+            str(queue),
+            "--start",
+            "2026-08-03",
+            "--weeks",
+            "2",
+            "--per-week",
+            "0",
+        ]
+    )
+    assert code == 0
+    printed = capsys.readouterr().out
+    assert "(0/0 slots)" in printed
+    assert "## Overflow (2 items beyond the horizon)" in printed

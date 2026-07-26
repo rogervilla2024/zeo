@@ -8,7 +8,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 <BaseLayout
   title="Disclaimer"
   description={`What ${config.site_name} content is and is not.`}
-  canonical={new URL("/disclaimer", config.domain).href}
+  canonical={new URL("/disclaimer/", config.domain).href}
   lang={config.default_language}
 >
   <a slot="header" href="/">{config.site_name}</a>
