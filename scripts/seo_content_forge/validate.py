@@ -28,6 +28,10 @@ _REQUIRED: dict[str, tuple[str, ...]] = {
     "VideoObject": ("name", "thumbnailUrl", "uploadDate"),
     "Event": ("name", "startDate", "location"),
     "Person": ("name", "url"),
+    "LocalBusiness": ("name", "address"),
+    "JobPosting": ("title", "description", "datePosted", "hiringOrganization"),
+    "Course": ("name", "description"),
+    "SoftwareApplication": ("name", "offers"),
 }
 _RECOMMENDED: dict[str, tuple[str, ...]] = {
     "Article": ("image", "dateModified", "publisher", "description"),
@@ -40,6 +44,15 @@ _RECOMMENDED: dict[str, tuple[str, ...]] = {
     "VideoObject": ("description", "duration", "contentUrl"),
     "Event": ("endDate", "description", "image", "offers", "organizer"),
     "Person": ("sameAs", "image", "jobTitle", "description"),
+    "LocalBusiness": ("url", "telephone", "openingHours", "geo", "priceRange", "image"),
+    "JobPosting": ("jobLocation", "validThrough", "employmentType", "baseSalary"),
+    "Course": ("provider", "offers", "hasCourseInstance"),
+    "SoftwareApplication": (
+        "applicationCategory",
+        "operatingSystem",
+        "aggregateRating",
+        "description",
+    ),
 }
 
 

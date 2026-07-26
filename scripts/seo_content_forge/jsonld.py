@@ -463,6 +463,270 @@ def event(
     return _clean(node)
 
 
+def local_business(
+    name: str,
+    url: str,
+    street_address: str,
+    address_locality: str,
+    postal_code: str,
+    address_country: str,
+    business_type: str = "LocalBusiness",
+    address_region: str | None = None,
+    telephone: str | None = None,
+    price_range: str | None = None,
+    image: list[str] | None = None,
+    latitude: str | None = None,
+    longitude: str | None = None,
+    opening_hours: list[str] | None = None,
+    same_as: list[str] | None = None,
+) -> dict[str, object]:
+    """Build a LocalBusiness node (Google local business rich result).
+
+    Args:
+        name: Business name, exactly as shown on the site.
+        url: Business page URL.
+        street_address: Street and number.
+        address_locality: City or town.
+        postal_code: Postal code.
+        address_country: ISO 3166-1 alpha-2 country code, e.g. ``"DE"``.
+        business_type: ``LocalBusiness`` or a schema.org subtype such as
+            ``Restaurant``, ``Dentist``, or ``Store``.
+        address_region: State, province, or region.
+        telephone: Phone number with country code.
+        price_range: Relative price band, e.g. ``"$$"``.
+        image: One or more absolute image URLs.
+        latitude: Decimal latitude as a string, paired with
+            ``longitude``.
+        longitude: Decimal longitude as a string.
+        opening_hours: Hour ranges like ``"Mo-Fr 09:00-17:00"``.
+        same_as: Authoritative profile URLs (maps listing, socials).
+
+    Returns:
+        The JSON-LD node as a dict.
+    """
+    geo: dict[str, object] | None = None
+    if latitude is not None and longitude is not None:
+        geo = {"@type": "GeoCoordinates", "latitude": latitude, "longitude": longitude}
+    node: dict[str, object] = {
+        "@context": SCHEMA_CONTEXT,
+        "@type": business_type,
+        "name": name,
+        "url": url,
+        "address": _clean(
+            {
+                "@type": "PostalAddress",
+                "streetAddress": street_address,
+                "addressLocality": address_locality,
+                "addressRegion": address_region,
+                "postalCode": postal_code,
+                "addressCountry": address_country,
+            }
+        ),
+        "telephone": telephone,
+        "priceRange": price_range,
+        "image": image,
+        "geo": geo,
+        "openingHours": opening_hours,
+        "sameAs": same_as,
+    }
+    return _clean(node)
+
+
+def job_posting(
+    title: str,
+    description: str,
+    date_posted: str,
+    organization_name: str,
+    organization_url: str | None = None,
+    address_locality: str | None = None,
+    address_region: str | None = None,
+    address_country: str | None = None,
+    is_remote: bool = False,
+    employment_type: str | None = None,
+    valid_through: str | None = None,
+    salary_value: str | None = None,
+    salary_currency: str | None = None,
+    salary_unit: str = "YEAR",
+) -> dict[str, object]:
+    """Build a JobPosting node (Google job posting rich result).
+
+    Args:
+        title: Job title only (no company name or location).
+        description: Full description in HTML.
+        date_posted: ISO 8601 date the posting went live.
+        organization_name: Hiring organization.
+        organization_url: Hiring organization's site URL.
+        address_locality: City of the job location.
+        address_region: State, province, or region of the job location.
+        address_country: Country of the job location (required by
+            Google for on-site jobs).
+        is_remote: ``True`` marks the job 100 percent remote
+            (``jobLocationType: TELECOMMUTE``); pass the applicant
+            country via ``address_country``.
+        employment_type: ``FULL_TIME``, ``PART_TIME``, ``CONTRACTOR``,
+            etc.
+        valid_through: ISO 8601 expiry datetime of the posting.
+        salary_value: Base salary amount, e.g. ``"85000"``.
+        salary_currency: ISO 4217 code backing ``salary_value``.
+        salary_unit: ``HOUR``, ``DAY``, ``WEEK``, ``MONTH``, or
+            ``YEAR``.
+
+    Returns:
+        The JSON-LD node as a dict.
+    """
+    organization: dict[str, object] = {
+        "@type": "Organization",
+        "name": organization_name,
+    }
+    if organization_url:
+        organization["sameAs"] = organization_url
+    location: dict[str, object] | None = None
+    if address_locality or address_region or address_country:
+        location = {
+            "@type": "Place",
+            "address": _clean(
+                {
+                    "@type": "PostalAddress",
+                    "addressLocality": address_locality,
+                    "addressRegion": address_region,
+                    "addressCountry": address_country,
+                }
+            ),
+        }
+    salary: dict[str, object] | None = None
+    if salary_value is not None and salary_currency is not None:
+        salary = {
+            "@type": "MonetaryAmount",
+            "currency": salary_currency,
+            "value": {
+                "@type": "QuantitativeValue",
+                "value": salary_value,
+                "unitText": salary_unit,
+            },
+        }
+    node: dict[str, object] = {
+        "@context": SCHEMA_CONTEXT,
+        "@type": "JobPosting",
+        "title": title,
+        "description": description,
+        "datePosted": date_posted,
+        "validThrough": valid_through,
+        "hiringOrganization": organization,
+        "jobLocation": location,
+        "jobLocationType": "TELECOMMUTE" if is_remote else None,
+        "applicantLocationRequirements": (
+            {"@type": "Country", "name": address_country}
+            if is_remote and address_country
+            else None
+        ),
+        "employmentType": employment_type,
+        "baseSalary": salary,
+    }
+    return _clean(node)
+
+
+def course(
+    name: str,
+    description: str,
+    provider_name: str,
+    provider_url: str | None = None,
+    url: str | None = None,
+    course_mode: str | None = None,
+    price: str | None = None,
+    currency: str | None = None,
+) -> dict[str, object]:
+    """Build a Course node (Google course list rich result).
+
+    Args:
+        name: Course title.
+        description: Concise course summary (Google shows ~60 chars).
+        provider_name: Organization offering the course.
+        provider_url: Provider's site URL.
+        url: Course page URL.
+        course_mode: ``online``, ``onsite``, or ``blended``; emitted on
+            a ``hasCourseInstance``.
+        price: Course price (``"0"`` for free), paired with
+            ``currency``.
+        currency: ISO 4217 code backing ``price``.
+
+    Returns:
+        The JSON-LD node as a dict.
+    """
+    provider: dict[str, object] = {"@type": "Organization", "name": provider_name}
+    if provider_url:
+        provider["sameAs"] = provider_url
+    offers: dict[str, object] | None = None
+    if price is not None and currency is not None:
+        offers = {"@type": "Offer", "price": price, "priceCurrency": currency}
+    node: dict[str, object] = {
+        "@context": SCHEMA_CONTEXT,
+        "@type": "Course",
+        "name": name,
+        "description": description,
+        "url": url,
+        "provider": provider,
+        "offers": offers,
+        "hasCourseInstance": (
+            {"@type": "CourseInstance", "courseMode": course_mode}
+            if course_mode
+            else None
+        ),
+    }
+    return _clean(node)
+
+
+def software_application(
+    name: str,
+    operating_system: str,
+    application_category: str,
+    price: str = "0",
+    currency: str = "USD",
+    rating_value: str | None = None,
+    rating_count: int | None = None,
+    description: str | None = None,
+    url: str | None = None,
+    image: list[str] | None = None,
+) -> dict[str, object]:
+    """Build a SoftwareApplication node (Google software app result).
+
+    Args:
+        name: Application name.
+        operating_system: e.g. ``"Windows, macOS"`` or ``"ANDROID"``.
+        application_category: schema.org category, e.g.
+            ``"DeveloperApplication"``.
+        price: Price as a string; ``"0"`` for free apps.
+        currency: ISO 4217 currency code.
+        rating_value: Average rating, e.g. ``"4.6"`` - Google requires
+            a rating or review for the rich result, so pass one when
+            real ratings exist.
+        rating_count: Number of ratings backing ``rating_value``.
+        description: Short application summary.
+        url: Application or download page URL.
+        image: One or more absolute image URLs.
+
+    Returns:
+        The JSON-LD node as a dict.
+    """
+    node: dict[str, object] = {
+        "@context": SCHEMA_CONTEXT,
+        "@type": "SoftwareApplication",
+        "name": name,
+        "operatingSystem": operating_system,
+        "applicationCategory": application_category,
+        "description": description,
+        "url": url,
+        "image": image,
+        "offers": {"@type": "Offer", "price": price, "priceCurrency": currency},
+    }
+    if rating_value is not None and rating_count is not None:
+        node["aggregateRating"] = {
+            "@type": "AggregateRating",
+            "ratingValue": rating_value,
+            "ratingCount": rating_count,
+        }
+    return _clean(node)
+
+
 BUILDERS: dict[str, Callable[..., dict[str, object]]] = {
     "article": article,
     "faq": faq_page,
@@ -475,4 +739,8 @@ BUILDERS: dict[str, Callable[..., dict[str, object]]] = {
     "video": video,
     "event": event,
     "person": person,
+    "localbusiness": local_business,
+    "jobposting": job_posting,
+    "course": course,
+    "softwareapp": software_application,
 }

@@ -83,4 +83,8 @@ def test_builders_registry_is_complete() -> None:
         "video",
         "event",
         "person",
+        "localbusiness",
+        "jobposting",
+        "course",
+        "softwareapp",
     }
