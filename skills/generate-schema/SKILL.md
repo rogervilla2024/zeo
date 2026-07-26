@@ -1,6 +1,6 @@
 ---
 name: generate-schema
-description: Generate and validate schema.org JSON-LD structured data for rich results (Article, BlogPosting, FAQPage, HowTo, BreadcrumbList, Organization, WebSite SearchAction, Product, Recipe, VideoObject, Event). Use when the user wants structured data, rich snippets, rich results, JSON-LD, schema markup, or to make a page eligible for enhanced Google listings.
+description: Generate and validate schema.org JSON-LD structured data for rich results (Article, BlogPosting, FAQPage, HowTo, BreadcrumbList, Organization, WebSite SearchAction, Product, Recipe, VideoObject, Event, Person, LocalBusiness, JobPosting, Course, SoftwareApplication, Speakable). Use when the user wants structured data, rich snippets, rich results, JSON-LD, schema markup, speakable/voice markup, or to make a page eligible for enhanced Google listings.
 ---
 
 # Generate schema.org JSON-LD for rich results
@@ -15,7 +15,9 @@ Gather from the user or the page being marked up:
 
 - Page type and the rich result targeted: `article`, `faq`, `howto`,
   `breadcrumb`, `organization`, `website`, `product`, `recipe`, `video`,
-  or `event`.
+  `event`, `person`, `localbusiness` (subtype via `business_type`),
+  `jobposting`, `course`, `softwareapp`, or `speakable` (voice/AEO
+  sections; 2-3 quotable selectors, never the whole article).
 - The concrete field values for that type (headline, URL, author,
   publisher name and logo URL, publish/modified dates, images, Q/A pairs,
   steps, breadcrumb trail, price and currency, etc.).

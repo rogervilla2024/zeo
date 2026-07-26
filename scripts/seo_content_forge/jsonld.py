@@ -727,6 +727,54 @@ def software_application(
     return _clean(node)
 
 
+def speakable(
+    name: str,
+    url: str,
+    css_selectors: list[str] | None = None,
+    xpaths: list[str] | None = None,
+    page_type: str = "WebPage",
+) -> dict[str, object]:
+    """Build a page node with a SpeakableSpecification (voice/AEO).
+
+    Marks the sections of a page best suited for text-to-speech
+    playback by assistants. Point the selectors at the 2-3 most
+    quotable, self-contained sections (headline, summary, key answer),
+    around 20-30 seconds of speech - never the whole article.
+
+    Args:
+        name: Page or article title.
+        url: Canonical page URL.
+        css_selectors: CSS selectors of the speakable sections, e.g.
+            ``[".article-summary", ".key-takeaways"]``. Prefer these
+            over xpaths.
+        xpaths: XPath expressions as an alternative to CSS selectors.
+        page_type: ``WebPage``, ``Article``, ``BlogPosting``, or
+            ``NewsArticle`` - must match the page's main node type.
+
+    Returns:
+        The JSON-LD node as a dict.
+
+    Raises:
+        ValueError: If neither ``css_selectors`` nor ``xpaths`` is
+            given.
+    """
+    if not css_selectors and not xpaths:
+        raise ValueError("speakable requires css_selectors or xpaths")
+    return {
+        "@context": SCHEMA_CONTEXT,
+        "@type": page_type,
+        "name": name,
+        "url": url,
+        "speakable": _clean(
+            {
+                "@type": "SpeakableSpecification",
+                "cssSelector": css_selectors,
+                "xpath": xpaths,
+            }
+        ),
+    }
+
+
 BUILDERS: dict[str, Callable[..., dict[str, object]]] = {
     "article": article,
     "faq": faq_page,
@@ -743,4 +791,5 @@ BUILDERS: dict[str, Callable[..., dict[str, object]]] = {
     "jobposting": job_posting,
     "course": course,
     "softwareapp": software_application,
+    "speakable": speakable,
 }

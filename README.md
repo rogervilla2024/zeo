@@ -100,7 +100,8 @@ output is deterministic and standards-correct:
 - `build_jsonld.py` - build JSON-LD for Article, FAQ, HowTo, Breadcrumb,
   Organization, WebSite SearchAction, Product, Recipe, VideoObject,
   Event, Person (author entities), LocalBusiness (subtypes supported),
-  JobPosting (on-site and remote), Course, SoftwareApplication
+  JobPosting (on-site and remote), Course, SoftwareApplication, and
+  Speakable (voice/AEO section markup)
 - `validate_schema.py` - check JSON-LD for required/recommended properties
 - `generate_sitemap.py` - build sitemaps with hreflang, Google image
   sitemap entries, and 50k splitting
