@@ -1,0 +1,29 @@
+---
+// Affiliate link resolved from the central table (affiliates.json at
+// the project root), so the correct destination and rel policy are
+// guaranteed by construction: every affiliate anchor ships
+// rel="sponsored nofollow" (Google's paid-link requirement) and
+// opens in a new tab. Usage in Astro pages and MDX:
+//
+//   <AffiliateLink id="acme-grinder">Acme Grinder</AffiliateLink>
+//
+// Plain-markdown articles link normally; check_affiliate_links.py
+// catches any affiliate href missing from the table or the rel.
+// Disclose affiliate relationships on the page and in the Disclaimer
+// trust page - schema-only or footer-only disclosure is not enough.
+import affiliates from "../../affiliates.json";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const link = affiliates.links.find((entry) => entry.id === id);
+if (!link) {
+  throw new Error(`affiliates.json has no link with id "${id}"`);
+}
+---
+
+<a href={link.url} rel="sponsored nofollow" target="_blank">
+  <slot />
+</a>

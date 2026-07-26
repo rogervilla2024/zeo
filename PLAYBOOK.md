@@ -64,6 +64,9 @@ property, not a per-site effort.
    so nothing decays unnoticed between Search Console reviews.
 3. Check internal-link health after the month's growth: orphaned new
    pages get reverse links (`internal-link-strategist`).
+4. Monetized sites: run `check_affiliate_links.py --dist dist --live`.
+   Every affiliate anchor needs rel="sponsored" and a row in
+   affiliates.json; dead destinations get replaced, not left to 404.
 
 ## Quarterly, per site
 

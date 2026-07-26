@@ -52,6 +52,12 @@ remembering to do it.
     (matching Cloudflare Workers endpoint in
     `templates/deploy/newsletter-worker.md`; keep legal.has_newsletter
     in sync for the privacy disclosure)
+  - `AffiliateLink.astro` - affiliate anchor resolved from the central
+    `affiliates.json` table (copy `templates/affiliates.example.json`
+    to the project root alongside it); ships
+    `rel="sponsored nofollow"` by construction. Plain-markdown links
+    are policed by `scripts/check_affiliate_links.py` instead.
+    Disclose affiliate relationships visibly and in the Disclaimer.
   - `AdSlot.astro` - AdSense-readiness slot: reserves layout-stable
     space per named slot but renders nothing until `ads.enabled` in
     site.config.json is true and the slot name is listed in
