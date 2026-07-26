@@ -133,6 +133,10 @@ output is deterministic and standards-correct:
   prioritized opportunities (optional PAGESPEED_API_KEY via .env)
 - `check_rich_results.py` - extract and validate all JSON-LD on a live
   page or local HTML file (offline rich-results test)
+- `fleet_report.py` - fold every site's `.seo-history.json` (written by
+  `seo_report.py`) into one self-contained HTML dashboard: per-site
+  gate matrix, score deltas, and trend; exits non-zero when any site
+  is red
 - `export_toolkit.py` - lift this directory into its own standalone git
   repository (`--dest`, optional `--remote`)
 

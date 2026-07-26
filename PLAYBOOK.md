@@ -49,7 +49,10 @@ property, not a per-site effort.
 ## Monthly, per site
 
 1. Review the CI audit issues; run `/seo-test` to fix and re-test
-   anything red.
+   anything red. For the portfolio view, run
+   `fleet_report.py --scan <sites-dir>` first: one HTML dashboard of
+   every site's gates and trend, worst site on top - fix red sites
+   before polishing green ones.
 2. Review Search Console for pages with declining clicks or position
    (the operator exports or pastes the data) and queue the worst ones
    for `refresh-content`.
