@@ -1,0 +1,58 @@
+---
+// Visible breadcrumb trail for Astro sites scaffolded by
+// seo-content-forge. Pair it with the BreadcrumbList JSON-LD generated
+// by scripts/build_jsonld.py (passed to SeoHead's jsonLd prop) - Google
+// shows the breadcrumb rich result when the visible trail and the
+// schema agree. Copy into src/components/Breadcrumbs.astro.
+//
+//   <Breadcrumbs items={[
+//     { name: "Home", url: "/" },
+//     { name: "Guides", url: "/guides/" },
+//     { name: frontmatter.title },   // current page: no url
+//   ]} />
+
+interface Crumb {
+  name: string;
+  url?: string;
+}
+
+interface Props {
+  items: Crumb[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb" class="breadcrumbs">
+  <ol>
+    {items.map((item, index) => (
+      <li>
+        {item.url && index < items.length - 1 ? (
+          <a href={item.url}>{item.name}</a>
+        ) : (
+          <span aria-current="page">{item.name}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  .breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.875rem;
+  }
+  .breadcrumbs li + li::before {
+    content: "/";
+    margin-right: 0.25rem;
+    opacity: 0.5;
+  }
+  .breadcrumbs [aria-current="page"] {
+    opacity: 0.75;
+  }
+</style>

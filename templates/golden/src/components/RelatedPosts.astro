@@ -1,0 +1,56 @@
+---
+// Related posts / read-next block: the visible half of the internal
+// linking rule. Feed it same-cluster pages (pillar to cluster, or the
+// suggest_internal_links.py inventory), not random recency.
+//   <RelatedPosts posts={[{title, url, description}]} />
+interface Post {
+  title: string;
+  url: string;
+  description?: string;
+}
+interface Props {
+  posts: Post[];
+  title?: string;
+}
+const { posts, title = "Read next" } = Astro.props;
+---
+
+{posts.length > 0 && (
+  <nav class="related" aria-label={title}>
+    <h2>{title}</h2>
+    <ul>
+      {posts.map((post) => (
+        <li>
+          <a href={post.url}>{post.title}</a>
+          {post.description && <p>{post.description}</p>}
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .related ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .related li {
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    padding: 0.875rem 1.125rem;
+  }
+  .related a {
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .related a:hover {
+    text-decoration: underline;
+  }
+  .related p {
+    margin: 0.25rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.9375rem;
+  }
+</style>

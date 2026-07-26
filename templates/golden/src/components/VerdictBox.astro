@@ -1,0 +1,62 @@
+---
+// Verdict box for review content: score, one-line verdict, best-for.
+// If the score is shown here, mirror it in Product aggregateRating or
+// Review schema - visible content and markup must agree.
+//   <VerdictBox score="4.5" outOf="5" verdict="..." bestFor="..." />
+interface Props {
+  score: string;
+  verdict: string;
+  outOf?: string;
+  bestFor?: string;
+  title?: string;
+}
+const { score, verdict, outOf = "5", bestFor, title = "Our verdict" } = Astro.props;
+---
+
+<aside class="verdict" aria-label={title}>
+  <div class="score" aria-label={`Score ${score} out of ${outOf}`}>
+    <span class="value">{score}</span>
+    <span class="out-of">/ {outOf}</span>
+  </div>
+  <div>
+    <strong>{title}</strong>
+    <p>{verdict}</p>
+    {bestFor && <p class="best-for">Best for: {bestFor}</p>}
+  </div>
+</aside>
+
+<style>
+  .verdict {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    background: var(--color-surface);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+  }
+  .score {
+    background: var(--color-primary);
+    color: var(--color-background);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .value {
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+  .out-of {
+    font-size: 0.875rem;
+    opacity: 0.85;
+  }
+  .verdict p {
+    margin: 0.5rem 0 0;
+  }
+  .best-for {
+    color: var(--color-muted);
+    font-size: 0.9375rem;
+  }
+</style>

@@ -34,9 +34,17 @@ Gather before scaffolding (ask only for what is missing):
    toolkit docs, README samples, or the user's earlier prompts (coffee,
    grinders, etc.) are illustrations only - generating content about
    them when they are not this site's niche is a failure.
-2. Scaffold the framework project with its official generator via Bash
-   (e.g. `npm create astro@latest`, `npx create-next-app`). Choose the
-   static/SSG configuration.
+2. Scaffold from the golden template (preferred for Astro): copy
+   `templates/golden/` to the project root and follow its README. The
+   copy already wires BaseLayout, the SEO head, the JSON-LD page
+   templates, trust-page stubs, RSS, and search, so a new site is the
+   copy plus the site.config.json from step 1 (overwrite the copied
+   one, then regenerate tokens.css, logo, favicons, and og-image and
+   replace `{{SITE_URL}}` in robots.txt). Later steps then become
+   verification plus content. Fall back to the framework's official
+   generator via Bash (e.g. `npm create astro@latest`,
+   `npx create-next-app`, static/SSG configuration) only when the site
+   needs Next.js or a structure the golden template does not cover.
 3. Choose the theme path. Default when the user has no preference:
    run the find-theme skill for the niche and propose adopting the top
    ready-made theme (adopt-theme skill) - professional design day one.

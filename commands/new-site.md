@@ -15,9 +15,11 @@ Orchestrate the following:
 
 1. Invoke the bootstrap-site skill and follow it end to end: write
    site.config.json (the single source of truth for all later skills),
-   scaffold the framework, build the SEO head component, embed validated
-   Organization and WebSite JSON-LD, install the AI-ready robots.txt
-   template, wire the sitemap, and generate llms.txt.
+   scaffold from the golden template (`templates/golden/` - a copy plus
+   the site.config.json change; generator fallback for non-Astro), build
+   the SEO head component, embed validated Organization and WebSite
+   JSON-LD, install the AI-ready robots.txt template, wire the sitemap,
+   and generate llms.txt.
 2. Delegate the heavy scaffolding work to the site-bootstrap-architect
    subagent, and the initial pillar/cluster plan to the
    build-topic-clusters skill. Write the first pillar article with

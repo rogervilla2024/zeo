@@ -1,0 +1,62 @@
+---
+// Homepage: minimal-variant layout (intro plus a chronological post
+// list) with the sitewide Organization and WebSite+SearchAction JSON-LD
+// mirroring what scripts/build_jsonld.py produces.
+import { getCollection } from "astro:content";
+import config from "../../site.config.json";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const organization = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: config.organization.name,
+  url: config.domain,
+  logo: new URL(config.organization.logo, config.domain).href,
+  ...(config.organization.sameAs.length
+    ? { sameAs: config.organization.sameAs }
+    : {}),
+};
+const website = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: config.site_name,
+  url: config.domain,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: config.seo.search_url_template,
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
+---
+
+<BaseLayout
+  title={config.site_name}
+  description={config.niche}
+  canonical={new URL("/", config.domain).href}
+  lang={config.default_language}
+  jsonLd={[organization, website]}
+>
+  <a slot="header" href="/">{config.site_name}</a>
+  <section class="prose">
+    <h1>{config.site_name}</h1>
+    <p>{config.niche}</p>
+  </section>
+  <section class="prose">
+    <h2>Latest articles</h2>
+    <ul>
+      {posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          <p>{post.data.description}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

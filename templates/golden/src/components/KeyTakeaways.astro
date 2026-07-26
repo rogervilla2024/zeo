@@ -1,0 +1,34 @@
+---
+// Key takeaways box for the top of an article: a 3-5 point summary in
+// the extractable format answer engines and skimming readers prefer.
+//   <KeyTakeaways points={["First point.", "Second point."]} />
+interface Props {
+  points: string[];
+  title?: string;
+}
+const { points, title = "Key takeaways" } = Astro.props;
+---
+
+<aside class="takeaways" aria-label={title}>
+  <strong>{title}</strong>
+  <ul>
+    {points.map((point) => <li>{point}</li>)}
+  </ul>
+</aside>
+
+<style>
+  .takeaways {
+    border-left: 4px solid var(--color-primary);
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+  }
+  .takeaways ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+  }
+  .takeaways li {
+    margin-bottom: 0.25rem;
+  }
+</style>

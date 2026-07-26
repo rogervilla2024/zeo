@@ -1,0 +1,23 @@
+---
+// Trust page stub. Run the generate-trust-pages skill to replace the
+// placeholders from templates/pages/terms-of-service.md before launch.
+import config from "../../site.config.json";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Terms of Service"
+  description={`Terms for using ${config.site_name}.`}
+  canonical={new URL("/terms-of-service", config.domain).href}
+  lang={config.default_language}
+>
+  <a slot="header" href="/">{config.site_name}</a>
+  <section class="prose">
+    <h1>Terms of Service</h1>
+    <p>
+      {"{{TERMS_BODY}}"} - fill this page from
+      templates/pages/terms-of-service.md with the generate-trust-pages
+      skill. Do not publish with placeholders left in.
+    </p>
+  </section>
+</BaseLayout>
