@@ -1,0 +1,13 @@
+{
+  "links": [
+    {
+      "id": "example-product",
+      "url": "https://www.example-merchant.com/product?tag=yoursite-20",
+      "merchant": "Example Merchant"
+    }
+  ],
+  "domains": [
+    "amzn.to",
+    "example-merchant.com"
+  ]
+}

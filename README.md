@@ -147,6 +147,10 @@ output is deterministic and standards-correct:
   `seo_report.py`) into one self-contained HTML dashboard: per-site
   gate matrix, score deltas, and trend; exits non-zero when any site
   is red
+- `check_affiliate_links.py` - enforce the affiliate policy from the
+  central `affiliates.json` table: every affiliate anchor needs
+  `rel="sponsored"` and a table entry; `--live` probes managed URLs
+  for dead destinations
 - `check_toolkit_version.py` - warn when this toolkit clone is behind
   upstream (commit count, plugin version, optional HEAD age), so
   process improvements actually reach every site
