@@ -82,6 +82,10 @@ property, not a per-site effort.
 - The toolkit repo is the single source of process; sites do not fork
   their own variants of skills or scripts. Improvements land here and
   every site benefits on its next session.
+- Start each working session with
+  `python scripts/check_toolkit_version.py` in the toolkit clone: it
+  fails when the clone is behind upstream, so a stale clone gets
+  pulled before it quietly diverges from the standard.
 
 ## Policy guard (Google spam policies, mapped to our gates)
 
