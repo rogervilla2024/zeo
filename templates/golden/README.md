@@ -98,6 +98,13 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   `[...slug].astro`) - short URLs with the keyword right after the
   domain; `/blog/` is only the listing hub. Static pages win over the
   catch-all route, so /about, /search, and /blog resolve normally.
+  Category archives render at `/<seo.category_base>/<category-slug>/`
+  (one per distinct `category` frontmatter value); homepage strip
+  titles and article breadcrumbs link to them. Set `seo.category_base`
+  to a native word on non-English sites (e.g. `kategori`) - just not
+  one that collides with an existing top-level page like `blog`.
+  `src/lib/slugify.ts` folds accented category names (including
+  Turkish dotless i) into ASCII slugs.
 - `src/content.config.ts` - blog collection schema; SEO-critical
   frontmatter is required at build time. The optional `category`
   field (the article's pillar from the cluster map) feeds the

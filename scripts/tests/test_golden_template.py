@@ -58,10 +58,12 @@ def test_required_skeleton_files_exist() -> None:
         "tsconfig.json",
         ".gitignore",
         "src/content.config.ts",
+        "src/lib/slugify.ts",
         "src/styles/site.css",
         "src/pages/index.astro",
         "src/pages/blog/index.astro",
         "src/pages/[...slug].astro",
+        "src/pages/[category_base]/[slug].astro",
         "src/pages/search.astro",
         "src/pages/rss.xml.js",
         "src/pages/about.astro",
@@ -83,9 +85,11 @@ def test_ui_strings_config_and_wiring() -> None:
         "footer_explore", "footer_trust", "rights", "search",
         "search_placeholder", "home", "skip_to_content", "theme_toggle",
         "about", "contact", "privacy_policy", "terms_of_service", "disclaimer",
-        "blog", "popular",
+        "blog", "popular", "category_description",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
+    # The category page substitutes the category name into the text.
+    assert "{category}" in ui["category_description"]
     assert all(isinstance(v, str) and v for v in ui.values())
     # The visible component labels must be driven by config.ui, so a
     # Turkish site never leaks English chrome.
@@ -105,8 +109,38 @@ def test_homepage_portal_composition() -> None:
     index = (GOLDEN / "src" / "pages" / "index.astro").read_text()
     for hook in ("feature-card", "category-strip", "PostCard", "Sidebar"):
         assert hook in index, f"homepage misses {hook}"
+    # Strip titles must link to the category archives.
+    assert '<a href={strip.url}>' in index
+    assert "slugify" in index
     schema = (GOLDEN / "src" / "content.config.ts").read_text()
     assert "category" in schema, "content schema misses the category field"
+
+
+def test_category_archive_pages() -> None:
+    config = json.loads((GOLDEN / "site.config.json").read_text())
+    # The URL segment is config-driven so non-English sites get a
+    # native path (e.g. /kategori/...).
+    base = config["seo"]["category_base"]
+    assert isinstance(base, str) and base and "/" not in base
+
+    route = (GOLDEN / "src" / "pages" / "[category_base]" / "[slug].astro")
+    text = route.read_text()
+    for hook in (
+        "getStaticPaths", "BreadcrumbList", "PostCard", "category_base",
+        "slugify", "ui.category_description", "canonical",
+    ):
+        assert hook in text, f"category route misses {hook}"
+
+    # The slug helper must fold Turkish dotless i explicitly - NFD
+    # normalization alone cannot, so its absence breaks Turkish sites.
+    helper = (GOLDEN / "src" / "lib" / "slugify.ts").read_text()
+    assert "\\u0131" in helper and "\\u0130" in helper
+    assert 'normalize("NFD")' in helper
+
+    # Article breadcrumbs climb to the category archive when set.
+    article = (GOLDEN / "src" / "pages" / "[...slug].astro").read_text()
+    assert "parentCrumb" in article
+    assert "post.data.category" in article
 
 
 def test_package_json_is_zero_js_static_build() -> None:

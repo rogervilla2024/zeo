@@ -15,6 +15,7 @@ import NewsletterCta from "../components/NewsletterCta.astro";
 import Sidebar from "../components/Sidebar.astro";
 import TableOfContents from "../components/TableOfContents.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { slugify } from "../lib/slugify";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -33,6 +34,17 @@ const updated = (post.data.updatedDate ?? post.data.pubDate).toISOString();
 const publishedDate = published.slice(0, 10);
 const updatedDate = updated.slice(0, 10);
 const ogImage = post.data.image ?? config.seo.og_image;
+
+// Breadcrumb level 2: the article's category archive when it has
+// one (tightening the cluster's internal links), the blog hub
+// otherwise. The JSON-LD below mirrors the same trail.
+const categoryBase = config.seo.category_base ?? "category";
+const parentCrumb = post.data.category
+  ? {
+      name: post.data.category,
+      url: `/${categoryBase}/${slugify(post.data.category)}/`,
+    }
+  : { name: ui.blog ?? "Blog", url: "/blog/" };
 
 const related = (await getCollection("blog"))
   .filter((other) => other.id !== post.id)
@@ -81,8 +93,8 @@ const breadcrumb = {
     {
       "@type": "ListItem",
       position: 2,
-      name: ui.blog ?? "Blog",
-      item: new URL("/blog/", config.domain).href,
+      name: parentCrumb.name,
+      item: new URL(parentCrumb.url, config.domain).href,
     },
     { "@type": "ListItem", position: 3, name: post.data.title, item: canonical },
   ],
@@ -116,7 +128,7 @@ const faqSchema = post.data.faq.length
     <Breadcrumbs
       items={[
         { name: ui.home ?? "Home", url: "/" },
-        { name: ui.blog ?? "Blog", url: "/blog/" },
+        { name: parentCrumb.name, url: parentCrumb.url },
         { name: post.data.title },
       ]}
     />

@@ -42,7 +42,8 @@
     "terms_of_service": "Terms of Service",
     "disclaimer": "Disclaimer",
     "blog": "Blog",
-    "popular": "Popular"
+    "popular": "Popular",
+    "category_description": "Articles in the {category} category."
   },
   "organization": {
     "name": "Example Site",
@@ -73,7 +74,8 @@
   "seo": {
     "title_suffix": " | Example Site",
     "og_image": "/og-image.png",
-    "search_url_template": "/search?q={search_term_string}"
+    "search_url_template": "/search?q={search_term_string}",
+    "category_base": "category"
   },
   "legal": {
     "contact_email": "hello@example.com",
