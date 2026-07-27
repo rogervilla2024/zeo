@@ -57,6 +57,14 @@ done because it builds; it is done when its screenshots pass review.
 - Nothing overlaps, wraps awkwardly, or renders as unstyled HTML.
 - The article page shows real images (diagrams or photos) in the body;
   an imageless article body is an automatic fail.
+- Distinctiveness: the design expresses THIS site's niche - a
+  stranger seeing the homepage with the text blurred should sense the
+  topic's mood from color, type, and composition. A look
+  interchangeable with a starter template, or a palette left at the
+  toolkit defaults, is an automatic fail.
+- The homepage opens with a designed hero (`.site-hero` composed:
+  background treatment, display title, tagline), never a bare h1
+  above a list.
 
 ## Output
 

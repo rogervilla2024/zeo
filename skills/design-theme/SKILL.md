@@ -22,21 +22,42 @@ render unstyled - and this skill builds the site's identity on top.
   magazine/feature writing -> editorial; topic-cluster knowledge site
   -> guide; product/comparison site -> review.
 
+## The bar
+
+Design like the strongest publisher in the niche, not like a starter
+template with new colors. The variant baseline exists so nothing can
+look broken - your job starts ABOVE it. Be bold: a timid pass (default
+palette, bare hero, beige cards) fails visual-review's
+distinctiveness check. Rough calibration: the site.css of a finished
+design is typically 150-400 lines of deliberate, site-specific CSS -
+if yours is 30 lines, you restyled nothing.
+
 ## Instructions
 
-1. Write a one-paragraph design brief from the niche before touching
-   code: the feeling the site should give (e.g. a health-adjacent
-   "benefits and harms" site reads calm, clinical, trustworthy - not
-   playful; a coffee site reads warm and craft-like), the palette
-   direction with concrete hex values, and the typography character.
+1. Write the design brief from the niche before touching code: the
+   mood in one sentence, then concrete choices. Anchor on an
+   archetype and push it:
+   - health/science: calm, clinical, high-trust - cool palette,
+     generous whitespace, precise type
+   - travel/leisure/entertainment: vivid and atmospheric - saturated
+     or dark-luxe palette, large display type, imagery-forward
+   - food/craft/lifestyle: warm, textured, inviting - earthy palette,
+     soft radius, friendly serif
+   - finance/legal/b2b: confident and sober - deep neutrals plus one
+     strong accent, sharp radius, structured grids
+   - tech/tools: crisp, modern - near-black or paper-white base,
+     electric accent, mono details
+   The mood must be guessable from a screenshot with the text blurred.
 2. Set the tokens in `site.config.json`:
    - `theme.palette`: primary (the identity color), accent (used
      sparingly), background/surface/text/muted tuned to the same
-     temperature; `on-primary` if primary is light.
+     temperature; `on-primary` if primary is light. Never leave the
+     example palette in place - unchanged defaults are a fail.
    - `theme.dark_palette`: same identity in dark; verify contrast.
-   - `theme.fonts`: pick stacks that carry the character (system
-     stacks are fine; a self-hosted woff2 pair is allowed within the
-     theme rules - preloaded, font-display swap).
+   - `theme.fonts`: a real pairing that carries the character -
+     self-hosted woff2 (e.g. from Fontsource) is encouraged for the
+     heading font: preloaded, `font-display: swap`, subset if large.
+     System stacks are the fallback, not the goal.
    - `theme.variant` and `theme.radius` (sharp for technical, soft
      for lifestyle).
 3. Regenerate the stylesheet - tokens plus the variant layer come out
@@ -47,24 +68,32 @@ render unstyled - and this skill builds the site's identity on top.
        --output src/styles/tokens.css
    ```
 
-4. Add the site-specific layer where the tokens cannot express it:
-   `src/styles/site.css` (imported by BaseLayout after tokens.css),
-   containing niche touches only - a header device, list markers,
-   image treatment, category badge colors. Keep it small; if a rule
-   would help every site, it belongs in the variant CSS upstream, not
-   here.
+4. Art-direct the site in `src/styles/site.css` (loaded by BaseLayout
+   after tokens.css). This is the identity layer - make it as large
+   as the design needs. Cover, at minimum:
+   - the hero (`.site-hero`): the first screen must look composed -
+     background treatment (tint, gradient, or generous negative
+     space), display-size title, tagline, CTA
+   - the header: brand weight, nav styling, hover/active states
+   - the card system (`.post-list li`): surfaces, borders or
+     elevation, hover response, category/topic accents
+   - the article page: heading treatments, block accents
+     (takeaways/toc/faq), image framing
+   - the footer: styled, not an afterthought
+   Only the SEO mechanics are off-limits; every visual surface is
+   yours to redesign.
 5. Every color pair must hold WCAG AA (4.5:1 body text, 3:1 large
    text) in BOTH light and dark modes. Check the pairs actually used:
    text/background, muted/background, on-primary/primary, link/
    background.
 6. Hard rules that survive any design: zero JavaScript added; one h1;
    visible focus states kept; the JS and media budgets still pass;
-   no external fonts, CSS, or images fetched at runtime.
+   no external fonts, CSS, or images fetched at runtime (self-hosted
+   assets only).
 7. Finish through the visual-review gate: build, screenshot at
-   390/768/1440, critique against its checklist, fix, re-shoot until
-   it passes. A design that has not passed visual-review does not
-   ship - this is the gate that ends "the site looks like a
-   skeleton".
+   390/768/1440, critique against its checklist - including the
+   distinctiveness check - fix, re-shoot until it passes. A design
+   that has not passed visual-review does not ship.
 
 ## Output
 

@@ -19,6 +19,40 @@ p, ul, ol { margin: 0 0 1.05rem; }
   color: var(--color-text);
 }
 
+/* Hero: front-page lead - oversized display type */
+.site-hero {
+  padding: 3rem 0 2.5rem;
+  text-align: center;
+}
+.site-hero-title {
+  font-size: 3.2rem;
+  line-height: 1.05;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+.site-hero-tagline {
+  font-size: 1.2rem;
+  color: var(--color-muted);
+  max-width: 52ch;
+  margin: 0 auto;
+}
+.site-hero-cta {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.5rem;
+  border: 2px solid var(--color-text);
+  color: var(--color-text);
+  text-decoration: none;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+}
+.site-hero-cta:hover {
+  background: var(--color-text);
+  color: var(--color-background);
+}
+
 /* Header: masthead - centered brand over a double rule */
 body > header.container {
   text-align: center;
