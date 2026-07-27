@@ -17,9 +17,11 @@ remembering to do it.
   with `aria-label` and `aria-current`. Pair with the BreadcrumbList
   JSON-LD from `scripts/build_jsonld.py`; Google shows the breadcrumb
   rich result when the visible trail and the schema agree.
-- `Footer.astro` / `Footer.tsx` - sitewide footer linking the trust
-  pages (About, Contact, Privacy Policy, Terms, Disclaimer) generated
-  by the generate-trust-pages skill from `../pages/`.
+- `Footer.astro` / `Footer.tsx` - designed sitewide footer: brand +
+  tagline column, the site's `nav` sections, the trust pages (About,
+  Contact, Privacy Policy, Terms, Disclaimer via generate-trust-pages),
+  and a copyright bar with the RSS link. Variants restyle the band via
+  `.site-footer`.
 - `SiteNav.astro` - primary header navigation from the `nav` array in
   site.config.json, with `aria-current` on the active page; rendered
   by BaseLayout next to the brand. A menuless header fails

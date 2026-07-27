@@ -201,3 +201,8 @@ blockquote {
 .site-aside a:hover {
   text-decoration: underline;
 }
+
+/* Footer: accent band */
+.site-footer {
+  border-top: 3px solid var(--color-accent);
+}

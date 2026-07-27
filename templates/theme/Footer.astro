@@ -1,50 +1,121 @@
 ---
-// Site footer for Astro sites scaffolded by seo-content-forge.
-// Links every page to the trust pages (About, Contact, Privacy, Terms,
-// Disclaimer) - a sitewide trust signal for users and quality raters.
-// Copy into src/components/Footer.astro and include in the base layout.
+// Site footer: a designed closing section, not an afterthought.
+// Three-part layout - brand + tagline, the site's own nav sections,
+// and the trust pages the quality raters look for - over a copyright
+// bar with the RSS link. Reads everything from site.config.json;
+// variants and the site's design layer restyle the band via the
+// .site-footer classes. Copy into src/components/Footer.astro.
 import config from "../../site.config.json";
 
+interface NavItem {
+  label: string;
+  href: string;
+}
+
 const year = new Date().getFullYear();
-const links = [
-  { name: "About", href: "/about" },
-  { name: "Contact", href: "/contact" },
-  { name: "Privacy Policy", href: "/privacy-policy" },
-  { name: "Terms of Service", href: "/terms-of-service" },
-  { name: "Disclaimer", href: "/disclaimer" },
+const navItems: NavItem[] = config.nav ?? [];
+const legalLinks = [
+  { label: "About", href: "/about/" },
+  { label: "Contact", href: "/contact/" },
+  { label: "Privacy Policy", href: "/privacy-policy/" },
+  { label: "Terms of Service", href: "/terms-of-service/" },
+  { label: "Disclaimer", href: "/disclaimer/" },
 ];
 ---
 
 <footer class="site-footer">
-  <nav aria-label="Footer">
-    <ul>
-      {links.map((link) => (
-        <li><a href={link.href}>{link.name}</a></li>
-      ))}
-    </ul>
-  </nav>
-  <p>&copy; {year} {config.site_name}. All rights reserved.</p>
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="/">{config.site_name}</a>
+      <p>{config.niche}</p>
+    </div>
+    {navItems.length > 0 && (
+      <nav class="footer-col" aria-label="Footer pages">
+        <h2>Explore</h2>
+        <ul>
+          {navItems.map((item) => (
+            <li><a href={item.href}>{item.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+    )}
+    <nav class="footer-col" aria-label="Footer legal">
+      <h2>Trust</h2>
+      <ul>
+        {legalLinks.map((link) => (
+          <li><a href={link.href}>{link.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+  <div class="container footer-bottom">
+    <p>&copy; {year} {config.site_name}. All rights reserved.</p>
+    <a href="/rss.xml">RSS</a>
+  </div>
 </footer>
 
 <style>
   .site-footer {
     margin-top: 4rem;
-    padding: 2rem 1rem;
-    border-top: 1px solid rgba(128, 128, 128, 0.25);
-    font-size: 0.875rem;
-    text-align: center;
+    padding: 2.5rem 0 1.5rem;
+    background: var(--color-surface);
+    font-size: 0.9rem;
   }
-  .site-footer ul {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem 1.5rem;
+  .footer-grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    padding-bottom: 2rem;
+  }
+  .footer-brand a {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .footer-brand p {
+    margin: 0.5rem 0 0;
+    color: var(--color-muted);
+    max-width: 34ch;
+  }
+  .footer-col h2 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    margin: 0 0 0.75rem;
+  }
+  .footer-col ul {
     list-style: none;
-    margin: 0 0 1rem;
+    margin: 0;
     padding: 0;
   }
-  .site-footer p {
+  .footer-col li {
+    padding: 0.25rem 0;
+  }
+  .footer-col a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .footer-col a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+  }
+  .footer-bottom p {
     margin: 0;
-    opacity: 0.7;
+    color: var(--color-muted);
+  }
+  .footer-bottom a {
+    color: var(--color-muted);
   }
 </style>

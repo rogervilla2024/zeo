@@ -202,3 +202,9 @@ blockquote {
 .site-aside a:hover {
   text-decoration: underline;
 }
+
+/* Footer: primary-tinted band */
+.site-footer {
+  background: color-mix(in srgb, var(--color-primary) 7%, var(--color-background));
+  border-top: 3px solid var(--color-primary);
+}

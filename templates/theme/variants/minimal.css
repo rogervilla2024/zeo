@@ -164,3 +164,9 @@ blockquote {
 .site-aside a:hover {
   text-decoration: underline;
 }
+
+/* Footer: quiet rule, type only */
+.site-footer {
+  background: transparent;
+  border-top: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+}
