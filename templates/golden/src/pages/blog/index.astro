@@ -44,6 +44,15 @@ const breadcrumb = {
     <ul class="post-list">
       {posts.map((post) => (
         <li>
+          {post.data.image && (
+            <img
+              src={post.data.image}
+              alt=""
+              width="640"
+              height="360"
+              loading="lazy"
+            />
+          )}
           <a href={`/${post.id}/`}>{post.data.title}</a>
           <p>{post.data.description}</p>
         </li>

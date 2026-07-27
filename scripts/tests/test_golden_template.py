@@ -83,7 +83,7 @@ def test_ui_strings_config_and_wiring() -> None:
         "footer_explore", "footer_trust", "rights", "search",
         "search_placeholder", "home", "skip_to_content", "theme_toggle",
         "about", "contact", "privacy_policy", "terms_of_service", "disclaimer",
-        "blog",
+        "blog", "popular",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     assert all(isinstance(v, str) and v for v in ui.values())

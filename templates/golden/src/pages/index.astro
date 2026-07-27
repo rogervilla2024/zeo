@@ -1,16 +1,20 @@
 ---
-// Homepage: minimal-variant layout (intro plus a chronological post
-// list) with the sitewide Organization and WebSite+SearchAction JSON-LD
-// mirroring what scripts/build_jsonld.py produces.
+// Homepage: portal-density composition - branding hero, a large
+// feature card for the newest article, a thumbnail card grid for the
+// rest, and a sticky popular rail. Sitewide Organization and
+// WebSite+SearchAction JSON-LD mirror scripts/build_jsonld.py output.
 import { getCollection } from "astro:content";
 import config from "../../site.config.json";
 import Hero from "../components/Hero.astro";
+import Sidebar from "../components/Sidebar.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const ui = config.ui ?? {};
 const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+const [featured, ...rest] = posts;
+const popular = posts.slice(0, 5);
 
 const organization = {
   "@context": "https://schema.org",
@@ -51,15 +55,52 @@ const website = {
   jsonLd={[organization, website]}
 >
   <Hero title={config.site_name} tagline={config.niche} />
-  <section class="home-latest">
-    <h2>{ui.latest_articles ?? "Latest articles"}</h2>
-    <ul class="post-list">
-      {posts.map((post) => (
-        <li>
-          <a href={`/${post.id}/`}>{post.data.title}</a>
-          <p>{post.data.description}</p>
-        </li>
-      ))}
-    </ul>
-  </section>
+  <div class="with-aside">
+    <section class="home-main">
+      {featured && (
+        <a class="feature-card" href={`/${featured.id}/`}>
+          {featured.data.image && (
+            <img
+              src={featured.data.image}
+              alt=""
+              width="1600"
+              height="900"
+              fetchpriority="high"
+            />
+          )}
+          <div class="feature-body">
+            <h2>{featured.data.title}</h2>
+            <p>{featured.data.description}</p>
+          </div>
+        </a>
+      )}
+      <h2 class="section-title">{ui.latest_articles ?? "Latest articles"}</h2>
+      <ul class="post-list">
+        {rest.map((post) => (
+          <li>
+            {post.data.image && (
+              <img
+                src={post.data.image}
+                alt=""
+                width="640"
+                height="360"
+                loading="lazy"
+              />
+            )}
+            <a href={`/${post.id}/`}>{post.data.title}</a>
+            <p>{post.data.description}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+    {popular.length > 0 && (
+      <Sidebar title={ui.popular ?? "Popular"}>
+        <ul>
+          {popular.map((post) => (
+            <li><a href={`/${post.id}/`}>{post.data.title}</a></li>
+          ))}
+        </ul>
+      </Sidebar>
+    )}
+  </div>
 </BaseLayout>

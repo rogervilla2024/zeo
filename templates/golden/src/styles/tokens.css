@@ -282,3 +282,38 @@ blockquote {
   background: transparent;
   border-top: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
 }
+
+/* Card thumbnails and the front-page feature card */
+.post-list li img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius);
+  margin-bottom: 0.75rem;
+}
+.feature-card {
+  display: block;
+  margin: 0 0 2rem;
+  text-decoration: none;
+  color: inherit;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-text) 14%, transparent);
+}
+.feature-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  object-fit: cover;
+}
+.feature-card .feature-body { padding: 1.4rem 1.6rem; }
+.feature-card h2 { margin: 0 0 0.5rem; padding: 0; border: none; font-size: 1.6rem; }
+.feature-card p { margin: 0; color: var(--color-muted); }
+.section-title { border: none; padding-top: 0; }
