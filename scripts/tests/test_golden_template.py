@@ -61,7 +61,7 @@ def test_required_skeleton_files_exist() -> None:
         "src/styles/site.css",
         "src/pages/index.astro",
         "src/pages/blog/index.astro",
-        "src/pages/blog/[...slug].astro",
+        "src/pages/[...slug].astro",
         "src/pages/search.astro",
         "src/pages/rss.xml.js",
         "src/pages/about.astro",

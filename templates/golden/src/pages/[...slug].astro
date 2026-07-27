@@ -4,16 +4,16 @@
 // RelatedPosts) with Article + BreadcrumbList (+ FAQPage) JSON-LD that
 // mirrors the visible content, as the toolkit's gates require.
 import { getCollection, render } from "astro:content";
-import config from "../../../site.config.json";
-import AdSlot from "../../components/AdSlot.astro";
-import ArticleMeta from "../../components/ArticleMeta.astro";
-import Breadcrumbs from "../../components/Breadcrumbs.astro";
-import FaqAccordion from "../../components/FaqAccordion.astro";
-import KeyTakeaways from "../../components/KeyTakeaways.astro";
-import NewsletterCta from "../../components/NewsletterCta.astro";
-import RelatedPosts from "../../components/RelatedPosts.astro";
-import TableOfContents from "../../components/TableOfContents.astro";
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import config from "../../site.config.json";
+import AdSlot from "../components/AdSlot.astro";
+import ArticleMeta from "../components/ArticleMeta.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import FaqAccordion from "../components/FaqAccordion.astro";
+import KeyTakeaways from "../components/KeyTakeaways.astro";
+import NewsletterCta from "../components/NewsletterCta.astro";
+import RelatedPosts from "../components/RelatedPosts.astro";
+import TableOfContents from "../components/TableOfContents.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -23,7 +23,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
 
-const canonical = new URL(`/blog/${post.id}/`, config.domain).href;
+const canonical = new URL(`/${post.id}/`, config.domain).href;
 const published = post.data.pubDate.toISOString();
 const updated = (post.data.updatedDate ?? post.data.pubDate).toISOString();
 // Full ISO datetimes go to the JSON-LD; the visible byline gets
@@ -38,7 +38,7 @@ const related = (await getCollection("blog"))
   .slice(0, 3)
   .map((other) => ({
     title: other.data.title,
-    url: `/blog/${other.id}/`,
+    url: `/${other.id}/`,
     description: other.data.description,
   }));
 
