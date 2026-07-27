@@ -12,14 +12,15 @@ interface NavItem {
   href: string;
 }
 
+const ui = config.ui ?? {};
 const year = new Date().getFullYear();
 const navItems: NavItem[] = config.nav ?? [];
 const legalLinks = [
-  { label: "About", href: "/about/" },
-  { label: "Contact", href: "/contact/" },
-  { label: "Privacy Policy", href: "/privacy-policy/" },
-  { label: "Terms of Service", href: "/terms-of-service/" },
-  { label: "Disclaimer", href: "/disclaimer/" },
+  { label: ui.about ?? "About", href: "/about/" },
+  { label: ui.contact ?? "Contact", href: "/contact/" },
+  { label: ui.privacy_policy ?? "Privacy Policy", href: "/privacy-policy/" },
+  { label: ui.terms_of_service ?? "Terms of Service", href: "/terms-of-service/" },
+  { label: ui.disclaimer ?? "Disclaimer", href: "/disclaimer/" },
 ];
 ---
 
@@ -31,7 +32,7 @@ const legalLinks = [
     </div>
     {navItems.length > 0 && (
       <nav class="footer-col" aria-label="Footer pages">
-        <h2>Explore</h2>
+        <h2>{ui.footer_explore ?? "Explore"}</h2>
         <ul>
           {navItems.map((item) => (
             <li><a href={item.href}>{item.label}</a></li>
@@ -40,7 +41,7 @@ const legalLinks = [
       </nav>
     )}
     <nav class="footer-col" aria-label="Footer legal">
-      <h2>Trust</h2>
+      <h2>{ui.footer_trust ?? "Trust"}</h2>
       <ul>
         {legalLinks.map((link) => (
           <li><a href={link.href}>{link.label}</a></li>
@@ -49,7 +50,7 @@ const legalLinks = [
     </nav>
   </div>
   <div class="container footer-bottom">
-    <p>&copy; {year} {config.site_name}. All rights reserved.</p>
+    <p>&copy; {year} {config.site_name}. {ui.rights ?? "All rights reserved."}</p>
     <a href="/rss.xml">RSS</a>
   </div>
 </footer>

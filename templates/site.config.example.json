@@ -18,6 +18,31 @@
       "href": "/about/"
     }
   ],
+  "ui": {
+    "latest_articles": "Latest articles",
+    "key_takeaways": "Key takeaways",
+    "on_this_page": "On this page",
+    "faq_title": "Frequently asked questions",
+    "read_next": "Read next",
+    "by": "By",
+    "published": "Published",
+    "updated": "Updated",
+    "min_read": "min read",
+    "footer_explore": "Explore",
+    "footer_trust": "Trust",
+    "rights": "All rights reserved.",
+    "search": "Search",
+    "search_placeholder": "Search this site",
+    "home": "Home",
+    "skip_to_content": "Skip to content",
+    "theme_toggle": "Theme",
+    "about": "About",
+    "contact": "Contact",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service",
+    "disclaimer": "Disclaimer",
+    "blog": "Blog"
+  },
   "organization": {
     "name": "Example Site",
     "logo": "/logo.png",

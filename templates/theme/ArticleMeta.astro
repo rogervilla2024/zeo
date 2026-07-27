@@ -11,25 +11,41 @@ interface Props {
   published: string;
   updated?: string;
   words?: number;
+  byLabel?: string;
+  publishedLabel?: string;
+  updatedLabel?: string;
+  minReadLabel?: string;
 }
-const { authorName, authorUrl, published, updated, words } = Astro.props;
+const {
+  authorName,
+  authorUrl,
+  published,
+  updated,
+  words,
+  byLabel = "By",
+  publishedLabel = "Published",
+  updatedLabel = "Updated",
+  minReadLabel = "min read",
+} = Astro.props;
 const readingMinutes = words ? Math.max(1, Math.round(words / 220)) : null;
 ---
 
 <p class="article-meta">
-  By <a href={authorUrl} rel="author">{authorName}</a>
+  {byLabel} <a href={authorUrl} rel="author">{authorName}</a>
   <span aria-hidden="true">&middot;</span>
-  <time datetime={published}>Published {published}</time>
+  <time datetime={published}>{publishedLabel} {published}</time>
   {updated && updated !== published && (
     <>
       <span aria-hidden="true">&middot;</span>
-      <span class="updated"><time datetime={updated}>Updated {updated}</time></span>
+      <span class="updated">
+        <time datetime={updated}>{updatedLabel} {updated}</time>
+      </span>
     </>
   )}
   {readingMinutes && (
     <>
       <span aria-hidden="true">&middot;</span>
-      <span>{readingMinutes} min read</span>
+      <span>{readingMinutes} {minReadLabel}</span>
     </>
   )}
 </p>

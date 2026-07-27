@@ -160,6 +160,9 @@ def build_css(tokens: ThemeTokens) -> str:
 {_vars(dark)}
 }}
 
+html {{
+  background: var(--color-background);
+}}
 body {{
   margin: 0;
   font-family: var(--font-body);

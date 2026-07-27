@@ -20,6 +20,7 @@ export async function getStaticPaths() {
   return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 
+const ui = config.ui ?? {};
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
 
@@ -70,11 +71,16 @@ const breadcrumb = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: config.domain },
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: ui.home ?? "Home",
+      item: config.domain,
+    },
     {
       "@type": "ListItem",
       position: 2,
-      name: "Blog",
+      name: ui.blog ?? "Blog",
       item: new URL("/blog/", config.domain).href,
     },
     { "@type": "ListItem", position: 3, name: post.data.title, item: canonical },
@@ -107,8 +113,8 @@ const faqSchema = post.data.faq.length
   <article class="prose">
     <Breadcrumbs
       items={[
-        { name: "Home", url: "/" },
-        { name: "Blog", url: "/blog/" },
+        { name: ui.home ?? "Home", url: "/" },
+        { name: ui.blog ?? "Blog", url: "/blog/" },
         { name: post.data.title },
       ]}
     />
@@ -119,12 +125,17 @@ const faqSchema = post.data.faq.length
       published={publishedDate}
       updated={updatedDate}
       words={post.body ? post.body.split(/\s+/).length : undefined}
+      byLabel={ui.by}
+      publishedLabel={ui.published}
+      updatedLabel={ui.updated}
+      minReadLabel={ui.min_read}
     />
     {post.data.takeaways.length > 0 && (
-      <KeyTakeaways points={post.data.takeaways} />
+      <KeyTakeaways points={post.data.takeaways} title={ui.key_takeaways} />
     )}
     {headings.filter((h) => h.depth === 2).length >= 4 && (
       <TableOfContents
+        title={ui.on_this_page}
         headings={headings
           .filter((h) => h.depth === 2)
           .map((h) => ({ slug: h.slug, text: h.text }))}
@@ -132,8 +143,8 @@ const faqSchema = post.data.faq.length
     )}
     <Content />
     <AdSlot name="article-end" />
-    {post.data.faq.length > 0 && <FaqAccordion items={post.data.faq} />}
+    {post.data.faq.length > 0 && <FaqAccordion items={post.data.faq} title={ui.faq_title} />}
     <NewsletterCta />
-    {related.length > 0 && <RelatedPosts posts={related} />}
+    {related.length > 0 && <RelatedPosts posts={related} title={ui.read_next} />}
   </article>
 </BaseLayout>

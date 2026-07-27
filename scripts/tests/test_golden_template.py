@@ -74,6 +74,33 @@ def test_required_skeleton_files_exist() -> None:
         assert (GOLDEN / relative).is_file(), f"missing {relative}"
 
 
+def test_ui_strings_config_and_wiring() -> None:
+    config = json.loads((GOLDEN / "site.config.json").read_text())
+    ui = config["ui"]
+    required = {
+        "latest_articles", "key_takeaways", "on_this_page", "faq_title",
+        "read_next", "by", "published", "updated", "min_read",
+        "footer_explore", "footer_trust", "rights", "search",
+        "search_placeholder", "home", "skip_to_content", "theme_toggle",
+        "about", "contact", "privacy_policy", "terms_of_service", "disclaimer",
+        "blog",
+    }
+    assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
+    assert all(isinstance(v, str) and v for v in ui.values())
+    # The visible component labels must be driven by config.ui, so a
+    # Turkish site never leaks English chrome.
+    pages = GOLDEN / "src" / "pages"
+    assert "ui.latest_articles" in (pages / "index.astro").read_text()
+    article = (pages / "[...slug].astro").read_text()
+    for key in ("ui.key_takeaways", "ui.faq_title", "ui.read_next", "ui.by"):
+        assert key in article, f"article template misses {key}"
+    assert "ui.search" in (pages / "search.astro").read_text()
+    footer = (GOLDEN / "src" / "components" / "Footer.astro").read_text()
+    assert "ui.footer_explore" in footer and "ui.rights" in footer
+    layout = (GOLDEN / "src" / "layouts" / "BaseLayout.astro").read_text()
+    assert "ui.skip_to_content" in layout
+
+
 def test_package_json_is_zero_js_static_build() -> None:
     package = json.loads((GOLDEN / "package.json").read_text())
     assert package["scripts"]["build"] == "astro build"
