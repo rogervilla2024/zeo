@@ -5,6 +5,7 @@
 import { getCollection } from "astro:content";
 import config from "../../../site.config.json";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import PostCard from "../../components/PostCard.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const ui = config.ui ?? {};
@@ -43,19 +44,12 @@ const breadcrumb = {
     <h1>{ui.blog ?? "Blog"}</h1>
     <ul class="post-list">
       {posts.map((post) => (
-        <li>
-          {post.data.image && (
-            <img
-              src={post.data.image}
-              alt=""
-              width="640"
-              height="360"
-              loading="lazy"
-            />
-          )}
-          <a href={`/${post.id}/`}>{post.data.title}</a>
-          <p>{post.data.description}</p>
-        </li>
+        <PostCard
+          title={post.data.title}
+          url={`/${post.id}/`}
+          description={post.data.description}
+          image={post.data.image}
+        />
       ))}
     </ul>
   </section>

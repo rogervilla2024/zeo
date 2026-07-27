@@ -335,3 +335,6 @@ blockquote {
   border-radius: 3px;
   background: var(--color-primary);
 }
+
+/* Category strips on the homepage */
+.category-strip { margin-top: 2.75rem; }

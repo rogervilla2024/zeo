@@ -1,11 +1,13 @@
 ---
 // Homepage: portal-density composition - branding hero, a large
-// feature card for the newest article, a thumbnail card grid for the
-// rest, and a sticky popular rail. Sitewide Organization and
-// WebSite+SearchAction JSON-LD mirror scripts/build_jsonld.py output.
+// feature card for the newest article, a limited latest grid, one
+// strip per category (pillar), and a sticky popular rail. Sitewide
+// Organization and WebSite+SearchAction JSON-LD mirror
+// scripts/build_jsonld.py output.
 import { getCollection } from "astro:content";
 import config from "../../site.config.json";
 import Hero from "../components/Hero.astro";
+import PostCard from "../components/PostCard.astro";
 import Sidebar from "../components/Sidebar.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
@@ -14,7 +16,23 @@ const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 const [featured, ...rest] = posts;
+const latest = rest.slice(0, 6);
 const popular = posts.slice(0, 5);
+
+// One strip per pillar/category, biggest clusters first, three most
+// recent articles each. Articles without a category join no strip.
+const byCategory = new Map<string, typeof posts>();
+for (const post of posts) {
+  const category = post.data.category;
+  if (!category) continue;
+  const bucket = byCategory.get(category) ?? [];
+  bucket.push(post);
+  byCategory.set(category, bucket);
+}
+const strips = [...byCategory.entries()]
+  .sort((a, b) => b[1].length - a[1].length)
+  .slice(0, 4)
+  .map(([name, list]) => ({ name, posts: list.slice(0, 3) }));
 
 const organization = {
   "@context": "https://schema.org",
@@ -76,22 +94,30 @@ const website = {
       )}
       <h2 class="section-title">{ui.latest_articles ?? "Latest articles"}</h2>
       <ul class="post-list">
-        {rest.map((post) => (
-          <li>
-            {post.data.image && (
-              <img
-                src={post.data.image}
-                alt=""
-                width="640"
-                height="360"
-                loading="lazy"
-              />
-            )}
-            <a href={`/${post.id}/`}>{post.data.title}</a>
-            <p>{post.data.description}</p>
-          </li>
+        {latest.map((post) => (
+          <PostCard
+            title={post.data.title}
+            url={`/${post.id}/`}
+            description={post.data.description}
+            image={post.data.image}
+          />
         ))}
       </ul>
+      {strips.map((strip) => (
+        <section class="category-strip">
+          <h2 class="section-title">{strip.name}</h2>
+          <ul class="post-list">
+            {strip.posts.map((post) => (
+              <PostCard
+                title={post.data.title}
+                url={`/${post.id}/`}
+                description={post.data.description}
+                image={post.data.image}
+              />
+            ))}
+          </ul>
+        </section>
+      ))}
     </section>
     {popular.length > 0 && (
       <Sidebar title={ui.popular ?? "Popular"}>
