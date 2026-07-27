@@ -43,6 +43,7 @@ def test_variant_css_targets_shipped_hooks() -> None:
             ".toc",
             ".takeaways",
             ".site-hero",
+            ".site-aside",
             "header.container",
         ):
             assert hook in css, f"{variant}.css misses {hook}"

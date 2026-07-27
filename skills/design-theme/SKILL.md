@@ -68,7 +68,22 @@ if yours is 30 lines, you restyled nothing.
        --output src/styles/tokens.css
    ```
 
-4. Art-direct the site in `src/styles/site.css` (loaded by BaseLayout
+4. Choose the site's COMPOSITION deliberately - layout is part of the
+   identity, and two sites must not share it any more than they share
+   a palette:
+   - header: nav style from the `nav` array in site.config.json
+     (fill it with the site's real sections) - inline links, centered
+     masthead, or pill/button links; style `.site-nav` accordingly
+   - columns: single column, right sidebar, or left sidebar. The
+     `.with-aside` grid utility (tokens.css) plus `Sidebar.astro`
+     make two-column pages one wrapper away - fill the aside with
+     what serves THIS site: cluster navigation on guide sites,
+     popular/recent articles on magazines, category links on review
+     sites. Sidebars belong on listing and article pages, never
+     forced onto trust pages.
+   - density and shape: card-heavy vs airy lists, sharp vs soft
+     radius, boxed vs full-bleed hero.
+5. Art-direct the site in `src/styles/site.css` (loaded by BaseLayout
    after tokens.css). This is the identity layer - make it as large
    as the design needs. Cover, at minimum:
    - the hero (`.site-hero`): the first screen must look composed -
@@ -82,31 +97,34 @@ if yours is 30 lines, you restyled nothing.
    - the footer: styled, not an afterthought
    Only the SEO mechanics are off-limits; every visual surface is
    yours to redesign.
-5. Every color pair must hold WCAG AA (4.5:1 body text, 3:1 large
+6. Every color pair must hold WCAG AA (4.5:1 body text, 3:1 large
    text) in BOTH light and dark modes. Check the pairs actually used:
    text/background, muted/background, on-primary/primary, link/
    background.
-6. Hard rules that survive any design: zero JavaScript added; one h1;
+7. Hard rules that survive any design: zero JavaScript added; one h1;
    visible focus states kept; the JS and media budgets still pass;
    no external fonts, CSS, or images fetched at runtime (self-hosted
    assets only).
-7. Finish through the visual-review gate: build, screenshot at
+8. Finish through the visual-review gate: build, screenshot at
    390/768/1440, critique against its checklist - including the
    distinctiveness check - fix, re-shoot until it passes. A design
    that has not passed visual-review does not ship.
 
 ## Output
 
-- Updated `site.config.json` theme section, regenerated tokens.css,
-  and (when needed) a small `src/styles/site.css`.
-- The design brief (one paragraph) recorded in the handoff, so the
-  next session restyles deliberately instead of guessing.
+- Updated `site.config.json` (theme section plus the `nav` array),
+  regenerated tokens.css, and the site's identity layer in
+  `src/styles/site.css`.
+- The design brief (mood, palette, composition) recorded in the
+  handoff, so the next session restyles deliberately instead of
+  guessing.
 - Passing visual-review screenshots at all three widths.
 
 ## Quality checklist
 
-- The look expresses the niche; two sites from this toolkit are never
-  visually confusable.
+- The look AND the composition express the niche; two sites from this
+  toolkit are never visually confusable - not in color, not in layout.
+- The header carries a real nav; sidebar (if any) serves the content.
 - All color pairs pass AA in light and dark.
 - Zero-JS preserved; budgets still green; focus states visible.
 - visual-review passed at 390/768/1440.

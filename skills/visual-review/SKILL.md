@@ -45,7 +45,8 @@ done because it builds; it is done when its screenshots pass review.
 - Clear visual hierarchy: one dominant element per screen; heading
   sizes step down meaningfully (fluid scale, not all near body size).
 - The header looks designed: aligned nav, spacing, active state - not
-  a row of bare links.
+  a row of bare links. A header with no navigation menu at all (brand
+  only) is an automatic fail.
 - Cards and grids align to a consistent gutter; imagery (or icon
   blocks) present where the variant expects them; no large empty
   white voids.
