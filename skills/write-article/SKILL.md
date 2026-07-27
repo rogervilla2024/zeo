@@ -65,7 +65,7 @@ Run the stages in order. Delegate each stage to the named subagent via the Task/
    The linker finds natural anchor phrases inside paragraphs (never headings or code), caps density, and links each target once. Review its insertions, and delegate to `internal-link-strategist` for links back FROM older articles TO the new one (reverse linking), which the strategist should list as edits to existing pages. A brand-new site with no inventory yet links to its pillar pages instead.
 9. Fact-check. Delegate to `fact-checker` (or invoke the fact-check skill) to verify claims, add citations, and correct stats, dates, and names. Do not proceed with unresolved flags.
 10. Schema. Delegate to `schema-engineer` to generate JSON-LD: Article/BlogPosting (with the author's profile URL when the site has author entities), FAQPage built from the stage-6 questions, and HowTo where relevant, matching the final content.
-11. Images (mandatory - an article never ships imageless). Invoke the generate-article-images skill: `images.min`-`images.max` visuals per article, SVG-first from the article's own content, stock photos only per `images.strategy`, all with alt text, dimensions, and image-sitemap entries.
+11. Images (mandatory - an article never ships imageless). Invoke the generate-article-images skill: one topic-depicting hero per article (`images.hero`, default an original AI-authored illustration of the subject, eager-loaded as the LCP), plus `images.min`-`images.max` body visuals, SVG-first from the article's own content, stock photos only per `images.strategy`, all with alt text, dimensions, and image-sitemap entries.
 12. Originality gate. When the site has published articles, verify the new article is not substantially similar to anything already on the site:
 
    ```bash
@@ -92,7 +92,7 @@ Run the stages in order. Delegate each stage to the named subagent via the Task/
 - [ ] Reads as human-written; check_ai_patterns.py passes with no banned phrases.
 - [ ] check_originality.py clears the threshold against the site's published articles.
 - [ ] Every statistic, date, and name is cited or corrected.
-- [ ] At least images.min images present (SVG diagrams or credited stock), each with alt and dimensions.
+- [ ] A topic-depicting hero present (illustration or photo per images.hero) plus at least images.min body images, each with alt and dimensions.
 - [ ] FAQ section present: 3-5 PAA-derived questions with extractable answers, mirrored in FAQPage JSON-LD.
 - [ ] In-body contextual internal links are present (suggest_internal_links.py applied and reviewed); the article never ships without them.
 - [ ] Reverse-link edits (older articles linking to this one) are listed for application.

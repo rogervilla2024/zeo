@@ -3,13 +3,20 @@
 Usage:
     python fetch_stock_images.py --query "french press coffee" \
         --slug french-press-brewing --out-dir public/img --count 2
+    python fetch_stock_images.py --query "thyme tea glass" \
+        --slug kekik-cayi --out-dir public/img --hero
 
 Requires PEXELS_API_KEY in the environment (free key from
 pexels.com/api; store in .env, never in the repository). Downloads the
 top results, resizes to a sane content width, converts to WebP, names
 files for SEO, and prints a JSON manifest (file, width, height,
 photographer credit) for the article to embed with alt text and
-explicit dimensions.
+explicit dimensions. The Pexels license does not require attribution;
+the credit field is there for sites that choose to give it.
+
+``--hero`` fetches exactly one landscape photo and cover-crops it to
+1600x900 as ``<slug>-hero.webp`` - the article's LCP image when
+``images.hero`` is ``photo``.
 """
 
 from __future__ import annotations
@@ -29,12 +36,41 @@ from seo_content_forge.fetch import fetch
 
 _API = "https://api.pexels.com/v1/search"
 MAX_WIDTH = 1600
+HERO_SIZE = (1600, 900)
 
 
 def slugify(text: str) -> str:
     """Lowercase, hyphenated, ascii-only slug for filenames."""
     text = re.sub(r"[^a-z0-9]+", "-", text.lower())
     return text.strip("-") or "image"
+
+
+def cover_crop(image: Image.Image, size: tuple[int, int] = HERO_SIZE) -> Image.Image:
+    """Scale-and-center-crop an image to exactly ``size`` (cover fit).
+
+    Args:
+        image: Source image (any aspect ratio).
+        size: Target (width, height).
+
+    Returns:
+        A new image of exactly ``size`` with the center preserved.
+    """
+    target_width, target_height = size
+    scale = max(target_width / image.width, target_height / image.height)
+    scaled = image.resize(
+        (round(image.width * scale), round(image.height * scale)),
+        Image.Resampling.LANCZOS,
+    )
+    left = (scaled.width - target_width) // 2
+    top = (scaled.height - target_height) // 2
+    return scaled.crop((left, top, left + target_width, top + target_height))
+
+
+def output_name(slug: str, index: int, hero: bool) -> str:
+    """The SEO filename for one downloaded photo."""
+    if hero:
+        return f"{slugify(slug)}-hero.webp"
+    return f"{slugify(slug)}-{index}.webp"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -44,15 +80,25 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--slug", required=True, help="SEO filename base.")
     parser.add_argument("--out-dir", required=True, type=Path)
     parser.add_argument("--count", type=int, default=2)
+    parser.add_argument(
+        "--hero",
+        action="store_true",
+        help="Fetch one landscape photo cover-cropped to 1600x900 "
+        "as <slug>-hero.webp.",
+    )
     args = parser.parse_args(argv)
+    if args.hero:
+        args.count = 1
 
     key = os.environ.get("PEXELS_API_KEY", "")
     if not key:
         print("PEXELS_API_KEY is not set (.env).", file=sys.stderr)
         return 2
 
+    orientation = "&orientation=landscape" if args.hero else ""
     result = fetch(
-        f"{_API}?query={args.query.replace(' ', '%20')}&per_page={args.count}",
+        f"{_API}?query={args.query.replace(' ', '%20')}"
+        f"&per_page={args.count}{orientation}",
         headers={"Authorization": key},
     )
     if not result.ok:
@@ -75,13 +121,15 @@ def main(argv: list[str] | None = None) -> int:
             continue
         with Image.open(io.BytesIO(image_bytes)) as source_image:
             image = source_image.convert("RGB")
-            if image.width > MAX_WIDTH:
+            if args.hero:
+                image = cover_crop(image)
+            elif image.width > MAX_WIDTH:
                 ratio = MAX_WIDTH / image.width
                 image = image.resize(
                     (MAX_WIDTH, int(image.height * ratio)),
                     Image.Resampling.LANCZOS,
                 )
-            name = f"{slugify(args.slug)}-{index}.webp"
+            name = output_name(args.slug, index, args.hero)
             image.save(args.out_dir / name, format="WEBP", quality=82)
             manifest.append(
                 {
