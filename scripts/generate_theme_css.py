@@ -4,8 +4,11 @@ Usage:
     python generate_theme_css.py --config site.config.json --output tokens.css
 
 Reads the ``theme`` section (palette, dark_palette, fonts, radius,
-max_width; all optional with sensible defaults) and writes the token
-stylesheet the theme components rely on.
+max_width, variant; all optional with sensible defaults) and writes
+the token stylesheet the theme components rely on, with the shipped
+stylesheet of ``theme.variant`` (minimal, editorial, guide, review)
+appended - so every site starts from a finished design baseline, never
+an unstyled skeleton.
 """
 
 from __future__ import annotations
@@ -16,7 +19,7 @@ from pathlib import Path
 
 import orjson
 
-from seo_content_forge.theme_css import build_css, from_config
+from seo_content_forge.theme_css import compose_css, from_config
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -30,7 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    css = build_css(from_config(orjson.loads(args.config.read_bytes())))
+    css = compose_css(from_config(orjson.loads(args.config.read_bytes())))
     if args.output:
         args.output.write_text(css, encoding="utf-8")
         print(f"Wrote {args.output}")

@@ -45,14 +45,21 @@ Gather before scaffolding (ask only for what is missing):
    generator via Bash (e.g. `npm create astro@latest`,
    `npx create-next-app`, static/SSG configuration) only when the site
    needs Next.js or a structure the golden template does not cover.
-3. Choose the theme path. Default when the user has no preference:
-   run the find-theme skill for the niche and propose adopting the top
-   ready-made theme (adopt-theme skill) - professional design day one.
-   Fall back to the custom path below when no theme fits or the user
-   wants a bespoke look.
-   Custom path - build the theme from the toolkit's templates (see
-   `templates/theme/README.md` for the full rules):
-   - generate the design tokens from the config's `theme` section:
+3. Build the theme. There is exactly one path: the toolkit's own
+   theme layer plus an AI-designed, niche-specific identity. Never
+   adopt or search for third-party themes - the ecosystem produces
+   generic personal-blog looks, and every site from this toolkit must
+   be visually distinct and topically appropriate.
+   - pick `theme.variant` by content type (minimal, editorial, guide,
+     review); its shipped stylesheet ships the design floor
+   - run the design-theme skill: derive the design brief from the
+     niche, set the palette/fonts/radius tokens, add the small
+     site-specific override layer, and hold every color pair to
+     WCAG AA in both modes
+   - build the mechanics from the toolkit's templates (see
+     `templates/theme/README.md` for the full rules):
+   - generate the design tokens (variant stylesheet included) from
+     the config's `theme` section:
 
      ```bash
      python scripts/generate_theme_css.py --config site.config.json \
@@ -63,8 +70,10 @@ Gather before scaffolding (ask only for what is missing):
      toggle, Speculation Rules prerendering, Footer) plus the SEO head
      component (`SeoHead.astro` for Astro, `next-metadata.ts` for
      Next.js)
-   - implement the layout variant named by `theme.variant`
-     (`templates/theme/variants/`: minimal, editorial, guide, review)
+   - the layout variant named by `theme.variant` is applied
+     automatically by generate_theme_css.py
+     (`templates/theme/variants/*.css`: minimal, editorial, guide,
+     review; the .md files describe each variant's intent)
    - wire the content blocks into the article template: ArticleMeta,
      KeyTakeaways, TableOfContents, FaqAccordion, RelatedPosts (plus
      ProsCons and VerdictBox for the review variant)
@@ -155,6 +164,9 @@ Gather before scaffolding (ask only for what is missing):
 
 - `check_rich_results.py --file` passes on the built homepage and one
   content page.
+- The visual-review gate passed at 390/768/1440 after the
+  design-theme pass - a site whose screenshots have not passed review
+  is not done, regardless of the other gates.
 - Built HTML contains the page text (view-source test), not an empty
   JavaScript shell.
 - robots.txt names the AI crawlers and points at the sitemap.
