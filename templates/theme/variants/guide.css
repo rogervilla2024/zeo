@@ -273,3 +273,65 @@ blockquote {
   background: color-mix(in srgb, var(--color-primary) 7%, var(--color-background));
   border-top: 3px solid var(--color-primary);
 }
+
+/* Card thumbnails: edge-to-edge cover images inside post cards */
+.post-list li img {
+  display: block;
+  width: calc(100% + 2.7rem);
+  max-width: none;
+  margin: -1.2rem -1.35rem 0.9rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: calc(var(--radius) - 2px) calc(var(--radius) - 2px) 0 0;
+}
+
+/* Feature card: the front-page lead story */
+.feature-card {
+  display: block;
+  margin: 0 0 2rem;
+  text-decoration: none;
+  color: inherit;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+  border-radius: calc(var(--radius) * 2);
+  overflow: hidden;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-text) 8%, transparent);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--color-text) 16%, transparent);
+}
+.feature-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  object-fit: cover;
+}
+.feature-card .feature-body { padding: 1.5rem 1.75rem; }
+.feature-card h2 {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: none;
+  font-size: 1.7rem;
+  line-height: 1.2;
+}
+.feature-card p { margin: 0; color: var(--color-muted); font-size: 1.02rem; }
+.feature-card:hover h2 { color: var(--color-primary); }
+
+/* Section title with a primary tick */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+.section-title::before {
+  content: "";
+  width: 0.45rem;
+  height: 1.35rem;
+  border-radius: 3px;
+  background: var(--color-primary);
+}
