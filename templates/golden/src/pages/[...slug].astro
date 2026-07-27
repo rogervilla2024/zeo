@@ -8,6 +8,7 @@ import { getCollection, render } from "astro:content";
 import config from "../../site.config.json";
 import AdSlot from "../components/AdSlot.astro";
 import ArticleMeta from "../components/ArticleMeta.astro";
+import AuthorBox from "../components/AuthorBox.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import FaqAccordion from "../components/FaqAccordion.astro";
 import KeyTakeaways from "../components/KeyTakeaways.astro";
@@ -34,6 +35,22 @@ const updated = (post.data.updatedDate ?? post.data.pubDate).toISOString();
 const publishedDate = published.slice(0, 10);
 const updatedDate = updated.slice(0, 10);
 const ogImage = post.data.image ?? config.seo.og_image;
+
+// The registered author entity behind this byline, for the visible
+// author box; frontmatter may write authorUrl with or without a
+// trailing slash.
+const normalizePath = (path: string) => path.replace(/\/+$/, "");
+const authors: {
+  name: string;
+  role: string;
+  url: string;
+  bio?: string;
+  image?: string;
+}[] = config.authors;
+const authorEntity = authors.find(
+  (candidate) =>
+    normalizePath(candidate.url) === normalizePath(post.data.authorUrl),
+);
 
 // Breadcrumb level 2: the article's category archive when it has
 // one (tightening the cluster's internal links), the blog hub
@@ -158,6 +175,14 @@ const faqSchema = post.data.faq.length
     <Content />
     <AdSlot name="article-end" />
     {post.data.faq.length > 0 && <FaqAccordion items={post.data.faq} title={ui.faq_title} />}
+    <AuthorBox
+      name={post.data.author}
+      url={post.data.authorUrl}
+      role={authorEntity?.role}
+      bio={authorEntity?.bio}
+      image={authorEntity?.image}
+      title={ui.about_the_author}
+    />
     <NewsletterCta />
   </article>
   {related.length > 0 && (

@@ -87,6 +87,7 @@ def test_ui_strings_config_and_wiring() -> None:
         "search_placeholder", "home", "skip_to_content", "theme_toggle",
         "about", "contact", "privacy_policy", "terms_of_service", "disclaimer",
         "blog", "popular", "category_description", "author_articles",
+        "about_the_author",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
@@ -165,6 +166,12 @@ def test_author_profile_pages() -> None:
     # author pointing elsewhere (e.g. an external profile) must not
     # break the build.
     assert 'startsWith("/authors/")' in text
+
+    # Articles end with a visible author box that mirrors the Article
+    # JSON-LD's author node and links to the profile page.
+    article = (GOLDEN / "src" / "pages" / "[...slug].astro").read_text()
+    for hook in ("AuthorBox", "authorEntity", "ui.about_the_author"):
+        assert hook in article, f"article template misses {hook}"
 
 
 def test_package_json_is_zero_js_static_build() -> None:

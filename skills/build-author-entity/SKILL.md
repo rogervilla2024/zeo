@@ -47,7 +47,9 @@ fabricated impressive one, which is a policy risk.
    this happens automatically for future articles.
 5. Add a visible author box to the article template: photo, name, role,
    one-line bio, link to the profile. Schema must mirror visible
-   content.
+   content. Golden-template sites ship this too (AuthorBox.astro,
+   rendered at the end of every article from the matching config
+   author), so there it works as soon as the config entry is filled.
 6. Verify with the offline checker on a built article page and the
    profile page:
 

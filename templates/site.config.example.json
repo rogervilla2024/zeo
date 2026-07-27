@@ -44,7 +44,8 @@
     "blog": "Blog",
     "popular": "Popular",
     "category_description": "Articles in the {category} category.",
-    "author_articles": "Articles by {author}"
+    "author_articles": "Articles by {author}",
+    "about_the_author": "About the author"
   },
   "organization": {
     "name": "Example Site",

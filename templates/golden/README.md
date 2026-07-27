@@ -110,7 +110,9 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   `/authors/<slug>/` - one per `authors` entry whose `url` starts
   with `/authors/` - with Person JSON-LD, the bio and sameAs links
   from the config, and the author's article list; article bylines
-  already point there via `authorUrl`.
+  already point there via `authorUrl`, and every article ends with a
+  visible author box (name, role, bio from the matching config
+  author) linking to the profile.
 - `src/content.config.ts` - blog collection schema; SEO-critical
   frontmatter is required at build time. The optional `category`
   field (the article's pillar from the cluster map) feeds the
