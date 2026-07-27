@@ -10,12 +10,19 @@ p, ul, ol { margin: 0 0 1rem; }
 
 /* Header: brand left, accent underline on hover */
 body > header.container {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
   margin-bottom: 2rem;
+  max-width: none;
+  padding-inline: max(1rem, calc((100% - var(--width-site)) / 2));
+  background: color-mix(in srgb, var(--color-background) 88%, transparent);
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid color-mix(in srgb, var(--color-muted) 30%, transparent);
 }
 body > header.container > a {
@@ -64,13 +71,14 @@ body > header.container nav a:hover {
   font-weight: 700;
 }
 
-/* Post list: review cards with room for a rating line */
+/* Post list: review card grid with hover lift */
 .post-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 1rem;
+  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
 }
 .post-list li {
   border: 1px solid color-mix(in srgb, var(--color-muted) 30%, transparent);
@@ -78,6 +86,11 @@ body > header.container nav a:hover {
   padding: 1.1rem 1.3rem;
   background: var(--color-surface);
   box-shadow: 0 1px 2px color-mix(in srgb, var(--color-text) 6%, transparent);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.post-list li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-text) 14%, transparent);
 }
 .post-list a {
   font-family: var(--font-heading);

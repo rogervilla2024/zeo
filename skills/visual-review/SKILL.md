@@ -18,18 +18,17 @@ done because it builds; it is done when its screenshots pass review.
 1. Build the site and serve the output locally (`npx astro preview`
    or a static server on the dist directory).
 2. Capture full-page screenshots of the homepage AND one article page
-   at three widths: 390 (mobile), 768 (tablet), 1440 (desktop). A short
-   Playwright script is enough:
+   at three widths, and collect the DevTools console at the same time.
+   The toolkit ships the harness - it screenshots 390/768/1440 into
+   shots/ and fails on any console error, page exception, or failed
+   network request (Chrome DevTools Protocol via Playwright):
 
-   ```js
-   const { chromium } = require("playwright");
-   const browser = await chromium.launch();
-   for (const [name, width] of [["mobile",390],["tablet",768],["desktop",1440]]) {
-     const page = await browser.newPage({ viewport: { width, height: 900 } });
-     await page.goto("http://localhost:4321/");
-     await page.screenshot({ path: `shots/home-${name}.png`, fullPage: true });
-   }
+   ```bash
+   node <toolkit>/templates/ci/visual-check.mjs / /<one-article-slug>/
    ```
+
+   A red console is an automatic fail even when the pixels look fine;
+   fix the errors before critiquing the screenshots.
 
 3. Read every screenshot and critique it against the checklist below.
    Be harsh: "acceptable" is not the bar; "a designer shipped this" is.

@@ -91,6 +91,10 @@ body > header.container nav a:hover { color: var(--color-primary); }
 .post-list li {
   border-top: 3px solid var(--color-accent);
   padding: 0.9rem 0 0;
+  transition: border-color 150ms ease;
+}
+.post-list li:hover {
+  border-top-color: var(--color-primary);
 }
 .post-list a {
   font-family: var(--font-heading);
@@ -100,6 +104,7 @@ body > header.container nav a:hover { color: var(--color-primary); }
   color: var(--color-text);
   text-decoration: none;
 }
+.post-list a { transition: color 150ms ease; }
 .post-list a:hover { color: var(--color-primary); }
 .post-list p {
   margin: 0.4rem 0 0;

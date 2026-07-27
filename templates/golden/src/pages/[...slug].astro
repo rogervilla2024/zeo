@@ -1,7 +1,8 @@
 ---
-// Article template: minimal-variant page order (Breadcrumbs, h1,
-// ArticleMeta, KeyTakeaways, TableOfContents, body, FaqAccordion,
-// RelatedPosts) with Article + BreadcrumbList (+ FAQPage) JSON-LD that
+// Article template: two-column composition - the reading column
+// (Breadcrumbs, h1, ArticleMeta, KeyTakeaways, TableOfContents, body,
+// FaqAccordion, NewsletterCta) plus a sticky right sidebar with the
+// in-cluster next reads. Article + BreadcrumbList (+ FAQPage) JSON-LD
 // mirrors the visible content, as the toolkit's gates require.
 import { getCollection, render } from "astro:content";
 import config from "../../site.config.json";
@@ -11,7 +12,7 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 import FaqAccordion from "../components/FaqAccordion.astro";
 import KeyTakeaways from "../components/KeyTakeaways.astro";
 import NewsletterCta from "../components/NewsletterCta.astro";
-import RelatedPosts from "../components/RelatedPosts.astro";
+import Sidebar from "../components/Sidebar.astro";
 import TableOfContents from "../components/TableOfContents.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
@@ -110,6 +111,7 @@ const faqSchema = post.data.faq.length
   ogType="article"
   jsonLd={[article, breadcrumb, ...faqSchema]}
 >
+  <div class="with-aside">
   <article class="prose">
     <Breadcrumbs
       items={[
@@ -145,6 +147,15 @@ const faqSchema = post.data.faq.length
     <AdSlot name="article-end" />
     {post.data.faq.length > 0 && <FaqAccordion items={post.data.faq} title={ui.faq_title} />}
     <NewsletterCta />
-    {related.length > 0 && <RelatedPosts posts={related} title={ui.read_next} />}
   </article>
+  {related.length > 0 && (
+    <Sidebar title={ui.read_next}>
+      <ul>
+        {related.map((other) => (
+          <li><a href={other.url}>{other.title}</a></li>
+        ))}
+      </ul>
+    </Sidebar>
+  )}
+  </div>
 </BaseLayout>
