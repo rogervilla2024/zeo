@@ -31,6 +31,6 @@ def test_adslot_component_contract() -> None:
 
 def test_golden_article_template_wires_a_slot() -> None:
     template = (
-        ROOT / "templates" / "golden" / "src" / "pages" / "blog" / "[...slug].astro"
+        ROOT / "templates" / "golden" / "src" / "pages" / "[...slug].astro"
     ).read_text()
     assert '<AdSlot name="article-end" />' in template

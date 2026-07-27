@@ -58,7 +58,7 @@ const website = {
     <ul class="post-list">
       {posts.map((post) => (
         <li>
-          <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          <a href={`/${post.id}/`}>{post.data.title}</a>
           <p>{post.data.description}</p>
         </li>
       ))}

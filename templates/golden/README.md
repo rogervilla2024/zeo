@@ -94,7 +94,10 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
 - `src/pages/` - homepage and blog index (minimal variant), the article
   template with Article + BreadcrumbList + FAQPage JSON-LD, RSS feed,
   noindexed search page, and the five trust-page stubs the Footer
-  links to.
+  links to. Articles publish at the ROOT (`/<slug>/`, via
+  `[...slug].astro`) - short URLs with the keyword right after the
+  domain; `/blog/` is only the listing hub. Static pages win over the
+  catch-all route, so /about, /search, and /blog resolve normally.
 - `src/content.config.ts` - blog collection schema; SEO-critical
   frontmatter is required at build time.
 - `public/robots.txt` - AI-ready robots template (replace

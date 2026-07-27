@@ -42,6 +42,6 @@ def test_worker_example_covers_the_contract() -> None:
 
 def test_golden_article_template_wires_the_cta() -> None:
     template = (
-        ROOT / "templates" / "golden" / "src" / "pages" / "blog" / "[...slug].astro"
+        ROOT / "templates" / "golden" / "src" / "pages" / "[...slug].astro"
     ).read_text()
     assert "<NewsletterCta />" in template
