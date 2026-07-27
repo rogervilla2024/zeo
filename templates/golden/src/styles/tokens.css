@@ -73,6 +73,28 @@ img, video {
   max-width: var(--max-width);
   margin-inline: auto;
 }
+/* Two-column composition: content plus .site-aside. Add .left to put
+   the aside before the content. Collapses on narrow viewports. */
+.with-aside {
+  display: grid;
+  gap: 2.5rem;
+  align-items: start;
+}
+@media (min-width: 1024px) {
+  .with-aside {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+  .with-aside.left {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+  .with-aside.left > .site-aside {
+    order: -1;
+  }
+  .with-aside > .site-aside {
+    position: sticky;
+    top: 1rem;
+  }
+}
 
 /* Variant: minimal - reading-first blog (spec: minimal.md).
    Appended after the token block by generate_theme_css.py; every value
@@ -209,4 +231,34 @@ blockquote {
   padding: 0.25rem 1.25rem;
   border-left: 3px solid var(--color-muted);
   color: var(--color-muted);
+}
+
+/* Sidebar (two-column compositions via .with-aside) */
+.site-aside {
+  padding: 1.25rem 1.4rem;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+  font-size: 0.95rem;
+}
+.site-aside-title {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  border: none;
+  padding: 0;
+}
+.site-aside ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.site-aside li {
+  padding: 0.35rem 0;
+  border: none;
+}
+.site-aside a {
+  text-decoration: none;
+}
+.site-aside a:hover {
+  text-decoration: underline;
 }

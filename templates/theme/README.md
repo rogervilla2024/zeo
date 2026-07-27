@@ -20,6 +20,15 @@ remembering to do it.
 - `Footer.astro` / `Footer.tsx` - sitewide footer linking the trust
   pages (About, Contact, Privacy Policy, Terms, Disclaimer) generated
   by the generate-trust-pages skill from `../pages/`.
+- `SiteNav.astro` - primary header navigation from the `nav` array in
+  site.config.json, with `aria-current` on the active page; rendered
+  by BaseLayout next to the brand. A menuless header fails
+  visual-review.
+- `Sidebar.astro` - `.site-aside` container for two-column
+  compositions: wrap content and the aside in the `.with-aside` grid
+  utility (tokens.css; add `.left` for a left sidebar). Fill with
+  cluster navigation, recent posts, or category links per the site's
+  composition (design-theme step 4).
 - `Hero.astro` - the homepage branding block (`.site-hero`: display
   title, tagline, optional CTA). Variants ship a baseline look; the
   design-theme skill art-directs it per site - a homepage opening

@@ -8,6 +8,16 @@
     "en"
   ],
   "default_language": "en",
+  "nav": [
+    {
+      "label": "Blog",
+      "href": "/blog/"
+    },
+    {
+      "label": "About",
+      "href": "/about/"
+    }
+  ],
   "organization": {
     "name": "Example Site",
     "logo": "/logo.png",

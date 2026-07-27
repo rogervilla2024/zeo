@@ -20,7 +20,9 @@
 //   font-display: swap.
 import "../styles/tokens.css";
 import "../styles/site.css";
+import config from "../../site.config.json";
 import SeoHead from "../components/SeoHead.astro";
+import SiteNav from "../components/SiteNav.astro";
 import Footer from "../components/Footer.astro";
 
 interface Props {
@@ -61,12 +63,14 @@ const { lang = "en", ...seo } = Astro.props;
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="container">
+      <a class="site-brand" href="/">{config.site_name}</a>
+      <SiteNav />
       <slot name="header" />
       <button
         id="theme-toggle"
         type="button"
         aria-label="Toggle dark mode"
-        style="float: right; background: none; border: 1px solid var(--color-muted); border-radius: var(--radius); padding: 0.25rem 0.5rem; cursor: pointer; color: var(--color-text);"
+        style="margin-left: auto; background: none; border: 1px solid var(--color-muted); border-radius: var(--radius); padding: 0.25rem 0.5rem; cursor: pointer; color: var(--color-text);"
       >Theme</button>
     </header>
     <main id="main" class="container">

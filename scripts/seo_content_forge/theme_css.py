@@ -205,4 +205,26 @@ img, video {{
   max-width: var(--max-width);
   margin-inline: auto;
 }}
+/* Two-column composition: content plus .site-aside. Add .left to put
+   the aside before the content. Collapses on narrow viewports. */
+.with-aside {{
+  display: grid;
+  gap: 2.5rem;
+  align-items: start;
+}}
+@media (min-width: 1024px) {{
+  .with-aside {{
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }}
+  .with-aside.left {{
+    grid-template-columns: 280px minmax(0, 1fr);
+  }}
+  .with-aside.left > .site-aside {{
+    order: -1;
+  }}
+  .with-aside > .site-aside {{
+    position: sticky;
+    top: 1rem;
+  }}
+}}
 """

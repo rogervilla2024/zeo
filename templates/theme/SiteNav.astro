@@ -1,0 +1,30 @@
+---
+// Primary header navigation, driven by the "nav" array in
+// site.config.json - a header without a real menu reads as an
+// unfinished starter. Zero JavaScript; the current page gets
+// aria-current for styling and accessibility.
+import config from "../../site.config.json";
+
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+const items: NavItem[] = config.nav ?? [];
+const path = Astro.url.pathname;
+
+function isCurrent(href: string): boolean {
+  if (href === "/") return path === "/";
+  return path === href || path.startsWith(href.endsWith("/") ? href : href + "/");
+}
+---
+
+{items.length > 0 && (
+  <nav class="site-nav" aria-label="Primary">
+    {items.map((item) => (
+      <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>
+        {item.label}
+      </a>
+    ))}
+  </nav>
+)}

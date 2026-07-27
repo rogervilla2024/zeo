@@ -160,3 +160,33 @@ blockquote {
   font-size: 0.8rem;
   letter-spacing: 0.05em;
 }
+
+/* Sidebar (two-column compositions via .with-aside) */
+.site-aside {
+  padding: 1.25rem 1.4rem;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+  font-size: 0.95rem;
+}
+.site-aside-title {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  border: none;
+  padding: 0;
+}
+.site-aside ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.site-aside li {
+  padding: 0.35rem 0;
+  border: none;
+}
+.site-aside a {
+  text-decoration: none;
+}
+.site-aside a:hover {
+  text-decoration: underline;
+}
