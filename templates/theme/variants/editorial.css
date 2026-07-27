@@ -270,3 +270,26 @@ blockquote {
   font-weight: 600;
 }
 .author-links a:hover { text-decoration: underline; }
+
+/* Author box at the end of articles */
+.author-box {
+  margin: 2.5rem 0 0;
+  padding: 1.25rem 1.4rem;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+}
+.author-box-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-muted);
+  margin: 0 0 0.75rem;
+}
+.author-box-body { display: flex; gap: 1rem; align-items: flex-start; }
+.author-box-body img { border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.author-box-name { margin: 0; font-weight: 700; }
+.author-box-name a { text-decoration: none; color: var(--color-text); }
+.author-box-name a:hover { color: var(--color-primary); text-decoration: underline; }
+.author-box-role { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 0.5rem; }
+.author-box-bio { margin: 0; font-size: 0.95rem; }
