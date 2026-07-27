@@ -43,9 +43,10 @@
     "disclaimer": "Disclaimer",
     "blog": "Blog",
     "popular": "Popular",
-    "category_description": "Articles in the {category} category.",
+    "category_description": "All {category} articles: evidence-based guides, comparisons, and practical tips.",
     "author_articles": "Articles by {author}",
-    "about_the_author": "About the author"
+    "about_the_author": "About the author",
+    "blog_description": "All articles from {site}, newest first - guides, reviews, and how-tos."
   },
   "organization": {
     "name": "Example Site",
@@ -67,6 +68,8 @@
     "pillar_topics": [],
     "launch_articles": 10,
     "max_batch": 10,
+    "min_internal_links": 2,
+    "require_category": true,
     "weekly_ramp": [
       10,
       15,

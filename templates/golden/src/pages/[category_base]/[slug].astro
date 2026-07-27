@@ -40,7 +40,8 @@ const { name, posts } = Astro.props;
 const base = config.seo.category_base ?? "category";
 const canonical = new URL(`/${base}/${Astro.params.slug}/`, config.domain).href;
 const description = (
-  ui.category_description ?? "Articles in the {category} category."
+  ui.category_description ??
+  "All {category} articles: evidence-based guides, comparisons, and practical tips."
 ).replace("{category}", name);
 
 const breadcrumb = {

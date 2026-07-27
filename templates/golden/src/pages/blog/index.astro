@@ -33,8 +33,11 @@ const breadcrumb = {
 ---
 
 <BaseLayout
-  title="Blog"
-  description={`All articles from ${config.site_name}.`}
+  title={ui.blog ?? "Blog"}
+  description={(
+    ui.blog_description ??
+    "All articles from {site}, newest first - guides, reviews, and how-tos."
+  ).replace("{site}", config.site_name)}
   canonical={new URL("/blog/", config.domain).href}
   lang={config.default_language}
   jsonLd={[breadcrumb]}

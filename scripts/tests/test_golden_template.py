@@ -88,12 +88,15 @@ def test_ui_strings_config_and_wiring() -> None:
         "search_placeholder", "home", "skip_to_content", "theme_toggle",
         "about", "contact", "privacy_policy", "terms_of_service", "disclaimer",
         "blog", "popular", "category_description", "author_articles",
-        "about_the_author",
+        "about_the_author", "blog_description",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
     assert "{category}" in ui["category_description"]
     assert "{author}" in ui["author_articles"]
+    assert "{site}" in ui["blog_description"]
+    blog = (GOLDEN / "src" / "pages" / "blog" / "index.astro").read_text()
+    assert "ui.blog_description" in blog and 'title={ui.blog' in blog
     assert all(isinstance(v, str) and v for v in ui.values())
     # The visible component labels must be driven by config.ui, so a
     # Turkish site never leaks English chrome.

@@ -72,6 +72,15 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
    the one sanctioned exception to the zero-JS default (it loads only
    on `/search` and is excluded from the JS budget gate).
 
+   Before going live, also clear the launch checklist - it fails
+   while any template placeholder, missing asset, or short launch
+   pack remains:
+
+   ```bash
+   uv run --project "$ZEO/scripts" python "$ZEO/scripts/check_launch_ready.py" \
+       --root .
+   ```
+
 9. Deploy (Cloudflare Pages; `public/_headers` ships the caching and
    security headers) and re-run the card with the live gates included,
    plus PageSpeed:
