@@ -10,6 +10,7 @@ import Hero from "../components/Hero.astro";
 import PostCard from "../components/PostCard.astro";
 import Sidebar from "../components/Sidebar.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { slugify } from "../lib/slugify";
 
 const ui = config.ui ?? {};
 const posts = (await getCollection("blog")).sort(
@@ -21,6 +22,8 @@ const popular = posts.slice(0, 5);
 
 // One strip per pillar/category, biggest clusters first, three most
 // recent articles each. Articles without a category join no strip.
+// Each strip title links to the category archive page.
+const categoryBase = config.seo.category_base ?? "category";
 const byCategory = new Map<string, typeof posts>();
 for (const post of posts) {
   const category = post.data.category;
@@ -32,7 +35,11 @@ for (const post of posts) {
 const strips = [...byCategory.entries()]
   .sort((a, b) => b[1].length - a[1].length)
   .slice(0, 4)
-  .map(([name, list]) => ({ name, posts: list.slice(0, 3) }));
+  .map(([name, list]) => ({
+    name,
+    url: `/${categoryBase}/${slugify(name)}/`,
+    posts: list.slice(0, 3),
+  }));
 
 const organization = {
   "@context": "https://schema.org",
@@ -105,7 +112,7 @@ const website = {
       </ul>
       {strips.map((strip) => (
         <section class="category-strip">
-          <h2 class="section-title">{strip.name}</h2>
+          <h2 class="section-title"><a href={strip.url}>{strip.name}</a></h2>
           <ul class="post-list">
             {strip.posts.map((post) => (
               <PostCard
