@@ -1,0 +1,22 @@
+---
+// One post card for .post-list grids (homepage latest, category
+// strips, blog listing). Renders the article's hero image when the
+// frontmatter carries one. Zero JavaScript; the variant CSS styles
+// .post-list li and its img.
+interface Props {
+  title: string;
+  url: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, url, description, image } = Astro.props;
+---
+
+<li>
+  {image && (
+    <img src={image} alt="" width="640" height="360" loading="lazy" />
+  )}
+  <a href={url}>{title}</a>
+  {description && <p>{description}</p>}
+</li>

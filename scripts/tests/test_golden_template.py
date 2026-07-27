@@ -101,6 +101,14 @@ def test_ui_strings_config_and_wiring() -> None:
     assert "ui.skip_to_content" in layout
 
 
+def test_homepage_portal_composition() -> None:
+    index = (GOLDEN / "src" / "pages" / "index.astro").read_text()
+    for hook in ("feature-card", "category-strip", "PostCard", "Sidebar"):
+        assert hook in index, f"homepage misses {hook}"
+    schema = (GOLDEN / "src" / "content.config.ts").read_text()
+    assert "category" in schema, "content schema misses the category field"
+
+
 def test_package_json_is_zero_js_static_build() -> None:
     package = json.loads((GOLDEN / "package.json").read_text())
     assert package["scripts"]["build"] == "astro build"

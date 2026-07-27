@@ -216,3 +216,6 @@ blockquote {
 .feature-card h2 { margin: 0 0 0.5rem; padding: 0; border: none; font-size: 1.6rem; }
 .feature-card p { margin: 0; color: var(--color-muted); }
 .section-title { border: none; padding-top: 0; }
+
+/* Category strips on the homepage */
+.category-strip { margin-top: 2.75rem; }

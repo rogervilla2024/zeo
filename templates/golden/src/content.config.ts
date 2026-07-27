@@ -14,6 +14,9 @@ const blog = defineCollection({
     author: z.string(),
     authorUrl: z.string(),
     image: z.string().optional(),
+    // Pillar/cluster name from the topic map; feeds the homepage
+    // category strips. Empty means the article joins no strip.
+    category: z.string().default(""),
     takeaways: z.array(z.string()).default([]),
     faq: z
       .array(z.object({ question: z.string(), answer: z.string() }))

@@ -99,7 +99,9 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   domain; `/blog/` is only the listing hub. Static pages win over the
   catch-all route, so /about, /search, and /blog resolve normally.
 - `src/content.config.ts` - blog collection schema; SEO-critical
-  frontmatter is required at build time.
+  frontmatter is required at build time. The optional `category`
+  field (the article's pillar from the cluster map) feeds the
+  homepage category strips.
 - `public/robots.txt` - AI-ready robots template (replace
   `{{SITE_URL}}`).
 - `public/_headers` - Cloudflare Pages caching and security headers.
