@@ -190,3 +190,9 @@ blockquote {
 .site-aside a:hover {
   text-decoration: underline;
 }
+
+/* Footer: masthead echo */
+.site-footer {
+  background: transparent;
+  border-top: 4px double color-mix(in srgb, var(--color-text) 60%, transparent);
+}
