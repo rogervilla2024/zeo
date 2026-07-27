@@ -64,6 +64,7 @@ def test_required_skeleton_files_exist() -> None:
         "src/pages/blog/index.astro",
         "src/pages/[...slug].astro",
         "src/pages/[category_base]/[slug].astro",
+        "src/pages/authors/[slug].astro",
         "src/pages/search.astro",
         "src/pages/rss.xml.js",
         "src/pages/about.astro",
@@ -85,11 +86,12 @@ def test_ui_strings_config_and_wiring() -> None:
         "footer_explore", "footer_trust", "rights", "search",
         "search_placeholder", "home", "skip_to_content", "theme_toggle",
         "about", "contact", "privacy_policy", "terms_of_service", "disclaimer",
-        "blog", "popular", "category_description",
+        "blog", "popular", "category_description", "author_articles",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
     assert "{category}" in ui["category_description"]
+    assert "{author}" in ui["author_articles"]
     assert all(isinstance(v, str) and v for v in ui.values())
     # The visible component labels must be driven by config.ui, so a
     # Turkish site never leaks English chrome.
@@ -141,6 +143,28 @@ def test_category_archive_pages() -> None:
     article = (GOLDEN / "src" / "pages" / "[...slug].astro").read_text()
     assert "parentCrumb" in article
     assert "post.data.category" in article
+
+
+def test_author_profile_pages() -> None:
+    config = json.loads((GOLDEN / "site.config.json").read_text())
+    # Config authors must resolve to the shipped route, so bylines and
+    # article JSON-LD never point at a 404.
+    for author in config["authors"]:
+        assert author["url"].startswith("/authors/")
+        assert author["bio"], "example author needs a bio placeholder"
+
+    route = (GOLDEN / "src" / "pages" / "authors" / "[slug].astro")
+    text = route.read_text()
+    for hook in (
+        "getStaticPaths", '"Person"', "BreadcrumbList", "PostCard",
+        "ui.author_articles", "canonical", "sameAs", "jobTitle",
+        "authorUrl",
+    ):
+        assert hook in text, f"author route misses {hook}"
+    # Only authors published under /authors/ get a page; a config
+    # author pointing elsewhere (e.g. an external profile) must not
+    # break the build.
+    assert 'startsWith("/authors/")' in text
 
 
 def test_package_json_is_zero_js_static_build() -> None:

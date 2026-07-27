@@ -23,10 +23,16 @@ fabricated impressive one, which is a policy risk.
 ## Instructions
 
 1. Register authors in site.config.json under an `authors` array:
-   name, role, profile path (e.g. `/authors/jane-doe`), and sameAs URLs.
+   name, role, profile path (e.g. `/authors/jane-doe`), bio, optional
+   image, and sameAs URLs.
 2. Create the author profile page per author: bio focused on
    experience and credentials relevant to the site's niche, photo,
-   role, and a list of their articles.
+   role, and a list of their articles. Sites built from
+   templates/golden already ship this page
+   (`src/pages/authors/[slug].astro`): it renders every config author
+   whose `url` starts with `/authors/` - profile, Person +
+   BreadcrumbList JSON-LD, and the author's article list - so on
+   those sites this step is just filling the config fields.
 3. Generate the Person schema for each profile page and validate it:
 
    ```bash

@@ -1,0 +1,131 @@
+---
+// Author profile page: the E-E-A-T entity behind every byline, one
+// page per config.authors entry at /authors/<slug>/. ArticleMeta
+// bylines already link authorUrl here, and the article JSON-LD's
+// author.url resolves to this page, so search engines can connect
+// every article to a verifiable Person. Fill bio and sameAs with the
+// build-author-entity skill - never invent credentials.
+import { getCollection } from "astro:content";
+import config from "../../../site.config.json";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import PostCard from "../../components/PostCard.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+interface Author {
+  name: string;
+  role: string;
+  url: string;
+  sameAs: string[];
+  bio?: string;
+  image?: string;
+}
+
+export async function getStaticPaths() {
+  const authors: Author[] = config.authors;
+  return authors
+    .filter((author) => author.url.startsWith("/authors/"))
+    .map((author) => ({
+      params: { slug: author.url.split("/").filter(Boolean).pop() },
+      props: { author },
+    }));
+}
+
+const ui = config.ui ?? {};
+const { author } = Astro.props as { author: Author };
+const canonical = new URL(`/authors/${Astro.params.slug}/`, config.domain).href;
+
+// Frontmatter may write authorUrl with or without a trailing slash.
+const normalize = (path: string) => path.replace(/\/+$/, "");
+const posts = (await getCollection("blog"))
+  .filter((post) => normalize(post.data.authorUrl) === normalize(author.url))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const articlesTitle = (ui.author_articles ?? "Articles by {author}").replace(
+  "{author}",
+  author.name,
+);
+const description = author.bio || articlesTitle;
+
+const person = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: author.name,
+  url: canonical,
+  jobTitle: author.role,
+  ...(author.bio ? { description: author.bio } : {}),
+  ...(author.image
+    ? { image: new URL(author.image, config.domain).href }
+    : {}),
+  ...(author.sameAs.length ? { sameAs: author.sameAs } : {}),
+  worksFor: { "@type": "Organization", name: config.organization.name },
+};
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: ui.home ?? "Home",
+      item: config.domain,
+    },
+    { "@type": "ListItem", position: 2, name: author.name, item: canonical },
+  ],
+};
+---
+
+<BaseLayout
+  title={author.name}
+  description={description}
+  canonical={canonical}
+  lang={config.default_language}
+  jsonLd={[person, breadcrumb]}
+>
+  <section class="listing">
+    <Breadcrumbs
+      items={[{ name: ui.home ?? "Home", url: "/" }, { name: author.name }]}
+    />
+    <div class="author-head">
+      {author.image && (
+        <img
+          class="author-photo"
+          src={author.image}
+          alt={author.name}
+          width="160"
+          height="160"
+        />
+      )}
+      <div>
+        <h1>{author.name}</h1>
+        <p class="author-role">{author.role}</p>
+        {author.bio && <p class="author-bio">{author.bio}</p>}
+        {author.sameAs.length > 0 && (
+          <ul class="author-links">
+            {author.sameAs.map((profile) => (
+              <li>
+                <a href={profile} rel="me noopener">
+                  {new URL(profile).hostname.replace(/^www\./, "")}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+    {posts.length > 0 && (
+      <>
+        <h2 class="section-title">{articlesTitle}</h2>
+        <ul class="post-list">
+          {posts.map((post) => (
+            <PostCard
+              title={post.data.title}
+              url={`/${post.id}/`}
+              description={post.data.description}
+              image={post.data.image}
+            />
+          ))}
+        </ul>
+      </>
+    )}
+  </section>
+</BaseLayout>

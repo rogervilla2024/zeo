@@ -51,7 +51,9 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
 5. Fill the trust-page stubs (`src/pages/about.astro`, contact,
    privacy-policy, terms-of-service, disclaimer) with the
    generate-trust-pages skill; register authors with
-   build-author-entity.
+   build-author-entity (the profile pages themselves ship at
+   `src/pages/authors/[slug].astro` and render straight from the
+   config's `authors` entries - fill name, role, bio, and sameAs).
 6. Write the launch content pack (`content.launch_articles` articles)
    through the write-article pipeline into `src/content/blog/` - the
    site never launches with an empty articles section.
@@ -104,7 +106,11 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   to a native word on non-English sites (e.g. `kategori`) - just not
   one that collides with an existing top-level page like `blog`.
   `src/lib/slugify.ts` folds accented category names (including
-  Turkish dotless i) into ASCII slugs.
+  Turkish dotless i) into ASCII slugs. Author profiles render at
+  `/authors/<slug>/` - one per `authors` entry whose `url` starts
+  with `/authors/` - with Person JSON-LD, the bio and sameAs links
+  from the config, and the author's article list; article bylines
+  already point there via `authorUrl`.
 - `src/content.config.ts` - blog collection schema; SEO-critical
   frontmatter is required at build time. The optional `category`
   field (the article's pillar from the cluster map) feeds the
