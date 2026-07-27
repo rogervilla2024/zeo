@@ -135,6 +135,11 @@ p, ul, ol { margin: 0 0 1rem; }
   color: var(--color-on-primary, #ffffff);
   text-decoration: none;
   font-weight: 600;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.site-hero-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--color-primary) 35%, transparent);
 }
 
 /* Header: site name left, quiet bottom rule */
@@ -175,8 +180,14 @@ body > header.container nav a:hover { color: var(--color-primary); }
   margin: 0;
 }
 .post-list li {
-  padding: 1rem 0;
+  padding: 1rem 0.6rem;
+  margin: 0 -0.6rem;
+  border-radius: var(--radius);
   border-bottom: 1px solid color-mix(in srgb, var(--color-muted) 22%, transparent);
+  transition: background 150ms ease;
+}
+.post-list li:hover {
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent);
 }
 .post-list li:last-child { border-bottom: none; }
 .post-list a {

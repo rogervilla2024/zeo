@@ -15,17 +15,24 @@ h3 { font-size: 1.15rem; margin: 1.6rem 0 0.5rem; }
 p, ul, ol { margin: 0 0 1rem; }
 .prose > p:first-of-type { font-size: 1.08rem; color: var(--color-text); }
 
-/* Header: brand bar with primary accent line */
+/* Header: sticky translucent brand bar with primary accent line */
 body > header.container {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
   margin-bottom: 2rem;
+  max-width: none;
+  padding-inline: max(1rem, calc((100% - var(--width-site)) / 2));
+  background: color-mix(in srgb, var(--color-background) 88%, transparent);
+  backdrop-filter: blur(10px);
   border-bottom: 3px solid var(--color-primary);
 }
-body > header.container > a {
+body > header.container > a.site-brand {
   font-family: var(--font-heading);
   font-weight: 700;
   font-size: 1.2rem;
@@ -35,65 +42,108 @@ body > header.container > a {
 body > header.container nav a {
   color: var(--color-text);
   text-decoration: none;
-  margin-right: 1rem;
+  margin-right: 0.35rem;
   font-size: 0.95rem;
-}
-body > header.container nav a:hover { color: var(--color-primary); }
-
-/* Hero: banner panel on the primary tint */
-.site-hero {
-  margin: 0 0 2rem;
-  padding: 2.5rem 2rem;
+  padding: 0.35rem 0.7rem;
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--color-primary) 10%, var(--color-background));
-  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  transition: background 150ms ease, color 150ms ease;
+}
+body > header.container nav a:hover {
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+body > header.container nav a[aria-current="page"] {
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  font-weight: 600;
+}
+
+/* Hero: layered gradient panel with an accent glow */
+.site-hero {
+  margin: 0 0 2.25rem;
+  padding: 3rem 2.5rem;
+  border-radius: calc(var(--radius) * 2);
+  background:
+    radial-gradient(
+      42rem 18rem at 85% -20%,
+      color-mix(in srgb, var(--color-accent) 18%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 16%, var(--color-background)),
+      color-mix(in srgb, var(--color-primary) 6%, var(--color-background)) 65%
+    );
+  border: 1px solid color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 .site-hero-title {
-  font-size: 2.5rem;
-  margin: 0 0 0.5rem;
+  font-size: clamp(2.1rem, 4.5vw, 3rem);
+  margin: 0 0 0.6rem;
   letter-spacing: -0.02em;
 }
 .site-hero-tagline {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--color-muted);
   max-width: 52ch;
   margin: 0;
 }
 .site-hero-cta {
   display: inline-block;
-  margin-top: 1.25rem;
-  padding: 0.55rem 1.35rem;
-  border-radius: var(--radius);
+  margin-top: 1.5rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 999px;
   background: var(--color-primary);
   color: var(--color-on-primary, #ffffff);
   text-decoration: none;
   font-weight: 600;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.site-hero-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
-/* Post list: bordered card list - guides read as a library */
+/* Post list: responsive card grid with hover lift */
 .post-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 0.9rem;
+  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
 }
 .post-list li {
-  border: 1px solid color-mix(in srgb, var(--color-muted) 30%, transparent);
-  border-left: 4px solid var(--color-primary);
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+  border-top: 4px solid var(--color-primary);
   border-radius: var(--radius);
-  padding: 1rem 1.25rem;
+  padding: 1.2rem 1.35rem;
   background: var(--color-surface);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-text) 8%, transparent);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.post-list li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-text) 14%, transparent);
 }
 .post-list a {
   font-family: var(--font-heading);
   font-weight: 650;
   font-size: 1.08rem;
+  line-height: 1.3;
   text-decoration: none;
+  color: var(--color-text);
+  transition: color 150ms ease;
 }
-.post-list a:hover { text-decoration: underline; }
+.post-list a:hover { color: var(--color-primary); }
+.post-list a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
 .post-list p {
-  margin: 0.3rem 0 0;
+  margin: 0.45rem 0 0;
   color: var(--color-muted);
   font-size: 0.95rem;
 }
@@ -107,11 +157,8 @@ body > header.container nav a:hover { color: var(--color-primary); }
   margin: 1.5rem 0;
   font-size: 0.95rem;
 }
-.toc a { text-decoration: none; }
-.toc a:hover { text-decoration: underline; }
-@media (min-height: 700px) {
-  .toc { position: sticky; top: 0.75rem; z-index: 2; }
-}
+.toc a { text-decoration: none; transition: color 150ms ease; }
+.toc a:hover { text-decoration: underline; color: var(--color-primary); }
 
 /* Guide blocks */
 .takeaways {
@@ -135,6 +182,10 @@ body > header.container nav a:hover { color: var(--color-primary); }
   padding: 0.6rem 1rem;
   margin-bottom: 0.5rem;
   background: var(--color-surface);
+  transition: border-color 150ms ease;
+}
+.faq details:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 .faq summary { cursor: pointer; font-weight: 600; }
 
@@ -152,6 +203,11 @@ body > header.container nav a:hover { color: var(--color-primary); }
   border-radius: var(--radius);
   padding: 0.9rem 1.1rem;
   background: var(--color-surface);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.related li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--color-text) 12%, transparent);
 }
 .related a { font-weight: 600; text-decoration: none; }
 .related a:hover { text-decoration: underline; }
@@ -179,10 +235,14 @@ blockquote {
   border-radius: var(--radius);
   background: var(--color-surface);
   border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-text) 6%, transparent);
   font-size: 0.95rem;
 }
 .site-aside-title {
-  font-size: 1rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-muted);
   margin: 0 0 0.75rem;
   border: none;
   padding: 0;
@@ -193,14 +253,19 @@ blockquote {
   padding: 0;
 }
 .site-aside li {
-  padding: 0.35rem 0;
+  padding: 0.45rem 0;
   border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-muted) 15%, transparent);
 }
+.site-aside li:last-child { border-bottom: none; }
 .site-aside a {
   text-decoration: none;
+  font-weight: 550;
+  transition: color 150ms ease;
 }
 .site-aside a:hover {
   text-decoration: underline;
+  color: var(--color-primary);
 }
 
 /* Footer: primary-tinted band */
