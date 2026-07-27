@@ -7,6 +7,7 @@ import config from "../../site.config.json";
 import Hero from "../components/Hero.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
+const ui = config.ui ?? {};
 const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
@@ -51,7 +52,7 @@ const website = {
 >
   <Hero title={config.site_name} tagline={config.niche} />
   <section class="home-latest">
-    <h2>Latest articles</h2>
+    <h2>{ui.latest_articles ?? "Latest articles"}</h2>
     <ul class="post-list">
       {posts.map((post) => (
         <li>

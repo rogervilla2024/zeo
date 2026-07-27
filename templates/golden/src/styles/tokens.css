@@ -28,6 +28,9 @@
   --color-muted: #9ca3af;
 }
 
+html {
+  background: var(--color-background);
+}
 body {
   margin: 0;
   font-family: var(--font-body);

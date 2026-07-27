@@ -5,17 +5,18 @@
 import config from "../../site.config.json";
 import SearchBox from "../components/SearchBox.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+const ui = config.ui ?? {};
 ---
 
 <BaseLayout
-  title="Search"
+  title={ui.search ?? "Search"}
   description={`Search ${config.site_name}.`}
   canonical={new URL("/search/", config.domain).href}
   lang={config.default_language}
   noindex={true}
 >
   <section class="prose">
-    <h1>Search</h1>
-    <SearchBox />
+    <h1>{ui.search ?? "Search"}</h1>
+    <SearchBox placeholder={ui.search_placeholder} />
   </section>
 </BaseLayout>
