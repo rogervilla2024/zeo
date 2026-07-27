@@ -20,6 +20,10 @@ remembering to do it.
 - `Footer.astro` / `Footer.tsx` - sitewide footer linking the trust
   pages (About, Contact, Privacy Policy, Terms, Disclaimer) generated
   by the generate-trust-pages skill from `../pages/`.
+- `Hero.astro` - the homepage branding block (`.site-hero`: display
+  title, tagline, optional CTA). Variants ship a baseline look; the
+  design-theme skill art-directs it per site - a homepage opening
+  with a bare h1 fails visual-review.
 - `BaseLayout.astro` - the composition root: tokens.css, SeoHead,
   favicon/manifest/RSS links, skip link, dark-mode toggle (stored
   preference applied before paint), Speculation Rules prerendering,

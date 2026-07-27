@@ -4,6 +4,7 @@
 // mirroring what scripts/build_jsonld.py produces.
 import { getCollection } from "astro:content";
 import config from "../../site.config.json";
+import Hero from "../components/Hero.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const posts = (await getCollection("blog")).sort(
@@ -49,10 +50,7 @@ const website = {
   jsonLd={[organization, website]}
 >
   <a slot="header" href="/">{config.site_name}</a>
-  <section class="prose">
-    <h1>{config.site_name}</h1>
-    <p>{config.niche}</p>
-  </section>
+  <Hero title={config.site_name} tagline={config.niche} />
   <section class="prose">
     <h2>Latest articles</h2>
     <ul class="post-list">

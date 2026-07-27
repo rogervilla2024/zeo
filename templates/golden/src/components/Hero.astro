@@ -1,0 +1,24 @@
+---
+// Homepage hero: the site's branding block. A homepage that opens
+// with a bare h1 over a list reads as an unstyled starter; this
+// component gives the design-theme skill a first screen to art-direct
+// (the variants ship a baseline look for .site-hero and the site's
+// design layer builds identity on top). Zero JavaScript.
+interface Props {
+  title: string;
+  tagline?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+
+const { title, tagline, ctaLabel, ctaHref } = Astro.props;
+---
+
+<section class="site-hero">
+  <h1 class="site-hero-title">{title}</h1>
+  {tagline && <p class="site-hero-tagline">{tagline}</p>}
+  {ctaLabel && ctaHref && (
+    <a class="site-hero-cta" href={ctaHref}>{ctaLabel}</a>
+  )}
+  <slot />
+</section>

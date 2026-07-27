@@ -38,7 +38,13 @@ def test_variant_css_is_zero_js_and_self_contained() -> None:
 def test_variant_css_targets_shipped_hooks() -> None:
     for variant in VARIANTS:
         css = variant_css(variant)
-        for hook in (".post-list", ".toc", ".takeaways", "header.container"):
+        for hook in (
+            ".post-list",
+            ".toc",
+            ".takeaways",
+            ".site-hero",
+            "header.container",
+        ):
             assert hook in css, f"{variant}.css misses {hook}"
         assert "var(--color-" in css, f"{variant}.css ignores the tokens"
     assert ".verdict" in variant_css("review")
