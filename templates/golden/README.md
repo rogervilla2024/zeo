@@ -85,6 +85,10 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
 
 ## What is inside
 
+- `CLAUDE.md` - operating rules for any Claude Code session working in
+  the site folder: which skill handles which task, and the no-commit-
+  while-a-gate-is-red rule. It loads automatically, so the workflow
+  survives even when nobody remembers to mention it.
 - `site.config.json` - copy of `templates/site.config.example.json`;
   the single source of truth every skill reads.
 - `src/layouts/BaseLayout.astro` + `src/components/` - the theme

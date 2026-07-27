@@ -47,11 +47,24 @@ def gate_commands(
     """
     # The gate subprocesses run with cwd=scripts/, so a relative --dist
     # must be resolved against the invoker's cwd first.
-    resolved = str(dist.resolve())
+    resolved_dist = dist.resolve()
+    resolved = str(resolved_dist)
     commands = [
         (name, [part.replace("{dist}", resolved) for part in template])
         for name, template in GATES
     ]
+    # The images gate reads the SOURCE, not dist: built HTML cannot
+    # reveal an image that was never added. Auto-enabled whenever the
+    # site root (dist's parent) has the golden content layout, so the
+    # gate runs without anyone remembering a new flag.
+    site_root = resolved_dist.parent
+    content = site_root / "src" / "content" / "blog"
+    if content.is_dir():
+        command = ["check_article_images.py", "--content", str(content)]
+        config_file = site_root / "site.config.json"
+        if config_file.is_file():
+            command += ["--config", str(config_file)]
+        commands.append(("article-images", command))
     if live_url:
         commands += [
             (name, [part.replace("{live}", live_url) for part in template])
@@ -95,9 +108,10 @@ def main(argv: list[str] | None = None) -> int:
     for name, ok in results.items():
         print(f"{'PASS' if ok else 'FAIL':4}  {name}")
     if args.live:
+        offline_count = len(results) - len(LIVE_GATES)
         print(
             f"\nScore: {passed}/{len(results)} gates "
-            f"({len(GATES)} offline + {len(LIVE_GATES)} live)"
+            f"({offline_count} offline + {len(LIVE_GATES)} live)"
         )
     else:
         print(f"\nScore: {passed}/{len(results)} offline gates")
