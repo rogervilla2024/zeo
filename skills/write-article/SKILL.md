@@ -81,9 +81,11 @@ Run the stages in order. Delegate each stage to the named subagent via the Task/
    python scripts/seo_report.py --dist dist --history .seo-history.json
    ```
 
-   The `article-images` gate fails any article missing its hero or
-   carrying fewer than `images.min` body images - fix with the
-   generate-article-images skill and re-run until the card is all
+   The source gates fail any article missing its hero or short of
+   `images.min` body images (`article-images`), below
+   `content.min_internal_links` in-body links (`internal-links`), or
+   lacking a `category` (`category`); `meta-quality` bounds the title
+   and description lengths. Fix and re-run until the card is all
    PASS. Include the passing card in the handoff as proof.
 14. Assemble and hand off. Return the final draft plus a metadata block (title, meta, slug, target keyword, internal links, schema).
 

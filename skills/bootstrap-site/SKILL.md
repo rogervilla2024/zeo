@@ -162,6 +162,11 @@ Gather before scaffolding (ask only for what is missing):
 
 ## Quality checklist
 
+- `check_launch_ready.py --root .` reports zero blockers: no template
+  placeholders left (config values, robots {{SITE_URL}}, trust-page
+  stubs), llms.txt/sitemap/favicons/logo/OG image present, and the
+  launch content pack (`content.launch_articles`) complete. The site
+  does not go live while this fails.
 - `check_rich_results.py --file` passes on the built homepage and one
   content page.
 - The visual-review gate passed at 390/768/1440 after the

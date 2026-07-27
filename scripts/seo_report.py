@@ -25,6 +25,14 @@ GATES: tuple[tuple[str, list[str]], ...] = (
     ("js-budget", ["check_js_budget.py", "--dist", "{dist}"]),
     ("broken-links", ["check_broken_links.py", "--dist", "{dist}"]),
     ("media-budget", ["check_media_budget.py", "--dist", "{dist}"]),
+    ("meta-quality", ["check_meta_quality.py", "--dist", "{dist}"]),
+)
+# Source gates enabled automatically at site roots (dist next to
+# src/content/blog/): each reads the content collection, not dist.
+SOURCE_GATES: tuple[tuple[str, str], ...] = (
+    ("article-images", "check_article_images.py"),
+    ("internal-links", "check_internal_links.py"),
+    ("category", "check_article_categories.py"),
 )
 LIVE_GATES: tuple[tuple[str, list[str]], ...] = (
     ("agent-ready", ["check_agent_ready.py", "--url", "{live}"]),
@@ -53,18 +61,20 @@ def gate_commands(
         (name, [part.replace("{dist}", resolved) for part in template])
         for name, template in GATES
     ]
-    # The images gate reads the SOURCE, not dist: built HTML cannot
-    # reveal an image that was never added. Auto-enabled whenever the
-    # site root (dist's parent) has the golden content layout, so the
-    # gate runs without anyone remembering a new flag.
+    # The source gates read the content collection, not dist: built
+    # HTML cannot reveal an image, link, or category that was never
+    # added. Auto-enabled whenever the site root (dist's parent) has
+    # the golden content layout, so they run without anyone
+    # remembering a new flag.
     site_root = resolved_dist.parent
     content = site_root / "src" / "content" / "blog"
     if content.is_dir():
-        command = ["check_article_images.py", "--content", str(content)]
         config_file = site_root / "site.config.json"
-        if config_file.is_file():
-            command += ["--config", str(config_file)]
-        commands.append(("article-images", command))
+        for name, script in SOURCE_GATES:
+            command = [script, "--content", str(content)]
+            if config_file.is_file():
+                command += ["--config", str(config_file)]
+            commands.append((name, command))
     if live_url:
         commands += [
             (name, [part.replace("{live}", live_url) for part in template])

@@ -27,9 +27,12 @@ when work is done. If unsure where the toolkit lives, ask; then run
        --dist dist --history .seo-history.json
    ```
 
-   Every line of the card must be PASS - including `article-images`,
-   which fails any article missing its hero or short of `images.min`
-   body images. A red gate is the to-do list, not a warning.
+   Every line of the card must be PASS - including `meta-quality`
+   (title/description bounds, duplicate titles) and the source gates
+   `article-images`, `internal-links`, and `category`, which fail any
+   article missing its hero, short of `images.min` body images or
+   `content.min_internal_links` in-body links, or lacking a
+   `category`. A red gate is the to-do list, not a warning.
 4. Theme and layout changes go through the design-theme skill and end
    with the visual-review gate (`$ZEO/templates/ci/visual-check.mjs`
    screenshots at 3 widths, zero console errors). Never edit
@@ -58,6 +61,7 @@ when work is done. If unsure where the toolkit lives, ask; then run
 | Trust pages | generate-trust-pages skill |
 | Structured data | generate-schema skill / `$ZEO/scripts/build_jsonld.py` |
 | Pre-publish check | `$ZEO/scripts/seo_report.py --dist dist` |
+| Launch readiness | `$ZEO/scripts/check_launch_ready.py --root .` before going live |
 | Post-deploy check | `seo_report.py --live https://<domain>` + `check_pagespeed.py` |
 | Refresh old content | `queue_refresh_candidates.py` + refresh-content skill |
 | Monetization | ads/newsletter keys in site.config.json; affiliate manager in the toolkit |

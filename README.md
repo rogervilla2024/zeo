@@ -163,6 +163,19 @@ output is deterministic and standards-correct:
   collection source: every article needs its hero frontmatter and at
   least `images.min` body images; seo_report.py runs it automatically
   when dist sits next to `src/content/blog/`.
+- `check_internal_links.py` - in-body internal link gate over the
+  content source (`content.min_internal_links`, scaling down on young
+  sites); auto-run by seo_report.py at site roots.
+- `check_article_categories.py` - every article must carry the
+  `category` frontmatter that feeds the homepage strips and archives
+  (`content.require_category` opts a site out); auto-run by
+  seo_report.py at site roots.
+- `check_meta_quality.py` - SERP snippet gate over dist: title and
+  meta-description presence and length bounds, plus cross-page
+  duplicate titles; part of seo_report.py's offline battery.
+- `check_launch_ready.py` - one-shot launch checklist for a site root:
+  template placeholders gone, robots/llms/sitemap/favicons/logo/OG
+  image present, trust pages filled, launch content pack complete.
 - `check_affiliate_links.py` - enforce the affiliate policy from the
   central `affiliates.json` table: every affiliate anchor needs
   `rel="sponsored"` and a table entry; `--live` probes managed URLs
