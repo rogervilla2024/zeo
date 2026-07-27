@@ -43,7 +43,8 @@
     "disclaimer": "Disclaimer",
     "blog": "Blog",
     "popular": "Popular",
-    "category_description": "Articles in the {category} category."
+    "category_description": "Articles in the {category} category.",
+    "author_articles": "Articles by {author}"
   },
   "organization": {
     "name": "Example Site",
@@ -55,6 +56,7 @@
       "name": "Jane Doe",
       "role": "Senior Editor",
       "url": "/authors/jane-doe",
+      "bio": "one-paragraph bio: real experience relevant to the niche, no invented credentials",
       "sameAs": []
     }
   ],
