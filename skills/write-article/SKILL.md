@@ -73,7 +73,19 @@ Run the stages in order. Delegate each stage to the named subagent via the Task/
    ```
 
    A failing score means rewriting the overlapping sections, not tweaking words until the number drops.
-13. Assemble and hand off. Return the final draft plus a metadata block (title, meta, slug, target keyword, internal links, schema).
+13. Gate the build (mandatory when working inside a site repo). The
+    article is not done while any gate is red:
+
+   ```bash
+   npm run build && npm run search:index
+   python scripts/seo_report.py --dist dist --history .seo-history.json
+   ```
+
+   The `article-images` gate fails any article missing its hero or
+   carrying fewer than `images.min` body images - fix with the
+   generate-article-images skill and re-run until the card is all
+   PASS. Include the passing card in the handoff as proof.
+14. Assemble and hand off. Return the final draft plus a metadata block (title, meta, slug, target keyword, internal links, schema).
 
 ## Output
 
@@ -97,4 +109,6 @@ Run the stages in order. Delegate each stage to the named subagent via the Task/
 - [ ] In-body contextual internal links are present (suggest_internal_links.py applied and reviewed); the article never ships without them.
 - [ ] Reverse-link edits (older articles linking to this one) are listed for application.
 - [ ] Valid JSON-LD schema matches the visible content.
+- [ ] seo_report.py card is green, article-images gate included (when
+      working inside a site repo).
 - [ ] No brand, domain, or niche assumptions beyond the provided inputs.

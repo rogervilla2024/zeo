@@ -22,7 +22,7 @@ py-modules = [
     "check_pagespeed", "check_rich_results", "check_ai_patterns",
     "check_originality", "check_js_budget", "export_toolkit", "fetch_stock_images", "generate_logo", "check_broken_links", "mine_questions", "check_media_budget", "check_canonical_host", "seo_report", "fleet_report",
     "content_calendar", "queue_refresh_candidates", "check_toolkit_version",
-    "check_affiliate_links",
+    "check_affiliate_links", "check_article_images",
 ]
 packages = ["seo_content_forge"]
 

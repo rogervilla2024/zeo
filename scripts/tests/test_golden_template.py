@@ -53,6 +53,7 @@ def test_tokens_css_regenerates_from_golden_config() -> None:
 def test_required_skeleton_files_exist() -> None:
     required = [
         "README.md",
+        "CLAUDE.md",
         "package.json",
         "astro.config.mjs",
         "tsconfig.json",
@@ -172,6 +173,18 @@ def test_author_profile_pages() -> None:
     article = (GOLDEN / "src" / "pages" / "[...slug].astro").read_text()
     for hook in ("AuthorBox", "authorEntity", "ui.about_the_author"):
         assert hook in article, f"article template misses {hook}"
+
+
+def test_claude_md_encodes_the_workflow() -> None:
+    # CLAUDE.md is what keeps builder sessions on the toolkit path -
+    # it must name the load-bearing skills and the gate rule.
+    text = (GOLDEN / "CLAUDE.md").read_text()
+    for hook in (
+        "write-article", "generate-article-images", "design-theme",
+        "seo_report.py", "article-images", "site.config.json",
+        "visual-check.mjs", "check_toolkit_version.py",
+    ):
+        assert hook in text, f"CLAUDE.md misses {hook}"
 
 
 def test_package_json_is_zero_js_static_build() -> None:

@@ -159,6 +159,10 @@ output is deterministic and standards-correct:
   with JSON history and deltas per run; offline gates by default,
   plus the live gates (agent-ready, canonical-host) with
   `--live https://domain` after deploy
+- `check_article_images.py` - image completeness gate over the content
+  collection source: every article needs its hero frontmatter and at
+  least `images.min` body images; seo_report.py runs it automatically
+  when dist sits next to `src/content/blog/`.
 - `check_affiliate_links.py` - enforce the affiliate policy from the
   central `affiliates.json` table: every affiliate anchor needs
   `rel="sponsored"` and a table entry; `--live` probes managed URLs
