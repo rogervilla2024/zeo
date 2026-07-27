@@ -28,7 +28,11 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
    Replace every `example.com` and `Example Site` value: name,
    domain, niche, audience, voice, authors, theme palette, and the
    `seo` section (og_image and search_url_template are safe as
-   shipped only because they are root-relative paths).
+   shipped only because they are root-relative paths). Then run the
+   design-theme skill: it turns the niche into a real visual identity
+   (palette, fonts, variant, `src/styles/site.css` overrides) on top
+   of the shipped variant baseline, and the site is not done until
+   the visual-review gate passes its screenshots.
 3. Regenerate the derived assets from the config:
 
    ```bash
@@ -96,5 +100,7 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
 - `public/robots.txt` - AI-ready robots template (replace
   `{{SITE_URL}}`).
 - `public/_headers` - Cloudflare Pages caching and security headers.
-- `src/styles/tokens.css` - design tokens rendered from this
-  directory's `site.config.json`; regenerate after editing the config.
+- `src/styles/tokens.css` - design tokens plus the `theme.variant`
+  stylesheet, rendered from this directory's `site.config.json`;
+  regenerate after editing the config. `src/styles/site.css` is the
+  empty niche-identity layer the design-theme skill fills.

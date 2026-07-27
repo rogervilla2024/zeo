@@ -1,0 +1,5 @@
+/* Site-specific design layer, loaded after tokens.css (which already
+   contains the variant baseline). The design-theme skill fills this
+   with the niche touches the tokens cannot express: a header device,
+   list markers, image treatment, badge colors. Keep it small - rules
+   useful to every site belong in the toolkit's variant CSS instead. */

@@ -36,7 +36,7 @@ Subagents (`agents/`, 15) - focused specialists the main agent delegates to:
 - `site-bootstrap-architect` - scaffolds brand-new SEO-ready sites that
   pass the checks from day one
 
-Skills (`skills/`, 23) - workflows that auto-trigger from natural language
+Skills (`skills/`, 22) - workflows that auto-trigger from natural language
 and orchestrate the subagents:
 
 - `write-article` (flagship, full pipeline), `humanize-content`,
@@ -46,7 +46,13 @@ and orchestrate the subagents:
   `generate-llms-txt`, `test-site-readiness`, `bootstrap-site`,
   `optimize-images`, `generate-article-images`, `build-author-entity`,
   `translate-article`, `refresh-content`, `generate-trust-pages`,
-  `find-theme`, `adopt-theme`, `visual-review`
+  `design-theme`, `visual-review`
+
+Themes are never adopted from third-party ecosystems: the
+`design-theme` skill designs each site's visual identity from its
+niche on top of the shipped variant stylesheets, and the
+`visual-review` gate blocks "done" until the screenshots pass - so
+every site looks distinct, topical, and finished by construction.
 
 Four gates are mandatory for every article: an FAQ block (3-5
 PAA-derived questions mirrored in FAQPage schema), contextual in-body
@@ -83,8 +89,12 @@ bootstrap-site skill copies into new projects:
   zero-JS content blocks (TableOfContents, KeyTakeaways, FaqAccordion,
   ProsCons, VerdictBox, ArticleMeta, RelatedPosts, Pagefind SearchBox,
   AdSlot, NewsletterCta, AffiliateLink),
-  and four layout variants (`variants/`: minimal, editorial, guide,
-  review) so sites sharing the skeleton do not share a look
+  and four layout variants shipped as finished stylesheets
+  (`variants/*.css`, appended to tokens.css by
+  `generate_theme_css.py`: minimal, editorial, guide, review) so no
+  site can render unstyled, and the design-theme skill layers a
+  niche-specific identity on top so sites sharing the skeleton do
+  not share a look
 - `ci/seo-audit.yml` - GitHub Actions workflow for site repos: weekly
   cron runs the three checkers against the live site and opens or
   updates an issue when any suite fails, so every site polices itself
@@ -123,10 +133,6 @@ output is deterministic and standards-correct:
   fonts, radius, a11y helpers) from the config's theme section
 - `check_js_budget.py` - enforce the theme's JavaScript budget on the
   build output (default 30 KB total; non-zero exit when over)
-- `find_theme.py` - sweep GitHub's astro-theme/astro-template ecosystem
-  (hundreds of candidates in seconds), hard-filter by permissive
-  license, activity, and stars, rank by niche fit; finalists feed the
-  find-theme/adopt-theme skills
 - `check_agent_ready.py` - agent-readiness score (isitagentready.com
   style): robots.txt AI-bot rules, llms.txt, sitemap, server-rendered
   content, semantic HTML, structured data, markdown negotiation, html

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from seo_content_forge.theme_css import build_css, from_config
+from seo_content_forge.theme_css import compose_css, from_config
 
 ROOT = Path(__file__).resolve().parents[2]
 GOLDEN = ROOT / "templates" / "golden"
@@ -42,7 +42,7 @@ def test_synced_files_match_sources() -> None:
 
 def test_tokens_css_regenerates_from_golden_config() -> None:
     config = json.loads((GOLDEN / "site.config.json").read_text())
-    expected = build_css(from_config(config))
+    expected = compose_css(from_config(config))
     actual = (GOLDEN / "src" / "styles" / "tokens.css").read_text()
     assert actual == expected, (
         "tokens.css is stale; regenerate with generate_theme_css.py "
@@ -58,6 +58,7 @@ def test_required_skeleton_files_exist() -> None:
         "tsconfig.json",
         ".gitignore",
         "src/content.config.ts",
+        "src/styles/site.css",
         "src/pages/index.astro",
         "src/pages/blog/index.astro",
         "src/pages/blog/[...slug].astro",

@@ -55,7 +55,7 @@ const website = {
   </section>
   <section class="prose">
     <h2>Latest articles</h2>
-    <ul>
+    <ul class="post-list">
       {posts.map((post) => (
         <li>
           <a href={`/blog/${post.id}/`}>{post.data.title}</a>

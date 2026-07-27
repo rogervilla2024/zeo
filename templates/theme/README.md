@@ -29,8 +29,13 @@ remembering to do it.
   fonts, radius, max width). Every component styles itself from these
   custom properties, so sites sharing the skeleton do not share a look.
 - Layout variants (`variants/`): `minimal`, `editorial`, `guide`,
-  `review` - composition specs implemented on top of BaseLayout. Set
-  `theme.variant` in site.config.json.
+  `review` - shipped as finished stylesheets (`*.css`) that
+  `generate_theme_css.py` appends to tokens.css based on
+  `theme.variant` in site.config.json, so the design floor is baked
+  in; the `.md` files describe each variant's intent. The
+  design-theme skill then layers the site's niche-specific identity
+  in `src/styles/site.css` (loaded by BaseLayout after tokens.css).
+  Third-party themes are never adopted.
 - Content blocks (all zero-JS or native HTML behavior):
   - `TableOfContents.astro` - anchor list Google can surface as jump
     links

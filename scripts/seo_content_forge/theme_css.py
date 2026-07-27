@@ -12,6 +12,12 @@ accessibility and stability ship with the tokens.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
+
+VARIANTS: tuple[str, ...] = ("minimal", "editorial", "guide", "review")
+_VARIANT_DIR = (
+    Path(__file__).resolve().parents[2] / "templates" / "theme" / "variants"
+)
 
 _DEFAULT_PALETTE: dict[str, str] = {
     "primary": "#0f766e",
@@ -51,6 +57,8 @@ class ThemeTokens:
         radius: Corner radius, e.g. ``8px``.
         max_width: Prose measure, e.g. ``72ch`` (article text only).
         site_width: Page shell width, e.g. ``1200px`` (header, grids).
+        variant: Layout variant whose shipped stylesheet is appended
+            (``minimal``, ``editorial``, ``guide``, or ``review``).
     """
 
     palette: dict[str, str] = field(default_factory=dict)
@@ -60,6 +68,7 @@ class ThemeTokens:
     radius: str = _DEFAULT_RADIUS
     max_width: str = _DEFAULT_MAX_WIDTH
     site_width: str = _DEFAULT_SITE_WIDTH
+    variant: str = "minimal"
 
 
 def from_config(config: dict[str, object]) -> ThemeTokens:
@@ -70,6 +79,7 @@ def from_config(config: dict[str, object]) -> ThemeTokens:
     fonts = fonts if isinstance(fonts, dict) else {}
     palette = theme.get("palette")
     dark = theme.get("dark_palette")
+    raw_variant = str(theme.get("variant", "minimal")).lower()
     return ThemeTokens(
         palette=dict(palette) if isinstance(palette, dict) else {},
         dark_palette=dict(dark) if isinstance(dark, dict) else {},
@@ -78,7 +88,41 @@ def from_config(config: dict[str, object]) -> ThemeTokens:
         radius=str(theme.get("radius", _DEFAULT_RADIUS)),
         max_width=str(theme.get("max_width", _DEFAULT_MAX_WIDTH)),
         site_width=str(theme.get("site_width", _DEFAULT_SITE_WIDTH)),
+        variant=raw_variant if raw_variant in VARIANTS else "minimal",
     )
+
+
+def variant_css(variant: str) -> str:
+    """The shipped stylesheet for a layout variant.
+
+    Args:
+        variant: One of :data:`VARIANTS`.
+
+    Returns:
+        The variant stylesheet content.
+
+    Raises:
+        ValueError: If the variant has no shipped stylesheet.
+    """
+    if variant not in VARIANTS:
+        raise ValueError(f"unknown variant {variant!r}; choose from {VARIANTS}")
+    return (_VARIANT_DIR / f"{variant}.css").read_text(encoding="utf-8")
+
+
+def compose_css(tokens: ThemeTokens) -> str:
+    """Tokens plus the variant layer: the site's complete stylesheet.
+
+    The design baseline ships with the toolkit so no site can render
+    as an unstyled skeleton; the per-site design pass (design-theme
+    skill) layers niche-specific overrides on top of this output.
+
+    Args:
+        tokens: The site's design tokens (including the variant).
+
+    Returns:
+        The full tokens.css content.
+    """
+    return build_css(tokens) + "\n" + variant_css(tokens.variant)
 
 
 def _vars(colors: dict[str, str]) -> str:
