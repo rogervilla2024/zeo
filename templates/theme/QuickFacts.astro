@@ -1,0 +1,28 @@
+---
+// Product quick-facts box: the at-a-glance spec panel a product or
+// game homepage opens with (RTP, provider, minimum bet, release
+// year...). Values come from site.config.json's product.facts, so
+// the design-theme skill fills data, not markup. Keep the visible
+// facts mirrored in any Product/SoftwareApplication JSON-LD.
+interface Fact {
+  label: string;
+  value: string;
+}
+interface Props {
+  title?: string;
+  facts: Fact[];
+}
+const { title = "Quick facts", facts } = Astro.props;
+---
+
+<section class="quick-facts">
+  <h2 class="section-title">{title}</h2>
+  <dl>
+    {facts.map((fact) => (
+      <div class="quick-fact">
+        <dt>{fact.label}</dt>
+        <dd>{fact.value}</dd>
+      </div>
+    ))}
+  </dl>
+</section>

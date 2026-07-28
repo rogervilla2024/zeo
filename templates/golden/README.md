@@ -129,7 +129,17 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
 - `src/content.config.ts` - blog collection schema; SEO-critical
   frontmatter is required at build time. The optional `category`
   field (the article's pillar from the cluster map) feeds the
-  homepage category strips.
+  homepage category strips. A second `entities` collection
+  (`src/content/entities/`) powers directory sites: attribute-typed
+  catalog entries rendered as cards and a comparison table.
+- The homepage is archetype-driven via `site_type` in
+  site.config.json: `portal` (default - feature card, latest grid,
+  category strips), `product` (quick-facts panel and how-it-works
+  steps from the `product` config section, hero CTA to the demo),
+  or `directory` (entity cards + comparison from the entities
+  collection). Flip the key and rebuild - no template surgery.
+  `EmbedFrame.astro` hosts third-party demos on a dedicated page
+  (e.g. `/demo/`), never the homepage.
 - `public/robots.txt` - AI-ready robots template (replace
   `{{SITE_URL}}`).
 - `public/_headers` - Cloudflare Pages caching and security headers.

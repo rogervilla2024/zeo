@@ -24,4 +24,25 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+// Directory-archetype catalog (site_type: "directory"): one entry
+// per entity (hotel, tool, venue) with typed attributes. Cards and
+// the comparison table on the homepage render from this data; the
+// deep dive stays an article, linked via `article`. Portal and
+// product sites simply leave the folder empty.
+const entities = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/entities" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().default(""),
+    image: z.string().optional(),
+    // Root-relative path to the entity's review article.
+    article: z.string().default(""),
+    badge: z.string().default(""),
+    order: z.number().default(999),
+    attributes: z
+      .array(z.object({ label: z.string(), value: z.string() }))
+      .default([]),
+  }),
+});
+
+export const collections = { blog, entities };

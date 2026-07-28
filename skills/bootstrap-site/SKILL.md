@@ -27,8 +27,13 @@ Gather before scaffolding (ask only for what is missing):
 
 1. Write `site.config.json` at the project root, copied from the
    toolkit's `templates/site.config.example.json` and filled in with the
-   gathered values. All later skills (write-article, generate-schema,
-   generate-llms-txt, test-site-readiness) read site context from here.
+   gathered values. Set `site_type` from what the visitor comes to DO:
+   `portal` (read across a topic), `product` (see/try one game or
+   product - also fill the `product` section: facts, steps, cta), or
+   `directory` (choose among entities - plan the
+   `src/content/entities/` catalog). All later skills (write-article,
+   generate-schema, generate-llms-txt, test-site-readiness) read site
+   context from here.
    HARD RULE: from this point on, the niche and every article topic come
    EXCLUSIVELY from site.config.json. Example topics appearing in
    toolkit docs, README samples, or the user's earlier prompts (coffee,

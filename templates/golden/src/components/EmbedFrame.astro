@@ -1,0 +1,25 @@
+---
+// Third-party embed (a game demo, a map) for a DEDICATED page such
+// as /demo/ - never the homepage: the frame only loads when the
+// visitor navigates to it, so the rest of the site stays zero-JS
+// and fast. Lazy-loaded and sandboxed by default; check the
+// provider's embed terms before shipping.
+interface Props {
+  src: string;
+  title: string;
+  ratio?: string;
+  note?: string;
+}
+const { src, title, ratio = "16 / 9", note } = Astro.props;
+---
+
+<figure class="embed-frame">
+  <iframe
+    src={src}
+    title={title}
+    loading="lazy"
+    sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+    style={`aspect-ratio: ${ratio};`}
+  ></iframe>
+  {note && <figcaption>{note}</figcaption>}
+</figure>
