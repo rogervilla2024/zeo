@@ -136,6 +136,21 @@ def analyze_robots(robots_txt: str | None) -> list[Check]:
             "not an accident.",
         )
     )
+    has_signals = bool(re.search(r"(?im)^\s*content-signal\s*:", text))
+    checks.append(
+        _check(
+            "robots-content-signals",
+            "bot-access",
+            has_signals,
+            "Content-Signal directive present"
+            if has_signals
+            else "no Content-Signal directives",
+            "Declare AI content usage preferences in robots.txt "
+            "(contentsignals.org), e.g. 'Content-Signal: search=yes, "
+            "ai-input=yes, ai-train=yes', consistent with the per-bot "
+            "rules.",
+        )
+    )
     return checks
 
 
