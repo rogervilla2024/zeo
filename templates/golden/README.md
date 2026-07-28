@@ -47,7 +47,8 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
        --short-name "Site"
    ```
 
-4. Replace `{{SITE_URL}}` in `public/robots.txt` with the domain.
+4. Replace `{{SITE_URL}}` in `public/robots.txt` and `{{DOMAIN}}` in
+   `public/_redirects` (www -> apex 301) with the domain.
 5. Fill the trust-page stubs (`src/pages/about.astro`, contact,
    privacy-policy, terms-of-service, disclaimer) with the
    generate-trust-pages skill; register authors with
@@ -57,9 +58,13 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
 6. Write the launch content pack (`content.launch_articles` articles)
    through the write-article pipeline into `src/content/blog/` - the
    site never launches with an empty articles section.
-7. Generate `llms.txt` (generate-llms-txt skill) and the sitemap
-   (`$ZEO/scripts/generate_sitemap.py`, or point robots.txt at the
-   sitemap your framework integration emits) into `public/`.
+7. `sitemap.xml` and `llms.txt` are BUILT IN as dynamic endpoints
+   (`src/pages/sitemap.xml.js`, `src/pages/llms.txt.js`): they render
+   from the live article list on every build, so they never go stale
+   as content grows. Do not hand-write `public/` copies - a static
+   file that lists 10 launch articles still lists 10 when the site
+   has 100. The generate-llms-txt skill can replace the llms.txt
+   endpoint with a hand-curated file when finer control is needed.
 8. Build, index search, and gate:
 
    ```bash
@@ -143,6 +148,15 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
 - `public/robots.txt` - AI-ready robots template (replace
   `{{SITE_URL}}`).
 - `public/_headers` - Cloudflare Pages caching and security headers.
+- `public/_redirects` - www -> apex 301 (replace `{{DOMAIN}}`), so
+  exactly one host serves content.
+- `src/pages/sitemap.xml.js` + `src/pages/llms.txt.js` - dynamic
+  sitemap and llms.txt rendered from the article list on every
+  build; they cannot go stale. Directory sites also get facet
+  archives at `/<directory.base>/<facet>/<value>/` (e.g.
+  `/otel/bolge/girne/`) - one pre-rendered, crawlable page per
+  attribute value listed in `directory.facets`, the zero-JS answer
+  to filtering; the homepage links them as chips.
 - `src/styles/tokens.css` - design tokens plus the `theme.variant`
   stylesheet, rendered from this directory's `site.config.json`;
   regenerate after editing the config. `src/styles/site.css` is the

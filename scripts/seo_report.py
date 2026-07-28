@@ -38,6 +38,7 @@ SOURCE_GATES: tuple[tuple[str, str], ...] = (
 LIVE_GATES: tuple[tuple[str, list[str]], ...] = (
     ("agent-ready", ["check_agent_ready.py", "--url", "{live}"]),
     ("canonical-host", ["check_canonical_host.py", "--domain", "{live}"]),
+    ("robots-conflict", ["check_robots_live.py", "--url", "{live}"]),
 )
 
 

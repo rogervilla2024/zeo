@@ -49,7 +49,12 @@ def test_gate_commands_offline_only(tmp_path: Path) -> None:
 
 def test_gate_commands_with_live_url(tmp_path: Path) -> None:
     commands = dict(gate_commands(tmp_path / "dist", "https://example.com"))
-    assert len(commands) == 8
+    assert len(commands) == 9
+    assert commands["robots-conflict"] == [
+        "check_robots_live.py",
+        "--url",
+        "https://example.com",
+    ]
     assert commands["agent-ready"] == [
         "check_agent_ready.py",
         "--url",
@@ -116,6 +121,7 @@ def test_main_live_records_history(
         "media-budget": True,
         "agent-ready": True,
         "canonical-host": False,
+        "robots-conflict": True,
     }
     monkeypatch.setattr(seo_report, "run_gates", lambda dist, live=None: fake)
     history = tmp_path / ".seo-history.json"
@@ -131,9 +137,9 @@ def test_main_live_records_history(
     )
     assert code == 1
     printed = capsys.readouterr().out
-    assert "Score: 5/6 gates (4 offline + 2 live)" in printed
+    assert "Score: 6/7 gates (4 offline + 3 live)" in printed
     assert "FAIL  canonical-host" in printed
     saved = json.loads(history.read_text())
     assert saved[-1]["live_url"] == "https://example.com"
     assert saved[-1]["results"]["canonical-host"] is False
-    assert saved[-1]["score"] == 5
+    assert saved[-1]["score"] == 6

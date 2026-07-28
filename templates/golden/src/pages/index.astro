@@ -85,6 +85,37 @@ const entities =
 const comparisonLabels =
   entities[0]?.data.attributes.map((attr) => attr.label) ?? [];
 
+// Facet chips: one link per attribute value of each configured
+// facet, pointing at its pre-rendered archive - the zero-JS answer
+// to filtering.
+interface DirectoryConfig {
+  base?: string;
+  facets: string[];
+}
+const directoryConfig: DirectoryConfig = config.directory ?? { facets: [] };
+const directoryBase = directoryConfig.base || "directory";
+const facetLinks =
+  siteType === "directory"
+    ? directoryConfig.facets.flatMap((label) => {
+        const facetSlug = slugify(label);
+        const values = new Map<string, string>();
+        for (const entity of entities) {
+          const match = entity.data.attributes.find(
+            (attr) => attr.label === label,
+          );
+          if (match && !values.has(slugify(match.value))) {
+            values.set(slugify(match.value), match.value);
+          }
+        }
+        return [...values.entries()]
+          .filter(([slug]) => facetSlug && slug)
+          .map(([slug, value]) => ({
+            label: value,
+            url: `/${directoryBase}/${facetSlug}/${slug}/`,
+          }));
+      })
+    : [];
+
 const organization = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -133,6 +164,13 @@ const website = {
   {siteType === "directory" && entities.length > 0 && (
     <section class="directory">
       <h2 class="section-title">{ui.directory_title ?? "Browse the directory"}</h2>
+      {facetLinks.length > 0 && (
+        <ul class="facet-nav">
+          {facetLinks.map((link) => (
+            <li><a href={link.url}>{link.label}</a></li>
+          ))}
+        </ul>
+      )}
       <ul class="entity-grid">
         {entities.map((entity) => (
           <EntityCard
