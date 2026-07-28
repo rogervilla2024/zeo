@@ -30,6 +30,7 @@ def test_run_gates_on_minimal_dist(tmp_path: Path) -> None:
     assert results["media-budget"] is True
     assert results["meta-quality"] is True
     assert results["image-attrs"] is True
+    assert results["orphan-pages"] is True
     assert "agent-ready" not in results
 
 
@@ -42,6 +43,7 @@ def test_gate_commands_offline_only(tmp_path: Path) -> None:
         "media-budget",
         "meta-quality",
         "image-attrs",
+        "orphan-pages",
     ]
     for _, argv in commands:
         assert not any("{dist}" in part or "{live}" in part for part in argv)
@@ -49,7 +51,7 @@ def test_gate_commands_offline_only(tmp_path: Path) -> None:
 
 def test_gate_commands_with_live_url(tmp_path: Path) -> None:
     commands = dict(gate_commands(tmp_path / "dist", "https://example.com"))
-    assert len(commands) == 10
+    assert len(commands) == 11
     assert commands["freshness"] == [
         "check_freshness_live.py",
         "--url",

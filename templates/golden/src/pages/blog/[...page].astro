@@ -1,0 +1,100 @@
+---
+// Blog hub with config-driven pagination. content.page_size decides
+// per site: a site under the threshold renders exactly one page
+// (identical to the old index), a 100-article site gets /blog/2/,
+// /blog/3/... so the hub never becomes one enormous page. Page 1
+// stays at /blog/ (the rest parameter is empty there). The visible
+// breadcrumb trail mirrors the BreadcrumbList JSON-LD.
+import { getCollection } from "astro:content";
+import config from "../../../site.config.json";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import PostCard from "../../components/PostCard.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths({ paginate }) {
+  const posts = (await getCollection("blog")).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  );
+  const size = config.content.page_size ?? 24;
+  return paginate(posts, { pageSize: size > 0 ? size : 100000 });
+}
+
+const ui = config.ui ?? {};
+const { page } = Astro.props;
+const blogTitle = ui.blog ?? "Blog";
+// Later pages need distinct titles - duplicate titles fail the
+// meta-quality gate and waste the snippet.
+const title =
+  page.currentPage > 1
+    ? `${blogTitle} - ${ui.page ?? "Page"} ${page.currentPage}`
+    : blogTitle;
+const canonical = new URL(page.url.current.endsWith("/")
+  ? page.url.current
+  : `${page.url.current}/`, config.domain).href;
+const description = (
+  ui.blog_description ??
+  "All articles from {site}, newest first - guides, reviews, and how-tos."
+).replace("{site}", config.site_name);
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: ui.home ?? "Home",
+      item: config.domain,
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: blogTitle,
+      item: new URL("/blog/", config.domain).href,
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  lang={config.default_language}
+  jsonLd={[breadcrumb]}
+>
+  <section class="listing">
+    <Breadcrumbs items={[{ name: ui.home ?? "Home", url: "/" }, { name: blogTitle }]} />
+    <h1>{title}</h1>
+    <ul class="post-list">
+      {page.data.map((post) => (
+        <PostCard
+          title={post.data.title}
+          url={`/${post.id}/`}
+          description={post.data.description}
+          image={post.data.image}
+        />
+      ))}
+    </ul>
+    {page.lastPage > 1 && (
+      <nav class="pagination" aria-label={ui.page ?? "Page"}>
+        {page.url.prev ? (
+          <a href={page.url.prev.endsWith("/") ? page.url.prev : `${page.url.prev}/`}>
+            {ui.pagination_prev ?? "Newer"}
+          </a>
+        ) : (
+          <span></span>
+        )}
+        <span class="pagination-status">
+          {(ui.page ?? "Page")} {page.currentPage} / {page.lastPage}
+        </span>
+        {page.url.next ? (
+          <a href={page.url.next.endsWith("/") ? page.url.next : `${page.url.next}/`}>
+            {ui.pagination_next ?? "Older"}
+          </a>
+        ) : (
+          <span></span>
+        )}
+      </nav>
+    )}
+  </section>
+</BaseLayout>

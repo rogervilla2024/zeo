@@ -27,6 +27,7 @@ GATES: tuple[tuple[str, list[str]], ...] = (
     ("media-budget", ["check_media_budget.py", "--dist", "{dist}"]),
     ("meta-quality", ["check_meta_quality.py", "--dist", "{dist}"]),
     ("image-attrs", ["check_image_attrs.py", "--dist", "{dist}"]),
+    ("orphan-pages", ["check_orphan_pages.py", "--dist", "{dist}"]),
 )
 # Source gates enabled automatically at site roots (dist next to
 # src/content/blog/): each reads the content collection, not dist.
@@ -34,6 +35,7 @@ SOURCE_GATES: tuple[tuple[str, str], ...] = (
     ("article-images", "check_article_images.py"),
     ("internal-links", "check_internal_links.py"),
     ("category", "check_article_categories.py"),
+    ("dates", "check_article_dates.py"),
 )
 LIVE_GATES: tuple[tuple[str, list[str]], ...] = (
     ("agent-ready", ["check_agent_ready.py", "--url", "{live}"]),

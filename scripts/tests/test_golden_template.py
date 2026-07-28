@@ -63,7 +63,8 @@ def test_required_skeleton_files_exist() -> None:
         "src/lib/slugify.ts",
         "src/styles/site.css",
         "src/pages/index.astro",
-        "src/pages/blog/index.astro",
+        "src/pages/blog/[...page].astro",
+        "src/pages/404.astro",
         "src/pages/[...slug].astro",
         "src/pages/[category_base]/[slug].astro",
         "src/pages/authors/[slug].astro",
@@ -97,15 +98,16 @@ def test_ui_strings_config_and_wiring() -> None:
         "about_the_author", "blog_description",
         "quick_facts", "how_to_title", "directory_title", "comparison_title",
         "facet_description", "entity_cta", "thread_replies",
-        "answers_count", "view_all",
+        "answers_count", "view_all", "page", "pagination_prev",
+        "pagination_next", "not_found_title", "not_found_text",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
     assert "{category}" in ui["category_description"]
     assert "{author}" in ui["author_articles"]
     assert "{site}" in ui["blog_description"]
-    blog = (GOLDEN / "src" / "pages" / "blog" / "index.astro").read_text()
-    assert "ui.blog_description" in blog and 'title={ui.blog' in blog
+    blog = (GOLDEN / "src" / "pages" / "blog" / "[...page].astro").read_text()
+    assert "ui.blog_description" in blog and "ui.blog" in blog
     assert all(isinstance(v, str) and v for v in ui.values())
     # The visible component labels must be driven by config.ui, so a
     # Turkish site never leaks English chrome.
@@ -119,6 +121,23 @@ def test_ui_strings_config_and_wiring() -> None:
     assert "ui.footer_explore" in footer and "ui.rights" in footer
     layout = (GOLDEN / "src" / "layouts" / "BaseLayout.astro").read_text()
     assert "ui.skip_to_content" in layout
+
+
+def test_blog_pagination_and_404() -> None:
+    blog = (GOLDEN / "src" / "pages" / "blog" / "[...page].astro").read_text()
+    # Pagination is config-driven per site: below content.page_size
+    # nothing changes; past it the hub splits into /blog/2/...
+    for hook in (
+        "paginate", "content.page_size", "pagination", "page.currentPage",
+        "ui.pagination_prev", "ui.pagination_next",
+    ):
+        assert hook in blog, f"blog hub misses {hook}"
+    config = json.loads((GOLDEN / "site.config.json").read_text())
+    assert config["content"]["page_size"] == 24
+
+    not_found = (GOLDEN / "src" / "pages" / "404.astro").read_text()
+    for hook in ("noindex", "hero-search", "ui.not_found_title"):
+        assert hook in not_found, f"404 page misses {hook}"
 
 
 def test_homepage_portal_composition() -> None:

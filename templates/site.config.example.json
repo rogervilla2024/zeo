@@ -56,7 +56,12 @@
     "entity_cta": "See prices",
     "thread_replies": "Answers",
     "answers_count": "{count} answers",
-    "view_all": "View all"
+    "view_all": "View all",
+    "page": "Page",
+    "pagination_prev": "Newer",
+    "pagination_next": "Older",
+    "not_found_title": "Page not found",
+    "not_found_text": "The address may have changed - try the search below or start from the homepage."
   },
   "organization": {
     "name": "Example Site",
@@ -80,6 +85,7 @@
     "max_batch": 10,
     "min_internal_links": 2,
     "require_category": true,
+    "page_size": 24,
     "weekly_ramp": [
       10,
       15,

@@ -617,3 +617,30 @@ blockquote {
 }
 .reply-author { margin: 0 0 0.3rem; font-weight: 700; font-size: 0.9rem; }
 .reply-text { margin: 0; }
+
+/* Pagination on the blog hub; branded 404 */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-muted) 22%, transparent);
+}
+.pagination a {
+  display: inline-block;
+  padding: 0.45rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 40%, transparent);
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+.pagination a:hover {
+  background: var(--color-primary);
+  color: var(--color-on-primary, #ffffff);
+}
+.pagination-status { color: var(--color-muted); font-size: 0.9rem; }
+.not-found { text-align: center; padding: 3rem 0; }
+.not-found .hero-search { margin: 1.5rem auto; justify-content: center; }

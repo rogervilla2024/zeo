@@ -59,6 +59,28 @@ def check_launch(root: Path) -> list[str]:
         problems.append("public/robots.txt missing")
     elif "{{SITE_URL}}" in robots.read_text(encoding="utf-8"):
         problems.append("public/robots.txt still contains {{SITE_URL}}")
+    # If the search page was renamed (e.g. /search -> /arama), the
+    # robots Disallow must move with it, or crawlers index the thin
+    # internal-search results the template deliberately blocks.
+    seo_section = config.get("seo") if isinstance(config, dict) else None
+    template_value = ""
+    if isinstance(seo_section, dict):
+        raw_template = seo_section.get("search_url_template")
+        if isinstance(raw_template, str):
+            template_value = raw_template
+    if template_value and robots.is_file():
+        path_part = template_value
+        if path_part.startswith("http") and path_part.count("/") >= 3:
+            path_part = "/" + path_part.split("/", 3)[3]
+        search_path = path_part.split("?", 1)[0].rstrip("/")
+        robots_text = robots.read_text(encoding="utf-8")
+        if search_path and f"Disallow: {search_path}" not in robots_text:
+            problems.append(
+                f"robots.txt has no 'Disallow: {search_path}' line matching "
+                "seo.search_url_template - internal search results would "
+                "get crawled"
+            )
+
     redirects = public / "_redirects"
     if redirects.is_file() and "{{DOMAIN}}" in redirects.read_text(
         encoding="utf-8"
