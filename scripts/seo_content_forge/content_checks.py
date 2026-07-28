@@ -10,6 +10,7 @@ deterministic check is what keeps them from silently disappearing.
 from __future__ import annotations
 
 import re
+from datetime import date, timedelta
 from pathlib import Path
 
 from seo_content_forge.article_images import parse_frontmatter
@@ -70,6 +71,54 @@ def check_internal_links(content_dir: Path, min_links: int) -> list[str]:
                 f"needs at least {effective}"
             )
     return problems
+
+
+def check_dates(content_dir: Path, today: date) -> list[str]:
+    """Find articles whose dates cannot be true.
+
+    Two rules: ``updatedDate`` must not precede ``pubDate`` (a
+    refresh that "updated" an article into the past lies to the
+    freshness signals), and neither date may sit in the future
+    beyond one day of timezone slack (a future-dated article
+    corrupts the sitemap's lastmod).
+
+    Args:
+        content_dir: Directory of article markdown files.
+        today: Reference date (injected for testability).
+
+    Returns:
+        Human-readable problems sorted by file; empty when clean.
+    """
+    limit = today + timedelta(days=1)
+    problems: list[str] = []
+    for path in sorted(content_dir.rglob("*.md")):
+        fields = parse_frontmatter(path.read_text(encoding="utf-8"))
+        published = _parse_date(fields.get("pubDate", ""))
+        updated = _parse_date(fields.get("updatedDate", ""))
+        if published is None:
+            problems.append(f"{path.name}: pubDate missing or unparseable")
+            continue
+        if published > limit:
+            problems.append(f"{path.name}: pubDate {published} is in the future")
+        if updated is not None:
+            if updated < published:
+                problems.append(
+                    f"{path.name}: updatedDate {updated} precedes "
+                    f"pubDate {published}"
+                )
+            if updated > limit:
+                problems.append(
+                    f"{path.name}: updatedDate {updated} is in the future"
+                )
+    return problems
+
+
+def _parse_date(value: str) -> date | None:
+    """Parse the date part of a frontmatter date value, if any."""
+    try:
+        return date.fromisoformat(value.strip()[:10])
+    except ValueError:
+        return None
 
 
 def check_categories(content_dir: Path) -> list[str]:

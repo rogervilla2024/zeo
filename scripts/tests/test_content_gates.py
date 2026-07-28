@@ -106,3 +106,42 @@ def test_cli_exit_codes(tmp_path: Path, capsys) -> None:  # type: ignore[no-unty
     assert categories_main(argv) == 0
     assert "Skipped" in capsys.readouterr().out
     assert categories_main(["--content", str(tmp_path / "absent")]) == 2
+
+
+def test_check_dates_rules(tmp_path: Path) -> None:
+    from datetime import date
+
+    from seo_content_forge.content_checks import check_dates
+
+    today = date(2026, 7, 28)
+    (tmp_path / "ok.md").write_text(
+        "---\npubDate: 2026-07-01\nupdatedDate: 2026-07-20\n---\nBody"
+    )
+    (tmp_path / "backwards.md").write_text(
+        "---\npubDate: 2026-07-10\nupdatedDate: 2026-06-01\n---\nBody"
+    )
+    (tmp_path / "future.md").write_text("---\npubDate: 2026-09-01\n---\nBody")
+    (tmp_path / "nodate.md").write_text("---\ntitle: x\n---\nBody")
+    problems = check_dates(tmp_path, today)
+    assert any("backwards.md" in p and "precedes" in p for p in problems)
+    assert any("future.md" in p and "future" in p for p in problems)
+    assert any("nodate.md" in p and "pubDate missing" in p for p in problems)
+    assert not any("ok.md" in p for p in problems)
+    # One day of timezone slack is allowed.
+    (tmp_path / "today.md").write_text("---\npubDate: 2026-07-29\n---\nBody")
+    assert not any("today.md" in p for p in check_dates(tmp_path, today))
+
+
+def test_dates_cli(tmp_path: Path, capsys) -> None:  # type: ignore[no-untyped-def]
+    from check_article_dates import main as dates_main
+
+    content = tmp_path / "blog"
+    content.mkdir()
+    (content / "ok.md").write_text("---\npubDate: 2020-01-02\n---\nBody")
+    assert dates_main(["--content", str(content)]) == 0
+    (content / "bad.md").write_text(
+        "---\npubDate: 2020-01-02\nupdatedDate: 2019-01-01\n---\nBody"
+    )
+    assert dates_main(["--content", str(content)]) == 1
+    assert "DATES bad.md" in capsys.readouterr().out
+    assert dates_main(["--content", str(tmp_path / "absent")]) == 2

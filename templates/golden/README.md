@@ -117,7 +117,15 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   noindexed search page, and the five trust-page stubs the Footer
   links to. Articles publish at the ROOT (`/<slug>/`, via
   `[...slug].astro`) - short URLs with the keyword right after the
-  domain; `/blog/` is only the listing hub. Static pages win over the
+  domain; `/blog/` is only the listing hub, paginated past
+  `content.page_size` articles (default 24; /blog/2/, /blog/3/...) so
+  it never becomes one enormous page - below the threshold nothing
+  changes. A branded, noindexed 404 page ships at `src/pages/404.astro`
+  (Cloudflare Pages serves dist/404.html automatically). Renaming the
+  search page (e.g. /search -> /arama) means renaming
+  `src/pages/search.astro`, updating `seo.search_url_template`, AND
+  moving the robots.txt Disallow line - the launch checker blocks the
+  halfway state. Static pages win over the
   catch-all route, so /about, /search, and /blog resolve normally.
   Category archives render at `/<seo.category_base>/<category-slug>/`
   (one per distinct `category` frontmatter value); homepage strip

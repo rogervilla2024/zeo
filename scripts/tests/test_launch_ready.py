@@ -124,3 +124,17 @@ def test_astro_expressions_are_not_placeholders(tmp_path: Path) -> None:
 
 def test_missing_config_exits_2(tmp_path: Path) -> None:
     assert main(["--root", str(tmp_path)]) == 2
+
+
+def test_search_rename_requires_matching_robots_disallow(tmp_path: Path) -> None:
+    build_ready_site(tmp_path)
+    config = dict(CONFIG)
+    config["seo"] = {"search_url_template": "/arama?q={search_term_string}"}
+    (tmp_path / "site.config.json").write_bytes(orjson.dumps(config))
+    problems = check_launch(tmp_path)
+    assert any("Disallow: /arama" in p for p in problems)
+    (tmp_path / "public" / "robots.txt").write_text(
+        "User-agent: *\nDisallow: /arama?\n"
+        "Sitemap: https://sample-orchard.com/sitemap.xml\n"
+    )
+    assert check_launch(tmp_path) == []

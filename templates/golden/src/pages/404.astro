@@ -1,0 +1,38 @@
+---
+// Branded 404. Cloudflare Pages serves dist/404.html automatically
+// for unknown paths; a dead end without navigation loses the visitor
+// Google just sent. Noindexed - error pages never belong in results.
+import config from "../../site.config.json";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const ui = config.ui ?? {};
+---
+
+<BaseLayout
+  title={ui.not_found_title ?? "Page not found"}
+  description={ui.not_found_text ??
+    "The address may have changed - try the search below or start from the homepage."}
+  canonical={new URL("/404/", config.domain).href}
+  lang={config.default_language}
+  noindex
+>
+  <section class="prose not-found">
+    <h1>{ui.not_found_title ?? "Page not found"}</h1>
+    <p>
+      {ui.not_found_text ??
+        "The address may have changed - try the search below or start from the homepage."}
+    </p>
+    <form class="hero-search" action="/search" method="get">
+      <input
+        type="search"
+        name="q"
+        placeholder={ui.search_placeholder ?? "Search this site"}
+        aria-label={ui.search ?? "Search"}
+      />
+      <button type="submit">{ui.search ?? "Search"}</button>
+    </form>
+    <p>
+      <a href="/">{ui.home ?? "Home"}</a> - <a href="/blog/">{ui.blog ?? "Blog"}</a>
+    </p>
+  </section>
+</BaseLayout>

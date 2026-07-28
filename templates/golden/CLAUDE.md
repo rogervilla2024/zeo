@@ -29,11 +29,11 @@ when work is done. If unsure where the toolkit lives, ask; then run
 
    Every line of the card must be PASS - including `meta-quality`
    (title/description bounds, duplicate titles), `image-attrs`
-   (every img needs alt plus width/height), and the source gates
-   `article-images`, `internal-links`, and `category`, which fail any
-   article missing its hero, short of `images.min` body images or
-   `content.min_internal_links` in-body links, or lacking a
-   `category`. A red gate is the to-do list, not a warning.
+   (every img needs alt plus width/height), `orphan-pages` (every
+   article must RECEIVE an in-prose link from another article), and
+   the source gates `article-images`, `internal-links`, `category`,
+   and `dates` (updatedDate never precedes pubDate, no future
+   dates). A red gate is the to-do list, not a warning.
 4. Theme and layout changes go through the design-theme skill and end
    with the visual-review gate (`$ZEO/templates/ci/visual-check.mjs`
    screenshots at 3 widths, zero console errors). Never edit
