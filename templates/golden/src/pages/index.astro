@@ -1,36 +1,50 @@
 ---
-// Homepage: portal-density composition - branding hero, a large
-// feature card for the newest article, a limited latest grid, one
-// strip per category (pillar), and a sticky popular rail. Sitewide
-// Organization and WebSite+SearchAction JSON-LD mirror
+// Homepage: archetype-driven composition. config.site_type declares
+// the page's PRIMARY JOB and picks the blocks:
+//   "portal"    - topic-cluster front page: feature card, latest
+//                 grid, one strip per category, popular rail.
+//   "product"   - one game/product: hero CTA to the demo, quick
+//                 facts panel, how-it-works steps, then the guides.
+//   "directory" - entity catalog: attribute cards plus a comparison
+//                 table (entities collection), then the articles.
+// Sitewide Organization and WebSite+SearchAction JSON-LD mirror
 // scripts/build_jsonld.py output.
 import { getCollection } from "astro:content";
 import config from "../../site.config.json";
+import EntityCard from "../components/EntityCard.astro";
 import Hero from "../components/Hero.astro";
+import HowToSteps from "../components/HowToSteps.astro";
 import PostCard from "../components/PostCard.astro";
+import QuickFacts from "../components/QuickFacts.astro";
 import Sidebar from "../components/Sidebar.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { slugify } from "../lib/slugify";
 
 const ui = config.ui ?? {};
+const siteType: string = config.site_type ?? "portal";
+
 const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 const [featured, ...rest] = posts;
-const latest = rest.slice(0, 6);
+// Product and directory homepages lead with their own blocks, so
+// the article section shrinks to a supporting role.
+const latest = rest.slice(0, siteType === "portal" ? 6 : 3);
 const popular = posts.slice(0, 5);
 
-// One strip per pillar/category, biggest clusters first, three most
-// recent articles each. Articles without a category join no strip.
-// Each strip title links to the category archive page.
+// One strip per pillar/category (portal only), biggest clusters
+// first, three most recent articles each; titles link to the
+// category archives.
 const categoryBase = config.seo.category_base ?? "category";
 const byCategory = new Map<string, typeof posts>();
-for (const post of posts) {
-  const category = post.data.category;
-  if (!category) continue;
-  const bucket = byCategory.get(category) ?? [];
-  bucket.push(post);
-  byCategory.set(category, bucket);
+if (siteType === "portal") {
+  for (const post of posts) {
+    const category = post.data.category;
+    if (!category) continue;
+    const bucket = byCategory.get(category) ?? [];
+    bucket.push(post);
+    byCategory.set(category, bucket);
+  }
 }
 const strips = [...byCategory.entries()]
   .sort((a, b) => b[1].length - a[1].length)
@@ -40,6 +54,36 @@ const strips = [...byCategory.entries()]
     url: `/${categoryBase}/${slugify(name)}/`,
     posts: list.slice(0, 3),
   }));
+
+// Product data from the config; empty sections simply do not render.
+interface ProductConfig {
+  name?: string;
+  cta_label?: string;
+  demo_path?: string;
+  facts: { label: string; value: string }[];
+  steps: { title: string; text: string }[];
+}
+const product: ProductConfig = config.product ?? { facts: [], steps: [] };
+const heroCta =
+  siteType === "product" && product.cta_label
+    ? {
+        ctaLabel: product.cta_label,
+        ctaHref: product.demo_path || (featured ? `/${featured.id}/` : "/blog/"),
+      }
+    : {};
+
+// Directory data from the entities collection; each card links to
+// the entity's in-depth article.
+const entities =
+  siteType === "directory"
+    ? (await getCollection("entities")).sort(
+        (a, b) =>
+          a.data.order - b.data.order ||
+          a.data.title.localeCompare(b.data.title),
+      )
+    : [];
+const comparisonLabels =
+  entities[0]?.data.attributes.map((attr) => attr.label) ?? [];
 
 const organization = {
   "@context": "https://schema.org",
@@ -79,7 +123,62 @@ const website = {
   lang={config.default_language}
   jsonLd={[organization, website]}
 >
-  <Hero title={config.site_name} tagline={config.niche} />
+  <Hero title={config.site_name} tagline={config.niche} {...heroCta} />
+  {siteType === "product" && product.facts.length > 0 && (
+    <QuickFacts title={ui.quick_facts} facts={product.facts} />
+  )}
+  {siteType === "product" && product.steps.length > 0 && (
+    <HowToSteps title={ui.how_to_title} steps={product.steps} />
+  )}
+  {siteType === "directory" && entities.length > 0 && (
+    <section class="directory">
+      <h2 class="section-title">{ui.directory_title ?? "Browse the directory"}</h2>
+      <ul class="entity-grid">
+        {entities.map((entity) => (
+          <EntityCard
+            title={entity.data.title}
+            url={entity.data.article}
+            description={entity.data.description}
+            image={entity.data.image}
+            badge={entity.data.badge}
+            attributes={entity.data.attributes}
+          />
+        ))}
+      </ul>
+      {comparisonLabels.length > 0 && (
+        <div class="comparison">
+          <table>
+            <thead>
+              <tr>
+                <th>{ui.comparison_title ?? "Compare"}</th>
+                {comparisonLabels.map((label) => <th>{label}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {entities.map((entity) => (
+                <tr>
+                  <td>
+                    {entity.data.article ? (
+                      <a href={entity.data.article}>{entity.data.title}</a>
+                    ) : (
+                      entity.data.title
+                    )}
+                  </td>
+                  {comparisonLabels.map((label) => (
+                    <td>
+                      {entity.data.attributes.find(
+                        (attr) => attr.label === label,
+                      )?.value ?? "-"}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  )}
   <div class="with-aside">
     <section class="home-main">
       {featured && (

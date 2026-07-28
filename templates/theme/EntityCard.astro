@@ -1,0 +1,41 @@
+---
+// Directory entity card: one catalog item (a hotel, a tool, a
+// venue) with its key attributes. Data comes from the entities
+// content collection; the card links to the entity's in-depth
+// review article, keeping articles the single deep-dive format.
+interface Attribute {
+  label: string;
+  value: string;
+}
+interface Props {
+  title: string;
+  url?: string;
+  description?: string;
+  image?: string;
+  badge?: string;
+  attributes?: Attribute[];
+}
+const { title, url, description, image, badge, attributes = [] } = Astro.props;
+---
+
+<li class="entity-card">
+  {image && (
+    <img src={image} alt="" width="640" height="360" loading="lazy" />
+  )}
+  {badge && <span class="entity-badge">{badge}</span>}
+  {url ? (
+    <a href={url}>{title}</a>
+  ) : (
+    <span class="entity-title">{title}</span>
+  )}
+  {description && <p>{description}</p>}
+  {attributes.length > 0 && (
+    <ul class="entity-attrs">
+      {attributes.map((attr) => (
+        <li>
+          <span>{attr.label}</span> {attr.value}
+        </li>
+      ))}
+    </ul>
+  )}
+</li>

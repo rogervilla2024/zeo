@@ -311,3 +311,142 @@ blockquote {
 .author-box-name a:hover { color: var(--color-primary); text-decoration: underline; }
 .author-box-role { color: var(--color-muted); font-size: 0.9rem; margin: 0 0 0.5rem; }
 .author-box-bio { margin: 0; font-size: 0.95rem; }
+
+/* Archetype blocks: product quick facts + how-to, directory cards */
+.quick-facts { margin: 0 0 2.25rem; }
+.quick-facts dl {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  margin: 0;
+}
+.quick-facts .quick-fact {
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+}
+.quick-facts dt {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  margin: 0 0 0.25rem;
+}
+.quick-facts dd { margin: 0; font-weight: 700; font-size: 1.05rem; }
+.howto-steps { margin: 0 0 2.25rem; }
+.howto-steps ol {
+  list-style: none;
+  counter-reset: step;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+.howto-steps li {
+  counter-increment: step;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem 1rem 3rem;
+  position: relative;
+}
+.howto-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0.9rem;
+  top: 1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-primary, #ffffff);
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: grid;
+  place-items: center;
+}
+.howto-steps p { margin: 0.3rem 0 0; color: var(--color-muted); font-size: 0.95rem; }
+.directory { margin: 0 0 2.25rem; }
+.entity-grid {
+  list-style: none;
+  margin: 0 0 1.75rem;
+  padding: 0;
+  display: grid;
+  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+}
+.entity-card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-muted) 25%, transparent);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.entity-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-text) 12%, transparent);
+}
+.entity-card img {
+  display: block;
+  width: calc(100% + 2.5rem);
+  max-width: none;
+  margin: -1.1rem -1.25rem 0.8rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.entity-card > a,
+.entity-card .entity-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  text-decoration: none;
+}
+.entity-card > a::after { content: ""; position: absolute; inset: 0; }
+.entity-card > a:hover { color: var(--color-primary); }
+.entity-card p { margin: 0.4rem 0 0; color: var(--color-muted); font-size: 0.93rem; }
+.entity-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-accent) 18%, var(--color-background));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  margin: 0 0 0.5rem;
+}
+.entity-attrs {
+  list-style: none;
+  margin: 0.7rem 0 0;
+  padding: 0.7rem 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-muted) 18%, transparent);
+  font-size: 0.88rem;
+  display: grid;
+  gap: 0.3rem;
+}
+.entity-attrs span { color: var(--color-muted); }
+.comparison { overflow-x: auto; margin: 0 0 1rem; }
+.comparison table { border-collapse: collapse; width: 100%; }
+.comparison th, .comparison td {
+  border: 1px solid color-mix(in srgb, var(--color-muted) 30%, transparent);
+  padding: 0.55rem 0.8rem;
+  text-align: left;
+  font-size: 0.92rem;
+}
+.comparison thead th {
+  background: var(--color-primary);
+  color: var(--color-on-primary, #ffffff);
+}
+.comparison tbody tr:nth-child(even) { background: var(--color-surface); }
+.embed-frame { margin: 1.5rem 0; }
+.embed-frame iframe {
+  display: block;
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--color-muted) 30%, transparent);
+  border-radius: var(--radius);
+}
+.embed-frame figcaption { font-size: 0.85rem; color: var(--color-muted); margin-top: 0.5rem; }

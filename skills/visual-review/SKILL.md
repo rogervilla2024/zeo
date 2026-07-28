@@ -65,6 +65,11 @@ done because it builds; it is done when its screenshots pass review.
 - The homepage opens with a designed hero (`.site-hero` composed:
   background treatment, display title, tagline), never a bare h1
   above a list.
+- Archetype match: the homepage does the niche's PRIMARY JOB
+  (`site_type`). A single-game/product niche rendered as a generic
+  article portal - no quick-facts panel, no how-it-works, no demo
+  CTA - is an automatic fail; so is an entity-catalog niche (hotels,
+  tools, venues) with no entity cards or comparison table.
 
 ## Output
 

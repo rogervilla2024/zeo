@@ -1,0 +1,27 @@
+---
+// Numbered how-to strip for product homepages: the "how it works in
+// N steps" band. Steps come from site.config.json's product.steps.
+// When an article covers the same process in depth, its HowTo
+// JSON-LD (build_jsonld.py) should mirror these visible steps.
+interface Step {
+  title: string;
+  text: string;
+}
+interface Props {
+  title?: string;
+  steps: Step[];
+}
+const { title = "How it works", steps } = Astro.props;
+---
+
+<section class="howto-steps">
+  <h2 class="section-title">{title}</h2>
+  <ol>
+    {steps.map((step) => (
+      <li>
+        <strong>{step.title}</strong>
+        <p>{step.text}</p>
+      </li>
+    ))}
+  </ol>
+</section>

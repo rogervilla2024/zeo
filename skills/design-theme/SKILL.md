@@ -34,7 +34,24 @@ if yours is 30 lines, you restyled nothing.
 
 ## Instructions
 
-1. Write the design brief from the niche before touching code: the
+1. First decide the site ARCHETYPE - what does the visitor come to
+   DO? Set `site_type` in site.config.json; the homepage composes
+   itself from it:
+   - `portal` (default): read across a topic - feature card, latest
+     grid, category strips.
+   - `product`: see/try ONE game, app, or product - hero CTA (to
+     `/demo/` or the pillar guide), `product.facts` quick-facts
+     panel, `product.steps` how-it-works strip, then the guides. Put
+     any third-party demo embed on a dedicated page with
+     EmbedFrame.astro, never the homepage.
+   - `directory`: choose among entities (hotels, tools, venues) -
+     fill `src/content/entities/` with attribute-typed entries; the
+     homepage renders entity cards plus a comparison table, each
+     linking to its review article.
+   A single-product niche shipped as a generic article portal is a
+   composition failure, whatever the colors look like.
+
+2. Write the design brief from the niche before touching code: the
    mood in one sentence, then concrete choices. Anchor on an
    archetype and push it:
    - health/science: calm, clinical, high-trust - cool palette,
@@ -48,7 +65,7 @@ if yours is 30 lines, you restyled nothing.
    - tech/tools: crisp, modern - near-black or paper-white base,
      electric accent, mono details
    The mood must be guessable from a screenshot with the text blurred.
-2. Set the tokens in `site.config.json`:
+3. Set the tokens in `site.config.json`:
    - `theme.palette`: primary (the identity color), accent (used
      sparingly), background/surface/text/muted tuned to the same
      temperature; `on-primary` if primary is light. Never leave the
@@ -60,7 +77,7 @@ if yours is 30 lines, you restyled nothing.
      System stacks are the fallback, not the goal.
    - `theme.variant` and `theme.radius` (sharp for technical, soft
      for lifestyle).
-3. Regenerate the stylesheet - tokens plus the variant layer come out
+4. Regenerate the stylesheet - tokens plus the variant layer come out
    of one command:
 
    ```bash
@@ -68,7 +85,7 @@ if yours is 30 lines, you restyled nothing.
        --output src/styles/tokens.css
    ```
 
-4. Choose the site's COMPOSITION deliberately - layout is part of the
+5. Choose the site's COMPOSITION deliberately - layout is part of the
    identity, and two sites must not share it any more than they share
    a palette:
    - header: nav style from the `nav` array in site.config.json
@@ -83,7 +100,7 @@ if yours is 30 lines, you restyled nothing.
      forced onto trust pages.
    - density and shape: card-heavy vs airy lists, sharp vs soft
      radius, boxed vs full-bleed hero.
-5. Art-direct the site in `src/styles/site.css` (loaded by BaseLayout
+6. Art-direct the site in `src/styles/site.css` (loaded by BaseLayout
    after tokens.css). This is the identity layer - make it as large
    as the design needs. Cover, at minimum:
    - the hero (`.site-hero`): the first screen must look composed -
@@ -97,15 +114,15 @@ if yours is 30 lines, you restyled nothing.
    - the footer: styled, not an afterthought
    Only the SEO mechanics are off-limits; every visual surface is
    yours to redesign.
-6. Every color pair must hold WCAG AA (4.5:1 body text, 3:1 large
+7. Every color pair must hold WCAG AA (4.5:1 body text, 3:1 large
    text) in BOTH light and dark modes. Check the pairs actually used:
    text/background, muted/background, on-primary/primary, link/
    background.
-7. Hard rules that survive any design: zero JavaScript added; one h1;
+8. Hard rules that survive any design: zero JavaScript added; one h1;
    visible focus states kept; the JS and media budgets still pass;
    no external fonts, CSS, or images fetched at runtime (self-hosted
    assets only).
-8. Finish through the visual-review gate: build, screenshot at
+9. Finish through the visual-review gate: build, screenshot at
    390/768/1440, critique against its checklist - including the
    distinctiveness check - fix, re-shoot until it passes. A design
    that has not passed visual-review does not ship.

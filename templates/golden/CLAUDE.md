@@ -52,6 +52,7 @@ when work is done. If unsure where the toolkit lives, ask; then run
 
 | Task | Use |
 | --- | --- |
+| Homepage archetype | `site_type` in site.config.json: portal / product (`product` config: facts, steps, demo CTA) / directory (`src/content/entities/` catalog) |
 | New article | write-article skill (ends by running the gates) |
 | Article images | generate-article-images skill |
 | Topic planning | build-topic-clusters skill (seasonal planner included) |

@@ -89,6 +89,7 @@ def test_ui_strings_config_and_wiring() -> None:
         "about", "contact", "privacy_policy", "terms_of_service", "disclaimer",
         "blog", "popular", "category_description", "author_articles",
         "about_the_author", "blog_description",
+        "quick_facts", "how_to_title", "directory_title", "comparison_title",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
@@ -176,6 +177,36 @@ def test_author_profile_pages() -> None:
     article = (GOLDEN / "src" / "pages" / "[...slug].astro").read_text()
     for hook in ("AuthorBox", "authorEntity", "ui.about_the_author"):
         assert hook in article, f"article template misses {hook}"
+
+
+def test_homepage_archetypes() -> None:
+    index = (GOLDEN / "src" / "pages" / "index.astro").read_text()
+    # The homepage must compose itself from site_type: product blocks
+    # (quick facts, how-to) and directory blocks (entity cards,
+    # comparison table) alongside the portal default.
+    for hook in (
+        "site_type", "QuickFacts", "HowToSteps", "EntityCard",
+        "comparison", 'getCollection("entities")', "product.facts",
+        "product.steps",
+    ):
+        assert hook in index, f"homepage misses {hook}"
+
+    config = json.loads((GOLDEN / "site.config.json").read_text())
+    assert config["site_type"] == "portal"
+    product = config["product"]
+    assert product["facts"] == [] and product["steps"] == []
+    for key in ("name", "cta_label", "demo_path"):
+        assert key in product
+
+    schema = (GOLDEN / "src" / "content.config.ts").read_text()
+    assert "entities" in schema and "attributes" in schema
+    assert (GOLDEN / "src" / "content" / "entities").is_dir()
+
+    # The archetype decision is wired into the design workflow.
+    design = (ROOT / "skills" / "design-theme" / "SKILL.md").read_text()
+    assert "site_type" in design and "ARCHETYPE" in design
+    review = (ROOT / "skills" / "visual-review" / "SKILL.md").read_text()
+    assert "Archetype match" in review
 
 
 def test_claude_md_encodes_the_workflow() -> None:
