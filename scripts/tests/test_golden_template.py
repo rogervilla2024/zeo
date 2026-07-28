@@ -71,6 +71,8 @@ def test_required_skeleton_files_exist() -> None:
         "src/pages/rss.xml.js",
         "src/pages/sitemap.xml.js",
         "src/pages/llms.txt.js",
+        "src/pages/api/articles.json.js",
+        "public/.well-known/api-catalog",
         "src/pages/[directory_base]/[facet]/[value].astro",
         "src/pages/about.astro",
         "src/pages/contact.astro",
@@ -240,10 +242,42 @@ def test_dynamic_sitemap_and_llms_endpoints() -> None:
     )
     llms = (GOLDEN / "src" / "pages" / "llms.txt.js").read_text()
     assert 'getCollection("blog")' in llms and "config.niche" in llms
+    assert "/api/articles.json" in llms
     assert not (GOLDEN / "public" / "llms.txt").exists()
     # robots.txt keeps pointing at the endpoint's path.
     robots = (GOLDEN / "public" / "robots.txt").read_text()
     assert "/sitemap.xml" in robots
+
+
+def test_agent_discovery_surface() -> None:
+    # The read API renders the full article catalog from the content
+    # collection - agents get the site in one request.
+    api = (GOLDEN / "src" / "pages" / "api" / "articles.json.js").read_text()
+    for hook in (
+        'getCollection("blog")', "description", "published", "updated",
+        "category", "application/json",
+    ):
+        assert hook in api, f"articles.json endpoint misses {hook}"
+
+    # RFC 9727 catalog: valid linkset JSON once the placeholder is
+    # substituted, anchoring the read API and llms.txt.
+    catalog_text = (
+        GOLDEN / "public" / ".well-known" / "api-catalog"
+    ).read_text()
+    assert "{{SITE_URL}}" in catalog_text
+    catalog = json.loads(
+        catalog_text.replace("{{SITE_URL}}", "https://example.com")
+    )
+    entry = catalog["linkset"][0]
+    assert entry["anchor"].endswith("/api/articles.json")
+    assert entry["service-doc"][0]["href"].endswith("/llms.txt")
+
+    # Link headers advertise the machine endpoints on the homepage,
+    # and the extensionless catalog gets its media type pinned.
+    headers = (GOLDEN / "public" / "_headers").read_text()
+    assert 'rel="api-catalog"' in headers
+    assert 'rel="describedby"' in headers
+    assert "application/linkset+json" in headers
 
     # The archetype decision is wired into the design workflow.
     design = (ROOT / "skills" / "design-theme" / "SKILL.md").read_text()

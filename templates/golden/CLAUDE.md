@@ -54,6 +54,7 @@ when work is done. If unsure where the toolkit lives, ask; then run
 | --- | --- |
 | Homepage archetype | `site_type` in site.config.json: portal / product (`product` config: facts, steps, demo CTA) / directory (`src/content/entities/` catalog + `directory.facets` filter archives) |
 | Sitemap / llms.txt | built-in dynamic endpoints (`src/pages/sitemap.xml.js`, `llms.txt.js`) - NEVER hand-write public/ copies, they go stale |
+| Agent discovery | built-in: `/api/articles.json` read API, `/.well-known/api-catalog` (replace `{{SITE_URL}}`), Link headers in `public/_headers` |
 | New article | write-article skill (ends by running the gates) |
 | Article images | generate-article-images skill |
 | Topic planning | build-topic-clusters skill (seasonal planner included) |

@@ -15,6 +15,17 @@
 /robots.txt
   Content-Type: text/plain; charset=utf-8
 
+# RFC 9727 well-known API catalog has no file extension; pin its type.
+/.well-known/api-catalog
+  Content-Type: application/linkset+json
+
+# RFC 8288 Link headers on the homepage: agents discover the machine
+# endpoints (API catalog, llms.txt, feed) without parsing HTML.
+/
+  Link: </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"
+  Link: </llms.txt>; rel="describedby"; type="text/plain"
+  Link: </rss.xml>; rel="alternate"; type="application/rss+xml"
+
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN

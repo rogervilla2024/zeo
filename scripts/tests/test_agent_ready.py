@@ -60,6 +60,21 @@ def test_good_robots_passes_all() -> None:
     ).passed
 
 
+def test_discovery_checks() -> None:
+    from seo_content_forge.agent_ready import discovery_checks
+
+    link = '</.well-known/api-catalog>; rel="api-catalog"'
+    checks = discovery_checks(link, True)
+    assert all(check.passed for check in checks)
+    assert _by_id(checks, "link-headers").category == "discoverability"
+
+    failing = discovery_checks(None, False)
+    assert not any(check.passed for check in failing)
+    assert all(check.fix for check in failing)
+    # An empty Link header value counts as absent, not present.
+    assert not _by_id(discovery_checks("", True), "link-headers").passed
+
+
 def test_missing_robots_fails_with_fixes() -> None:
     checks = [
         check

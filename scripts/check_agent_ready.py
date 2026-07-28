@@ -20,6 +20,7 @@ from seo_content_forge.agent_ready import (
     Check,
     analyze_html,
     analyze_robots,
+    discovery_checks,
     presence_checks,
     summarize,
 )
@@ -50,6 +51,7 @@ def collect_checks(base_url: str) -> list[Check]:
     sitemap = fetch(sitemap_url)
     markdown_probe = fetch(base, accept="text/markdown")
     homepage = fetch(base)
+    api_catalog = fetch(urljoin(base, ".well-known/api-catalog"))
 
     checks = analyze_robots(robots_text)
     checks += presence_checks(
@@ -57,6 +59,9 @@ def collect_checks(base_url: str) -> list[Check]:
         sitemap_found=sitemap.ok,
         markdown_negotiation=markdown_probe.ok
         and "markdown" in markdown_probe.content_type,
+    )
+    checks += discovery_checks(
+        homepage.link_header if homepage.ok else None, api_catalog.ok
     )
     checks += analyze_html(homepage.text if homepage.ok else "")
     return checks
