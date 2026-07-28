@@ -184,6 +184,11 @@ output is deterministic and standards-correct:
   central `affiliates.json` table: every affiliate anchor needs
   `rel="sponsored"` and a table entry; `--live` probes managed URLs
   for dead destinations
+- `check_robots_live.py` - live gate: fetch the SERVED robots.txt and
+  fail when any user-agent is both allowed and disallowed at root
+  (the signature of a CDN-managed robots block, e.g. Cloudflare AI
+  Crawl Control, fighting the site's own AI-ready rules); part of
+  seo_report.py's `--live` battery.
 - `check_toolkit_version.py` - warn when this toolkit clone is behind
   upstream (commit count, plugin version, optional HEAD age), so
   process improvements actually reach every site

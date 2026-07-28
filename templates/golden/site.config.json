@@ -51,7 +51,8 @@
     "quick_facts": "Quick facts",
     "how_to_title": "How it works",
     "directory_title": "Browse the directory",
-    "comparison_title": "Compare"
+    "comparison_title": "Compare",
+    "facet_description": "All entries where {label} is {value}."
   },
   "organization": {
     "name": "Example Site",
@@ -142,5 +143,9 @@
     "demo_path": "",
     "facts": [],
     "steps": []
+  },
+  "directory": {
+    "base": "directory",
+    "facets": []
   }
 }

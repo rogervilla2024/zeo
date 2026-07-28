@@ -16,6 +16,7 @@ SYNCED: dict[str, Path] = {
     "src/layouts/BaseLayout.astro": THEME / "BaseLayout.astro",
     "public/robots.txt": ROOT / "templates" / "robots.txt",
     "public/_headers": ROOT / "templates" / "deploy" / "_headers",
+    "public/_redirects": ROOT / "templates" / "deploy" / "_redirects",
     "site.config.json": ROOT / "templates" / "site.config.example.json",
 }
 
@@ -68,6 +69,9 @@ def test_required_skeleton_files_exist() -> None:
         "src/pages/authors/[slug].astro",
         "src/pages/search.astro",
         "src/pages/rss.xml.js",
+        "src/pages/sitemap.xml.js",
+        "src/pages/llms.txt.js",
+        "src/pages/[directory_base]/[facet]/[value].astro",
         "src/pages/about.astro",
         "src/pages/contact.astro",
         "src/pages/privacy-policy.astro",
@@ -90,6 +94,7 @@ def test_ui_strings_config_and_wiring() -> None:
         "blog", "popular", "category_description", "author_articles",
         "about_the_author", "blog_description",
         "quick_facts", "how_to_title", "directory_title", "comparison_title",
+        "facet_description",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
@@ -201,6 +206,44 @@ def test_homepage_archetypes() -> None:
     schema = (GOLDEN / "src" / "content.config.ts").read_text()
     assert "entities" in schema and "attributes" in schema
     assert (GOLDEN / "src" / "content" / "entities").is_dir()
+
+    # Directory facet archives: config declares the facets, the
+    # 3-segment route pre-renders one page per attribute value, and
+    # the homepage links them as chips.
+    directory = config["directory"]
+    assert directory["base"] and directory["facets"] == []
+    assert "facet-nav" in index and "facetLinks" in index
+    facet_route = (
+        GOLDEN / "src" / "pages" / "[directory_base]" / "[facet]"
+        / "[value].astro"
+    ).read_text()
+    for hook in (
+        "getStaticPaths", "EntityCard", "BreadcrumbList", "slugify",
+        "ui.facet_description", "canonical",
+    ):
+        assert hook in facet_route, f"facet route misses {hook}"
+    assert "{label}" in config["ui"]["facet_description"]
+    assert "{value}" in config["ui"]["facet_description"]
+
+
+def test_dynamic_sitemap_and_llms_endpoints() -> None:
+    # A hand-written public/sitemap.xml lists the launch pack forever;
+    # the endpoints regenerate from the article list on every build.
+    sitemap = (GOLDEN / "src" / "pages" / "sitemap.xml.js").read_text()
+    for hook in (
+        'getCollection("blog")', "lastmod", "category_base",
+        "/authors/", 'getCollection("entities")', "urlset",
+    ):
+        assert hook in sitemap, f"sitemap endpoint misses {hook}"
+    assert not (GOLDEN / "public" / "sitemap.xml").exists(), (
+        "golden must not ship a static sitemap next to the endpoint"
+    )
+    llms = (GOLDEN / "src" / "pages" / "llms.txt.js").read_text()
+    assert 'getCollection("blog")' in llms and "config.niche" in llms
+    assert not (GOLDEN / "public" / "llms.txt").exists()
+    # robots.txt keeps pointing at the endpoint's path.
+    robots = (GOLDEN / "public" / "robots.txt").read_text()
+    assert "/sitemap.xml" in robots
 
     # The archetype decision is wired into the design workflow.
     design = (ROOT / "skills" / "design-theme" / "SKILL.md").read_text()

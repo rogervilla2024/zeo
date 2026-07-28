@@ -62,3 +62,19 @@ Tools. Search Console tracking stays with the operator.
   routes, add `@astrojs/cloudflare` and re-run the test suite.
 - Cloudflare's CDN and early hints generally improve field CWV; the
   JS budget and image rules still decide the outcome.
+
+## Cloudflare AI Crawl Control vs. the site's robots.txt
+
+The zone-level "AI Scrapers & Crawlers" / "Manage robots.txt" feature
+PREPENDS a managed block to the served robots.txt that disallows
+GPTBot, ClaudeBot, CCBot and friends - directly contradicting this
+toolkit's AI-ready robots template below it. Which rule wins is
+crawler-dependent, so the crawl policy becomes undefined. Turn the
+managed robots.txt off (zone -> Settings -> AI Crawl Control) or
+align it with the site's policy. The `robots-conflict` live gate
+(`seo_report.py --live`) fetches the SERVED robots.txt and fails
+while the conflict exists, so a panel change can never silently
+reintroduce it.
+
+Also upload `public/_redirects` with `{{DOMAIN}}` replaced so www
+301s to the apex - one host, one set of URLs.

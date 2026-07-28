@@ -1,0 +1,111 @@
+---
+// Directory facet archive: one static listing per attribute value at
+// /<directory.base>/<facet>/<value>/ (e.g. /otel/bolge/girne/). This
+// is the zero-JS answer to "filtering": every filter combination the
+// config declares (directory.facets, matched against entity
+// attribute labels) is pre-rendered as a crawlable page. Three URL
+// segments, so it can never collide with the two-segment category
+// archives.
+import { getCollection } from "astro:content";
+import config from "../../../../site.config.json";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import EntityCard from "../../../components/EntityCard.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { slugify } from "../../../lib/slugify";
+
+export async function getStaticPaths() {
+  const directory = config.directory ?? {};
+  const base = directory.base || "directory";
+  const facets: string[] = directory.facets ?? [];
+  const entities = (await getCollection("entities")).sort(
+    (a, b) =>
+      a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
+  );
+
+  const paths = new Map<
+    string,
+    {
+      params: { directory_base: string; facet: string; value: string };
+      props: { facetLabel: string; valueLabel: string; entities: typeof entities };
+    }
+  >();
+  for (const label of facets) {
+    const facetSlug = slugify(label);
+    if (!facetSlug) continue;
+    for (const entity of entities) {
+      const match = entity.data.attributes.find(
+        (attr) => attr.label === label,
+      );
+      if (!match) continue;
+      const valueSlug = slugify(match.value);
+      if (!valueSlug) continue;
+      const key = `${facetSlug}/${valueSlug}`;
+      const existing = paths.get(key);
+      if (existing) {
+        existing.props.entities.push(entity);
+      } else {
+        paths.set(key, {
+          params: { directory_base: base, facet: facetSlug, value: valueSlug },
+          props: { facetLabel: label, valueLabel: match.value, entities: [entity] },
+        });
+      }
+    }
+  }
+  return [...paths.values()];
+}
+
+const ui = config.ui ?? {};
+const { facetLabel, valueLabel, entities } = Astro.props;
+const base = (config.directory ?? {}).base || "directory";
+const canonical = new URL(
+  `/${base}/${Astro.params.facet}/${Astro.params.value}/`,
+  config.domain,
+).href;
+const description = (
+  ui.facet_description ?? "All entries where {label} is {value}."
+)
+  .replace("{label}", facetLabel)
+  .replace("{value}", valueLabel);
+
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: ui.home ?? "Home",
+      item: config.domain,
+    },
+    { "@type": "ListItem", position: 2, name: valueLabel, item: canonical },
+  ],
+};
+---
+
+<BaseLayout
+  title={`${valueLabel} - ${facetLabel}`}
+  description={description}
+  canonical={canonical}
+  lang={config.default_language}
+  jsonLd={[breadcrumb]}
+>
+  <section class="listing">
+    <Breadcrumbs
+      items={[{ name: ui.home ?? "Home", url: "/" }, { name: valueLabel }]}
+    />
+    <h1>{valueLabel}</h1>
+    <p class="category-intro">{description}</p>
+    <ul class="entity-grid">
+      {entities.map((entity) => (
+        <EntityCard
+          title={entity.data.title}
+          url={entity.data.article}
+          description={entity.data.description}
+          image={entity.data.image}
+          badge={entity.data.badge}
+          attributes={entity.data.attributes}
+        />
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

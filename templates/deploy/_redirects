@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects. Replace {{DOMAIN}} with the bare
+# apex host (e.g. example.com) before deploying. www consolidates
+# onto the apex with a 301 so exactly one host serves content -
+# canonicals already point at the apex, this closes the duplicate.
+https://www.{{DOMAIN}}/* https://{{DOMAIN}}/:splat 301

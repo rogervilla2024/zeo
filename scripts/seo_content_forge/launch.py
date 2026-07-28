@@ -59,19 +59,37 @@ def check_launch(root: Path) -> list[str]:
         problems.append("public/robots.txt missing")
     elif "{{SITE_URL}}" in robots.read_text(encoding="utf-8"):
         problems.append("public/robots.txt still contains {{SITE_URL}}")
-    if not (public / "llms.txt").is_file():
-        problems.append("public/llms.txt missing (generate-llms-txt skill)")
-    if not _has_any(public, ("sitemap*.xml",)) and not _has_any(
-        root / "dist", ("sitemap*.xml",)
+    redirects = public / "_redirects"
+    if redirects.is_file() and "{{DOMAIN}}" in redirects.read_text(
+        encoding="utf-8"
     ):
-        problems.append("no sitemap*.xml in public/ or dist/")
+        problems.append("public/_redirects still contains {{DOMAIN}}")
+    # Dynamic endpoints (src/pages/*.js) satisfy the llms/sitemap
+    # checks: they render into dist on every build, so they can never
+    # go stale the way a hand-written public/ copy does.
+    pages = root / "src" / "pages"
+    if (
+        not (public / "llms.txt").is_file()
+        and not (pages / "llms.txt.js").is_file()
+        and not (root / "dist" / "llms.txt").is_file()
+    ):
+        problems.append(
+            "no llms.txt (src/pages/llms.txt.js endpoint or public/llms.txt)"
+        )
+    if (
+        not _has_any(public, ("sitemap*.xml",))
+        and not _has_any(root / "dist", ("sitemap*.xml",))
+        and not (pages / "sitemap.xml.js").is_file()
+    ):
+        problems.append(
+            "no sitemap (src/pages/sitemap.xml.js endpoint or a sitemap*.xml)"
+        )
     if not _has_any(public, ("favicon.ico", "favicon.svg")):
         problems.append("no favicon in public/ (generate_favicons.py)")
     for asset in ("logo.png", "og-image.png"):
         if not (public / asset).is_file():
             problems.append(f"public/{asset} missing")
 
-    pages = root / "src" / "pages"
     if pages.is_dir():
         for page in sorted(pages.glob("*.astro")):
             if _PAGE_PLACEHOLDER.search(page.read_text(encoding="utf-8")):
