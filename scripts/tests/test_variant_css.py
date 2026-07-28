@@ -51,6 +51,11 @@ def test_variant_css_targets_shipped_hooks() -> None:
             ".entity-card",
             ".comparison",
             ".embed-frame",
+            ".hero-search",
+            ".entity-panel",
+            ".gallery",
+            ".thread-list",
+            ".reply-card",
         ):
             assert hook in css, f"{variant}.css misses {hook}"
         assert "var(--color-" in css, f"{variant}.css ignores the tokens"

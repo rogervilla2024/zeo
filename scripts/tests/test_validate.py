@@ -78,3 +78,22 @@ def test_list_input_returns_result_per_node() -> None:
     results = validate(nodes)
     assert len(results) == 2
     assert all(result.is_valid for result in results)
+
+
+def test_qapage_rules() -> None:
+    from seo_content_forge.validate import validate_node
+
+    good = {
+        "@context": "https://schema.org",
+        "@type": "QAPage",
+        "mainEntity": {
+            "@type": "Question",
+            "name": "Is it safe?",
+            "answerCount": 2,
+        },
+    }
+    assert validate_node(good).is_valid
+    missing = {"@context": "https://schema.org", "@type": "QAPage"}
+    result = validate_node(missing)
+    assert not result.is_valid
+    assert any("mainEntity" in error for error in result.errors)

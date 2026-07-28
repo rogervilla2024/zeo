@@ -9,6 +9,8 @@ import config from "../../site.config.json";
 import AdSlot from "../components/AdSlot.astro";
 import ArticleMeta from "../components/ArticleMeta.astro";
 import AuthorBox from "../components/AuthorBox.astro";
+import EntityPanel from "../components/EntityPanel.astro";
+import ThreadReplies from "../components/ThreadReplies.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import FaqAccordion from "../components/FaqAccordion.astro";
 import KeyTakeaways from "../components/KeyTakeaways.astro";
@@ -50,6 +52,15 @@ const authors: {
 const authorEntity = authors.find(
   (candidate) =>
     normalizePath(candidate.url) === normalizePath(post.data.authorUrl),
+);
+
+// When this article is an entity's review (directory archetype),
+// its catalog entry decorates the page with the booking-style fact
+// panel: gallery, attributes, price, and the offer CTA.
+const entityEntry = (await getCollection("entities")).find(
+  (entity) =>
+    entity.data.article &&
+    normalizePath(entity.data.article) === normalizePath(`/${post.id}/`),
 );
 
 // Breadcrumb level 2: the article's category archive when it has
@@ -116,6 +127,38 @@ const breadcrumb = {
     { "@type": "ListItem", position: 3, name: post.data.title, item: canonical },
   ],
 };
+// Forum threads: editorial answers mirrored in QAPage JSON-LD -
+// schema and visible thread must stay identical.
+const answerNode = (reply: { author: string; text: string }) => ({
+  "@type": "Answer",
+  text: reply.text,
+  author: { "@type": "Person", name: reply.author },
+});
+const acceptedReply = post.data.replies.find((reply) => reply.highlight);
+const otherReplies = post.data.replies.filter(
+  (reply) => reply !== acceptedReply,
+);
+const qaSchema = post.data.replies.length
+  ? [
+      {
+        "@context": "https://schema.org",
+        "@type": "QAPage",
+        mainEntity: {
+          "@type": "Question",
+          name: post.data.title,
+          text: post.data.description,
+          answerCount: post.data.replies.length,
+          ...(acceptedReply
+            ? { acceptedAnswer: answerNode(acceptedReply) }
+            : {}),
+          ...(otherReplies.length
+            ? { suggestedAnswer: otherReplies.map(answerNode) }
+            : {}),
+        },
+      },
+    ]
+  : [];
+
 const faqSchema = post.data.faq.length
   ? [
       {
@@ -138,7 +181,7 @@ const faqSchema = post.data.faq.length
   lang={config.default_language}
   ogImage={ogImage}
   ogType="article"
-  jsonLd={[article, breadcrumb, ...faqSchema]}
+  jsonLd={[article, breadcrumb, ...faqSchema, ...qaSchema]}
 >
   <div class="with-aside">
   <article class="prose">
@@ -161,6 +204,17 @@ const faqSchema = post.data.faq.length
       updatedLabel={ui.updated}
       minReadLabel={ui.min_read}
     />
+    {entityEntry && (
+      <EntityPanel
+        title={entityEntry.data.title}
+        badge={entityEntry.data.badge}
+        price={entityEntry.data.price}
+        ctaUrl={entityEntry.data.cta_url}
+        ctaLabel={ui.entity_cta}
+        images={entityEntry.data.images}
+        attributes={entityEntry.data.attributes}
+      />
+    )}
     {post.data.takeaways.length > 0 && (
       <KeyTakeaways points={post.data.takeaways} title={ui.key_takeaways} />
     )}
@@ -173,6 +227,9 @@ const faqSchema = post.data.faq.length
       />
     )}
     <Content />
+    {post.data.replies.length > 0 && (
+      <ThreadReplies replies={post.data.replies} title={ui.thread_replies} />
+    )}
     <AdSlot name="article-end" />
     {post.data.faq.length > 0 && <FaqAccordion items={post.data.faq} title={ui.faq_title} />}
     <AuthorBox

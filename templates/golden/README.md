@@ -142,10 +142,19 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   site.config.json: `portal` (default - feature card, latest grid,
   category strips), `product` (quick-facts panel and how-it-works
   steps from the `product` config section, hero CTA to the demo),
-  or `directory` (entity cards + comparison from the entities
-  collection). Flip the key and rebuild - no template surgery.
+  `directory` (search hero, entity cards + comparison from the
+  entities collection, grouped by the first facet past a dozen
+  entries), or `forum` (search hero + thread list with answer
+  counts). Flip the key and rebuild - no template surgery.
   `EmbedFrame.astro` hosts third-party demos on a dedicated page
-  (e.g. `/demo/`), never the homepage.
+  (e.g. `/demo/`), never the homepage. Directory entities carry
+  `images` (gallery), `price`, and an affiliate `cta_url`; when an
+  article is an entity's review, the article page opens with the
+  booking-style `EntityPanel` (gallery, attributes, price, offer
+  CTA, rel="sponsored nofollow"). Forum threads are articles with
+  `replies` frontmatter - rendered as an answer thread and mirrored
+  in QAPage JSON-LD; answers are editorial and truthfully
+  attributed, never fabricated community members.
 - `public/robots.txt` - AI-ready robots template (replace
   `{{SITE_URL}}`).
 - `public/_headers` - Cloudflare Pages caching and security headers.
