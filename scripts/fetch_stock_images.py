@@ -4,7 +4,7 @@ Usage:
     python fetch_stock_images.py --query "french press coffee" \
         --slug french-press-brewing --out-dir public/img --count 2
     python fetch_stock_images.py --query "thyme tea glass" \
-        --slug kekik-cayi --out-dir public/img --hero
+        --slug coffee-grinder --out-dir public/img --hero
 
 Requires PEXELS_API_KEY in the environment (free key from
 pexels.com/api; store in .env, never in the repository). Downloads the

@@ -15,18 +15,18 @@ from seo_content_forge.article_images import (
 from seo_report import gate_commands
 
 GOOD = """---
-title: "Kekik"
-image: "/img/kekik-hero.svg"
+title: "First article"
+image: "/img/first-hero.svg"
 ---
 Intro.
 
-![diagram](/img/kekik-1.svg)
+![diagram](/img/first-1.svg)
 
-<img src="/img/kekik-2.svg" alt="table">
+<img src="/img/first-2.svg" alt="table">
 """
 
 NO_HERO = """---
-title: "Adacayi"
+title: "Second article"
 ---
 Body without any hero.
 
@@ -35,8 +35,8 @@ Body without any hero.
 """
 
 NO_BODY_IMAGES = """---
-title: "Ihlamur"
-image: "/img/ihlamur-hero.svg"
+title: "Third article"
+image: "/img/third-hero.svg"
 ---
 Text only.
 """
@@ -44,8 +44,8 @@ Text only.
 
 def test_parse_frontmatter_scalars_only() -> None:
     fields = parse_frontmatter(GOOD)
-    assert fields["image"] == "/img/kekik-hero.svg"
-    assert fields["title"] == "Kekik"
+    assert fields["image"] == "/img/first-hero.svg"
+    assert fields["title"] == "First article"
     assert parse_frontmatter("no frontmatter here") == {}
     # List items and indented lines never leak in as keys.
     nested = "---\ntakeaways:\n  - one\n- two\nimage: /x.png\n---\nBody"

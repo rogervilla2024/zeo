@@ -17,24 +17,24 @@ from seo_content_forge.content_checks import (
 )
 
 LINKED = """---
-title: "Kekik"
-category: "Bitki"
-image: "/img/kekik.svg"
+title: "First article"
+category: "Guides"
+image: "/img/first.svg"
 ---
-See [ihlamur](/ihlamur/) and <a href="/adacayi/">adacayi</a>.
+See [third](/third-post/) and <a href="/second-post/">second</a>.
 
-![hero](/img/kekik-1.svg)
+![hero](/img/first-1.svg)
 """
 
 UNLINKED = """---
-title: "Ihlamur"
-category: "Bitki"
+title: "Third article"
+category: "Guides"
 ---
 No links here, and [external](https://example.org) does not count.
 """
 
 UNCATEGORIZED = """---
-title: "Zencefil"
+title: "Fourth article"
 ---
 Body.
 """

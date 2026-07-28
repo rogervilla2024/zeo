@@ -1,6 +1,6 @@
 {
   "name": "zeo",
-  "version": "0.46.0",
+  "version": "0.46.1",
   "description": "Site-agnostic toolkit of subagents, skills, and commands for bootstrapping new SEO-ready sites and producing original content: research, drafting, humanizing, on-page and technical SEO, schema.org rich results, GEO/AEO, internal linking, XML sitemaps, llms.txt, and an objective test-and-fix loop (agent-readiness, PageSpeed, rich results). Built to run across any number of sites.",
   "keywords": [
     "seo",

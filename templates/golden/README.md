@@ -159,7 +159,7 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   advertises it - the homepage's Link headers (`public/_headers`)
   point there. Directory sites also get facet
   archives at `/<directory.base>/<facet>/<value>/` (e.g.
-  `/otel/bolge/girne/`) - one pre-rendered, crawlable page per
+  `/hotels/region/coast/`) - one pre-rendered, crawlable page per
   attribute value listed in `directory.facets`, the zero-JS answer
   to filtering; the homepage links them as chips.
 - `src/styles/tokens.css` - design tokens plus the `theme.variant`
