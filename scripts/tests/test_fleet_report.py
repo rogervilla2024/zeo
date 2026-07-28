@@ -138,3 +138,54 @@ def test_main_explicit_history_and_bad_file(tmp_path: Path) -> None:
     assert code == 1
     assert output.is_file()
     assert main(["--output", str(output)]) == 2
+
+
+def test_regressions_and_recoveries_detected() -> None:
+    from seo_content_forge.fleet import maintenance_order
+
+    runs: list[dict[str, object]] = [
+        {"results": {"a": True, "b": True, "c": False}},
+        {"results": {"a": True, "b": False, "c": True}},
+    ]
+    report = site_report("blog", runs)
+    assert report.regressions == ["b"]
+    assert report.recoveries == ["c"]
+    # A single-run site has nothing to regress against.
+    fresh = site_report("new", [{"results": {"a": False}}])
+    assert fresh.regressions == [] and fresh.failing == ["a"]
+
+    ranked = maintenance_order([report, fresh])
+    # Regressions outrank standing failures.
+    assert [entry.name for entry, _ in ranked] == ["blog", "new"]
+    assert "1 regressed: b" in ranked[0][1]
+    green = site_report("ok", [{"results": {"a": True}}])
+    assert maintenance_order([green]) == []
+
+
+def test_build_html_marks_regressions_and_maintenance() -> None:
+    runs: list[dict[str, object]] = [
+        {"results": {"a": True, "b": True}},
+        {"results": {"a": False, "b": True}},
+    ]
+    html_out = build_html([site_report("blog", runs)])
+    assert "FAIL (new)" in html_out
+    assert "Maintenance order" in html_out
+    assert "1 regressed: a" in html_out
+    # A green fleet renders no maintenance section.
+    green = build_html([site_report("ok", [{"results": {"a": True}}])])
+    assert "Maintenance order" not in green
+
+
+def test_main_prints_maintenance_order(tmp_path: Path, capsys) -> None:  # type: ignore[no-untyped-def]
+    _write_history(
+        tmp_path / "blog" / ".seo-history.json",
+        [
+            {"results": {"a": True, "b": True}},
+            {"results": {"a": True, "b": False}},
+        ],
+    )
+    out_file = tmp_path / "fleet.html"
+    assert main(["--scan", str(tmp_path), "--output", str(out_file)]) == 1
+    printed = capsys.readouterr().out
+    assert "Maintenance order (regressions first):" in printed
+    assert "1. blog  1 regressed: b" in printed

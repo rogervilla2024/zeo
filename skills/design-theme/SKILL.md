@@ -96,7 +96,10 @@ if yours is 30 lines, you restyled nothing.
 
 5. Choose the site's COMPOSITION deliberately - layout is part of the
    identity, and two sites must not share it any more than they share
-   a palette:
+   a palette. Pick one recipe per group from recipes.md (hero H1-H4,
+   header N1-N3, listing L1-L3, footer F1-F3), record the combo
+   (e.g. `H2+N1+L2+F3`) in the design brief, and never repeat a
+   fleet site's exact combo - change at least two letters. Concretely:
    - header: nav style from the `nav` array in site.config.json
      (fill it with the site's real sections) - inline links, centered
      masthead, or pill/button links; style `.site-nav` accordingly

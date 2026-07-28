@@ -20,7 +20,13 @@ from pathlib import Path
 
 import orjson
 
-from seo_content_forge.fleet import SiteReport, build_html, discover, site_report
+from seo_content_forge.fleet import (
+    SiteReport,
+    build_html,
+    discover,
+    maintenance_order,
+    site_report,
+)
 
 
 def _parse_history_arg(value: str) -> tuple[str, Path]:
@@ -100,6 +106,12 @@ def main(argv: list[str] | None = None) -> int:
         failing = sorted(gate for gate, ok in report.gates.items() if not ok)
         status = "green" if report.is_green else f"failing: {', '.join(failing)}"
         print(f"{report.name:24} {report.score}/{report.total}  {status}")
+
+    ranked = maintenance_order(reports)
+    if ranked:
+        print("\nMaintenance order (regressions first):")
+        for position, (report, reason) in enumerate(ranked, start=1):
+            print(f"  {position}. {report.name}  {reason}")
 
     args.output.write_text(build_html(reports, title=args.title), encoding="utf-8")
     print(f"\nReport written: {args.output}")
