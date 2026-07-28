@@ -1,0 +1,27 @@
+---
+// Zero-JS photo gallery: a responsive thumbnail grid where each
+// image links to its full-size file. Used on entity (hotel, venue,
+// product) article pages via EntityPanel; no lightbox script - the
+// browser's back button is the lightbox.
+interface Props {
+  images: string[];
+  alt?: string;
+}
+const { images, alt = "" } = Astro.props;
+---
+
+<ul class="gallery">
+  {images.map((src, index) => (
+    <li>
+      <a href={src}>
+        <img
+          src={src}
+          alt={alt ? `${alt} (${index + 1})` : ""}
+          width="640"
+          height="360"
+          loading="lazy"
+        />
+      </a>
+    </li>
+  ))}
+</ul>

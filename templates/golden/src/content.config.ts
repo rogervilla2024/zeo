@@ -21,6 +21,19 @@ const blog = defineCollection({
     faq: z
       .array(z.object({ question: z.string(), answer: z.string() }))
       .default([]),
+    // Forum-archetype threads: editorial answers rendered as a
+    // discussion under the article, mirrored in QAPage JSON-LD.
+    // Attribute answers to real authors or cited sources - never
+    // fabricate community members.
+    replies: z
+      .array(
+        z.object({
+          author: z.string(),
+          text: z.string(),
+          highlight: z.boolean().default(false),
+        }),
+      )
+      .default([]),
   }),
 });
 
@@ -35,9 +48,15 @@ const entities = defineCollection({
     title: z.string(),
     description: z.string().default(""),
     image: z.string().optional(),
+    // Additional photos for the gallery on the entity's article page.
+    images: z.array(z.string()).default([]),
     // Root-relative path to the entity's review article.
     article: z.string().default(""),
     badge: z.string().default(""),
+    // Display price ("from 120 EUR" / "$$$") and the outbound offer
+    // link (affiliate URL; rendered rel="sponsored nofollow").
+    price: z.string().default(""),
+    cta_url: z.string().default(""),
     order: z.number().default(999),
     attributes: z
       .array(z.object({ label: z.string(), value: z.string() }))

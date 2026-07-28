@@ -13,9 +13,18 @@ interface Props {
   description?: string;
   image?: string;
   badge?: string;
+  price?: string;
   attributes?: Attribute[];
 }
-const { title, url, description, image, badge, attributes = [] } = Astro.props;
+const {
+  title,
+  url,
+  description,
+  image,
+  badge,
+  price,
+  attributes = [],
+} = Astro.props;
 ---
 
 <li class="entity-card">
@@ -29,6 +38,7 @@ const { title, url, description, image, badge, attributes = [] } = Astro.props;
     <span class="entity-title">{title}</span>
   )}
   {description && <p>{description}</p>}
+  {price && <p class="entity-price">{price}</p>}
   {attributes.length > 0 && (
     <ul class="entity-attrs">
       {attributes.map((attr) => (

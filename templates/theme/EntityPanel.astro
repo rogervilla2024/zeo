@@ -1,0 +1,60 @@
+---
+// Entity fact panel for the top of an entity's review article: the
+// booking-style summary - gallery, badge, price, attribute list, and
+// the outbound offer CTA. The article body below stays the honest
+// deep dive; this panel is the at-a-glance decision layer. The CTA
+// is an affiliate/offer link, so it ships rel="sponsored nofollow"
+// per the affiliate policy.
+import Gallery from "./Gallery.astro";
+
+interface Attribute {
+  label: string;
+  value: string;
+}
+interface Props {
+  title: string;
+  badge?: string;
+  price?: string;
+  ctaUrl?: string;
+  ctaLabel?: string;
+  images?: string[];
+  attributes?: Attribute[];
+}
+const {
+  title,
+  badge,
+  price,
+  ctaUrl,
+  ctaLabel = "See prices",
+  images = [],
+  attributes = [],
+} = Astro.props;
+---
+
+<aside class="entity-panel">
+  {images.length > 0 && <Gallery images={images} alt={title} />}
+  <div class="entity-panel-body">
+    {badge && <span class="entity-badge">{badge}</span>}
+    {attributes.length > 0 && (
+      <ul class="entity-attrs">
+        {attributes.map((attr) => (
+          <li>
+            <span>{attr.label}</span> {attr.value}
+          </li>
+        ))}
+      </ul>
+    )}
+    <div class="entity-panel-offer">
+      {price && <strong class="entity-price">{price}</strong>}
+      {ctaUrl && (
+        <a
+          class="entity-cta"
+          href={ctaUrl}
+          rel="sponsored nofollow noopener"
+        >
+          {ctaLabel}
+        </a>
+      )}
+    </div>
+  </div>
+</aside>

@@ -69,7 +69,8 @@ done because it builds; it is done when its screenshots pass review.
   (`site_type`). A single-game/product niche rendered as a generic
   article portal - no quick-facts panel, no how-it-works, no demo
   CTA - is an automatic fail; so is an entity-catalog niche (hotels,
-  tools, venues) with no entity cards or comparison table.
+  tools, venues) with no entity cards or comparison table, and a
+  Q&A/discussion niche with no thread list or answer threads.
 
 ## Output
 

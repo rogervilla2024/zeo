@@ -7,6 +7,11 @@
 //                 facts panel, how-it-works steps, then the guides.
 //   "directory" - entity catalog: attribute cards plus a comparison
 //                 table (entities collection), then the articles.
+//                 Past a dozen entities the grid groups itself by the
+//                 first facet, booking-style.
+//   "forum"     - discussion board: question threads as rows with
+//                 answer counts; thread pages carry the editorial
+//                 answers and QAPage JSON-LD.
 // Sitewide Organization and WebSite+SearchAction JSON-LD mirror
 // scripts/build_jsonld.py output.
 import { getCollection } from "astro:content";
@@ -31,6 +36,11 @@ const [featured, ...rest] = posts;
 // the article section shrinks to a supporting role.
 const latest = rest.slice(0, siteType === "portal" ? 6 : 3);
 const popular = posts.slice(0, 5);
+// Forum homepages are a board: threads as rows, newest first.
+const isForum = siteType === "forum";
+const threads = isForum ? posts.slice(0, 12) : [];
+const answersLabel = (count: number) =>
+  (ui.answers_count ?? "{count} answers").replace("{count}", String(count));
 
 // One strip per pillar/category (portal only), biggest clusters
 // first, three most recent articles each; titles link to the
@@ -116,6 +126,29 @@ const facetLinks =
       })
     : [];
 
+// Booking-style grouping: past a dozen entities a flat grid stops
+// working - group by the first facet's values, capped per group,
+// each heading linking to its full archive.
+const GROUP_LIMIT = 12;
+const firstFacet = directoryConfig.facets[0];
+const groupsMap = new Map<string, typeof entities>();
+if (siteType === "directory" && entities.length > GROUP_LIMIT && firstFacet) {
+  for (const entity of entities) {
+    const match = entity.data.attributes.find(
+      (attr) => attr.label === firstFacet,
+    );
+    if (!match) continue;
+    const bucket = groupsMap.get(match.value) ?? [];
+    bucket.push(entity);
+    groupsMap.set(match.value, bucket);
+  }
+}
+const groups = [...groupsMap.entries()].map(([value, list]) => ({
+  value,
+  url: `/${directoryBase}/${slugify(firstFacet ?? "")}/${slugify(value)}/`,
+  entities: list.slice(0, 6),
+}));
+
 const organization = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -154,7 +187,19 @@ const website = {
   lang={config.default_language}
   jsonLd={[organization, website]}
 >
-  <Hero title={config.site_name} tagline={config.niche} {...heroCta} />
+  <Hero title={config.site_name} tagline={config.niche} {...heroCta}>
+    {(siteType === "directory" || isForum) && (
+      <form class="hero-search" action="/search" method="get">
+        <input
+          type="search"
+          name="q"
+          placeholder={ui.search_placeholder ?? "Search this site"}
+          aria-label={ui.search ?? "Search"}
+        />
+        <button type="submit">{ui.search ?? "Search"}</button>
+      </form>
+    )}
+  </Hero>
   {siteType === "product" && product.facts.length > 0 && (
     <QuickFacts title={ui.quick_facts} facts={product.facts} />
   )}
@@ -171,19 +216,44 @@ const website = {
           ))}
         </ul>
       )}
-      <ul class="entity-grid">
-        {entities.map((entity) => (
-          <EntityCard
-            title={entity.data.title}
-            url={entity.data.article}
-            description={entity.data.description}
-            image={entity.data.image}
-            badge={entity.data.badge}
-            attributes={entity.data.attributes}
-          />
-        ))}
-      </ul>
-      {comparisonLabels.length > 0 && (
+      {groups.length > 0 ? (
+        groups.map((group) => (
+          <section class="entity-group">
+            <h2 class="section-title">
+              <a href={group.url}>{group.value}</a>
+              <a class="view-all" href={group.url}>{ui.view_all ?? "View all"}</a>
+            </h2>
+            <ul class="entity-grid">
+              {group.entities.map((entity) => (
+                <EntityCard
+                  title={entity.data.title}
+                  url={entity.data.article}
+                  description={entity.data.description}
+                  image={entity.data.image}
+                  badge={entity.data.badge}
+                  price={entity.data.price}
+                  attributes={entity.data.attributes}
+                />
+              ))}
+            </ul>
+          </section>
+        ))
+      ) : (
+        <ul class="entity-grid">
+          {entities.map((entity) => (
+            <EntityCard
+              title={entity.data.title}
+              url={entity.data.article}
+              description={entity.data.description}
+              image={entity.data.image}
+              badge={entity.data.badge}
+              price={entity.data.price}
+              attributes={entity.data.attributes}
+            />
+          ))}
+        </ul>
+      )}
+      {groups.length === 0 && comparisonLabels.length > 0 && (
         <div class="comparison">
           <table>
             <thead>
@@ -219,7 +289,28 @@ const website = {
   )}
   <div class="with-aside">
     <section class="home-main">
-      {featured && (
+      {isForum && (
+        <>
+          <h2 class="section-title">{ui.latest_articles ?? "Latest threads"}</h2>
+          <ol class="thread-list">
+            {threads.map((post) => (
+              <li>
+                <a href={`/${post.id}/`}>{post.data.title}</a>
+                <p class="thread-meta">
+                  {post.data.category && (
+                    <span class="thread-tag">{post.data.category}</span>
+                  )}
+                  <span>{answersLabel(post.data.replies.length)}</span>
+                  <time datetime={post.data.pubDate.toISOString().slice(0, 10)}>
+                    {post.data.pubDate.toISOString().slice(0, 10)}
+                  </time>
+                </p>
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+      {!isForum && featured && (
         <a class="feature-card" href={`/${featured.id}/`}>
           {featured.data.image && (
             <img
@@ -236,17 +327,21 @@ const website = {
           </div>
         </a>
       )}
-      <h2 class="section-title">{ui.latest_articles ?? "Latest articles"}</h2>
-      <ul class="post-list">
-        {latest.map((post) => (
-          <PostCard
-            title={post.data.title}
-            url={`/${post.id}/`}
-            description={post.data.description}
-            image={post.data.image}
-          />
-        ))}
-      </ul>
+      {!isForum && (
+        <>
+          <h2 class="section-title">{ui.latest_articles ?? "Latest articles"}</h2>
+          <ul class="post-list">
+            {latest.map((post) => (
+              <PostCard
+                title={post.data.title}
+                url={`/${post.id}/`}
+                description={post.data.description}
+                image={post.data.image}
+              />
+            ))}
+          </ul>
+        </>
+      )}
       {strips.map((strip) => (
         <section class="category-strip">
           <h2 class="section-title"><a href={strip.url}>{strip.name}</a></h2>

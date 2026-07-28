@@ -28,6 +28,7 @@ _REQUIRED: dict[str, tuple[str, ...]] = {
     "VideoObject": ("name", "thumbnailUrl", "uploadDate"),
     "Event": ("name", "startDate", "location"),
     "Person": ("name", "url"),
+    "QAPage": ("mainEntity",),
     "LocalBusiness": ("name", "address"),
     "JobPosting": ("title", "description", "datePosted", "hiringOrganization"),
     "Course": ("name", "description"),

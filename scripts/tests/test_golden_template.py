@@ -96,7 +96,8 @@ def test_ui_strings_config_and_wiring() -> None:
         "blog", "popular", "category_description", "author_articles",
         "about_the_author", "blog_description",
         "quick_facts", "how_to_title", "directory_title", "comparison_title",
-        "facet_description",
+        "facet_description", "entity_cta", "thread_replies",
+        "answers_count", "view_all",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
@@ -282,8 +283,33 @@ def test_agent_discovery_surface() -> None:
     # The archetype decision is wired into the design workflow.
     design = (ROOT / "skills" / "design-theme" / "SKILL.md").read_text()
     assert "site_type" in design and "ARCHETYPE" in design
+    assert "`forum`" in design
     review = (ROOT / "skills" / "visual-review" / "SKILL.md").read_text()
     assert "Archetype match" in review
+
+
+def test_directory_pro_and_forum_archetype() -> None:
+    index = (GOLDEN / "src" / "pages" / "index.astro").read_text()
+    # Booking-style directory: zero-JS search hero, facet grouping
+    # past a dozen entities, price on cards.
+    for hook in ("hero-search", "entity-group", "GROUP_LIMIT", "view_all",
+                 "price={entity.data.price}"):
+        assert hook in index, f"homepage misses {hook}"
+    # Forum board: thread rows with answer counts.
+    for hook in ("thread-list", "isForum", "answers_count", "thread-tag"):
+        assert hook in index, f"homepage misses {hook}"
+
+    schema = (GOLDEN / "src" / "content.config.ts").read_text()
+    for field in ("images", "price", "cta_url", "replies", "highlight"):
+        assert field in schema, f"content schema misses {field}"
+
+    article = (GOLDEN / "src" / "pages" / "[...slug].astro").read_text()
+    for hook in ("EntityPanel", "ThreadReplies", "QAPage", "acceptedAnswer",
+                 "entityEntry"):
+        assert hook in article, f"article template misses {hook}"
+    # The offer CTA is an affiliate link and must say so.
+    panel = (GOLDEN / "src" / "components" / "EntityPanel.astro").read_text()
+    assert 'rel="sponsored nofollow noopener"' in panel
 
 
 def test_claude_md_encodes_the_workflow() -> None:

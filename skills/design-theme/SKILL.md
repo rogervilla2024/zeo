@@ -45,9 +45,18 @@ if yours is 30 lines, you restyled nothing.
      any third-party demo embed on a dedicated page with
      EmbedFrame.astro, never the homepage.
    - `directory`: choose among entities (hotels, tools, venues) -
-     fill `src/content/entities/` with attribute-typed entries; the
-     homepage renders entity cards plus a comparison table, each
-     linking to its review article.
+     fill `src/content/entities/` with attribute-typed entries
+     (photos in `images`, display `price`, affiliate `cta_url`); the
+     homepage renders a search hero, entity cards, and a comparison
+     table (grouping by the first facet past a dozen entities), each
+     card linking to its review article, where the EntityPanel shows
+     the gallery, attributes, and offer CTA booking-style.
+   - `forum`: a question-and-answer board - articles with `replies`
+     frontmatter render as threads (question + editorial answers +
+     QAPage JSON-LD) and the homepage becomes a thread list with
+     answer counts. INTEGRITY RULE: answers are editorial content
+     attributed to real authors or cited sources - never invent
+     community members, votes, or activity.
    A single-product niche shipped as a generic article portal is a
    composition failure, whatever the colors look like.
 

@@ -1,0 +1,29 @@
+---
+// Forum-archetype answer thread: editorial answers rendered as a
+// discussion under the question article. INTEGRITY RULE: answers are
+// editorial content attributed to real authors or cited sources -
+// never invent community members or fake vote counts. The page's
+// QAPage JSON-LD must mirror exactly these visible answers.
+interface Reply {
+  author: string;
+  text: string;
+  highlight?: boolean;
+}
+interface Props {
+  replies: Reply[];
+  title?: string;
+}
+const { replies, title = "Answers" } = Astro.props;
+---
+
+<section class="thread-replies">
+  <h2 class="section-title">{title}</h2>
+  <ol>
+    {replies.map((reply) => (
+      <li class={reply.highlight ? "reply-card reply-highlight" : "reply-card"}>
+        <p class="reply-author">{reply.author}</p>
+        <p class="reply-text">{reply.text}</p>
+      </li>
+    ))}
+  </ol>
+</section>

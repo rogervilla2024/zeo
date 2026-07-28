@@ -52,7 +52,11 @@
     "how_to_title": "How it works",
     "directory_title": "Browse the directory",
     "comparison_title": "Compare",
-    "facet_description": "All entries where {label} is {value}."
+    "facet_description": "All entries where {label} is {value}.",
+    "entity_cta": "See prices",
+    "thread_replies": "Answers",
+    "answers_count": "{count} answers",
+    "view_all": "View all"
   },
   "organization": {
     "name": "Example Site",

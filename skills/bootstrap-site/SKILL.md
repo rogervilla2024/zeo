@@ -29,9 +29,12 @@ Gather before scaffolding (ask only for what is missing):
    toolkit's `templates/site.config.example.json` and filled in with the
    gathered values. Set `site_type` from what the visitor comes to DO:
    `portal` (read across a topic), `product` (see/try one game or
-   product - also fill the `product` section: facts, steps, cta), or
+   product - also fill the `product` section: facts, steps, cta),
    `directory` (choose among entities - plan the
-   `src/content/entities/` catalog). All later skills (write-article,
+   `src/content/entities/` catalog with facets, photos, prices, and
+   affiliate cta_urls), or `forum` (ask and answer - threads via the
+   `replies` frontmatter, answers editorial and truthfully
+   attributed). All later skills (write-article,
    generate-schema, generate-llms-txt, test-site-readiness) read site
    context from here.
    HARD RULE: from this point on, the niche and every article topic come
