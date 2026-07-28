@@ -10,9 +10,9 @@ from check_launch_ready import main
 from seo_content_forge.launch import check_launch
 
 CONFIG = {
-    "site_name": "Faydalari Zararlari",
-    "domain": "https://faydalarizararlari.com",
-    "authors": [{"name": "Ayse Yilmaz", "url": "/authors/ayse-yilmaz"}],
+    "site_name": "Orchard Notes",
+    "domain": "https://sample-orchard.com",
+    "authors": [{"name": "Sam Rivers", "url": "/authors/sam-rivers"}],
     "content": {"launch_articles": 2},
 }
 
@@ -22,7 +22,7 @@ def build_ready_site(root: Path) -> None:
     public = root / "public"
     public.mkdir()
     (public / "robots.txt").write_text(
-        "User-agent: *\nSitemap: https://faydalarizararlari.com/sitemap.xml\n"
+        "User-agent: *\nSitemap: https://sample-orchard.com/sitemap.xml\n"
     )
     (public / "llms.txt").write_text("# Site\n")
     (public / "sitemap.xml").write_text("<urlset/>")
@@ -93,8 +93,8 @@ def test_redirects_placeholder_blocks_launch(tmp_path: Path) -> None:
     problems = check_launch(tmp_path)
     assert any("_redirects still contains {{DOMAIN}}" in p for p in problems)
     (tmp_path / "public" / "_redirects").write_text(
-        "https://www.faydalarizararlari.com/* "
-        "https://faydalarizararlari.com/:splat 301\n"
+        "https://www.sample-orchard.com/* "
+        "https://sample-orchard.com/:splat 301\n"
     )
     assert check_launch(tmp_path) == []
 
@@ -108,7 +108,7 @@ def test_api_catalog_placeholder_blocks_launch(tmp_path: Path) -> None:
     problems = check_launch(tmp_path)
     assert any("api-catalog still contains {{SITE_URL}}" in p for p in problems)
     catalog.write_text(
-        '{"linkset": [{"anchor": "https://faydalarizararlari.com/api"}]}'
+        '{"linkset": [{"anchor": "https://sample-orchard.com/api"}]}'
     )
     assert check_launch(tmp_path) == []
 

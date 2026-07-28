@@ -18,8 +18,8 @@ def test_slugify_seo_names() -> None:
 
 
 def test_output_name_hero_and_body() -> None:
-    assert output_name("Kekik Cayi", 1, hero=True) == "kekik-cayi-hero.webp"
-    assert output_name("Kekik Cayi", 2, hero=False) == "kekik-cayi-2.webp"
+    assert output_name("Coffee Grinder", 1, hero=True) == "coffee-grinder-hero.webp"
+    assert output_name("Coffee Grinder", 2, hero=False) == "coffee-grinder-2.webp"
 
 
 def test_cover_crop_landscape_and_portrait_to_16x9() -> None:
