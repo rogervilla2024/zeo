@@ -20,6 +20,7 @@ export async function GET() {
     "## Key pages",
     "",
     `- [Articles](${absolute("/blog/")})`,
+    `- [Article index, JSON](${absolute("/api/articles.json")})`,
     `- [About](${absolute("/about/")})`,
     `- [Contact](${absolute("/contact/")})`,
     "",

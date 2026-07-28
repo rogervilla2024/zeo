@@ -47,8 +47,9 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
        --short-name "Site"
    ```
 
-4. Replace `{{SITE_URL}}` in `public/robots.txt` and `{{DOMAIN}}` in
-   `public/_redirects` (www -> apex 301) with the domain.
+4. Replace `{{SITE_URL}}` in `public/robots.txt` and
+   `public/.well-known/api-catalog`, and `{{DOMAIN}}` in
+   `public/_redirects` (www -> apex 301), with the domain.
 5. Fill the trust-page stubs (`src/pages/about.astro`, contact,
    privacy-policy, terms-of-service, disclaimer) with the
    generate-trust-pages skill; register authors with
@@ -152,7 +153,11 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   exactly one host serves content.
 - `src/pages/sitemap.xml.js` + `src/pages/llms.txt.js` - dynamic
   sitemap and llms.txt rendered from the article list on every
-  build; they cannot go stale. Directory sites also get facet
+  build; they cannot go stale. `src/pages/api/articles.json.js` is
+  the site's read API for agents (full article index as JSON), and
+  `public/.well-known/api-catalog` (RFC 9727; replace `{{SITE_URL}}`)
+  advertises it - the homepage's Link headers (`public/_headers`)
+  point there. Directory sites also get facet
   archives at `/<directory.base>/<facet>/<value>/` (e.g.
   `/otel/bolge/girne/`) - one pre-rendered, crawlable page per
   attribute value listed in `directory.facets`, the zero-JS answer

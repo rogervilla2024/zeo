@@ -1,0 +1,21 @@
+{
+  "linkset": [
+    {
+      "anchor": "{{SITE_URL}}/api/articles.json",
+      "service-desc": [
+        {
+          "href": "{{SITE_URL}}/api/articles.json",
+          "type": "application/json",
+          "title": "Article index: every published article with title, URL, description, dates, category, and author"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "{{SITE_URL}}/llms.txt",
+          "type": "text/plain",
+          "title": "Site orientation for AI systems (llms.txt)"
+        }
+      ]
+    }
+  ]
+}

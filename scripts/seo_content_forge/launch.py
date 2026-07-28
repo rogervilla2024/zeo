@@ -64,6 +64,13 @@ def check_launch(root: Path) -> list[str]:
         encoding="utf-8"
     ):
         problems.append("public/_redirects still contains {{DOMAIN}}")
+    catalog = public / ".well-known" / "api-catalog"
+    if catalog.is_file() and "{{SITE_URL}}" in catalog.read_text(
+        encoding="utf-8"
+    ):
+        problems.append(
+            "public/.well-known/api-catalog still contains {{SITE_URL}}"
+        )
     # Dynamic endpoints (src/pages/*.js) satisfy the llms/sitemap
     # checks: they render into dist on every build, so they can never
     # go stale the way a hand-written public/ copy does.

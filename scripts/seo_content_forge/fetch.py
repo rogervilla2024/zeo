@@ -51,11 +51,14 @@ class FetchResult:
         status: HTTP status code, or 0 when the request failed entirely.
         content_type: Value of the Content-Type header, lowercased.
         text: Decoded body (empty on failure).
+        link_header: Value of the Link response header (RFC 8288),
+            empty when absent - agent-discovery checks read it.
     """
 
     status: int
     content_type: str
     text: str
+    link_header: str = ""
 
     @property
     def ok(self) -> bool:
@@ -95,6 +98,7 @@ def fetch(
                 status=int(response.status),
                 content_type=content_type,
                 text=decode_body(body, content_type),
+                link_header=str(response.headers.get("Link", "") or ""),
             )
     except urllib.error.HTTPError as exc:
         return FetchResult(status=int(exc.code), content_type="", text="")

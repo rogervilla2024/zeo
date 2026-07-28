@@ -78,3 +78,22 @@ reintroduce it.
 
 Also upload `public/_redirects` with `{{DOMAIN}}` replaced so www
 301s to the apex - one host, one set of URLs.
+
+## Markdown for Agents
+
+Enable the zone's "Markdown for Agents" feature (AI Crawl Control
+area) so requests carrying `Accept: text/markdown` get a markdown
+rendering of the HTML while browsers keep getting HTML. Static
+hosting cannot do this content negotiation itself; the edge does.
+The agent-ready gate's markdown-negotiation check turns green once
+the toggle is on.
+
+## Redirect direction: www -> apex, never the reverse
+
+The template's canonicals and sitemap all use the APEX domain
+(site.config.json's `domain`). `public/_redirects` therefore 301s
+www to the apex. Do NOT add a Cloudflare Redirect Rule sending the
+apex to www - that makes every canonical URL redirect away from
+itself, which search engines treat as a broken canonical. If a scan
+reports "redirected to www", find and remove the apex->www rule in
+the Cloudflare dashboard (Rules -> Redirect Rules / Bulk Redirects).

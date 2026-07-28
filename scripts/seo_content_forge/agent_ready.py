@@ -154,6 +154,49 @@ def analyze_robots(robots_txt: str | None) -> list[Check]:
     return checks
 
 
+def discovery_checks(
+    link_header: str | None, api_catalog_found: bool
+) -> list[Check]:
+    """Agent-discovery checks: Link headers and the API catalog.
+
+    Args:
+        link_header: The homepage's Link response header (RFC 8288),
+            None/empty when absent.
+        api_catalog_found: Whether ``/.well-known/api-catalog``
+            (RFC 9727) returned 2xx.
+
+    Returns:
+        Two checks mirroring the isitagentready.com audit items.
+    """
+    has_link = bool(link_header)
+    return [
+        _check(
+            "link-headers",
+            "discoverability",
+            has_link,
+            f"Link header present: {link_header}"
+            if has_link
+            else "no Link header on the homepage",
+            "Serve Link response headers on the homepage pointing "
+            "agents at the machine endpoints, e.g. "
+            "'Link: </.well-known/api-catalog>; rel=\"api-catalog\"' "
+            "(templates/deploy/_headers ships them).",
+        ),
+        _check(
+            "api-catalog",
+            "discoverability",
+            api_catalog_found,
+            "/.well-known/api-catalog found"
+            if api_catalog_found
+            else "/.well-known/api-catalog missing",
+            "Publish /.well-known/api-catalog (RFC 9727, "
+            "application/linkset+json) anchoring the site's read API "
+            "(/api/articles.json) and docs (/llms.txt); the golden "
+            "template ships it.",
+        ),
+    ]
+
+
 def analyze_html(html: str) -> list[Check]:
     """Analyze a page's raw HTML as a non-JS agent would receive it.
 

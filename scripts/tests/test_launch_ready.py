@@ -99,6 +99,20 @@ def test_redirects_placeholder_blocks_launch(tmp_path: Path) -> None:
     assert check_launch(tmp_path) == []
 
 
+def test_api_catalog_placeholder_blocks_launch(tmp_path: Path) -> None:
+    build_ready_site(tmp_path)
+    well_known = tmp_path / "public" / ".well-known"
+    well_known.mkdir()
+    catalog = well_known / "api-catalog"
+    catalog.write_text('{"linkset": [{"anchor": "{{SITE_URL}}/api"}]}')
+    problems = check_launch(tmp_path)
+    assert any("api-catalog still contains {{SITE_URL}}" in p for p in problems)
+    catalog.write_text(
+        '{"linkset": [{"anchor": "https://faydalarizararlari.com/api"}]}'
+    )
+    assert check_launch(tmp_path) == []
+
+
 def test_astro_expressions_are_not_placeholders(tmp_path: Path) -> None:
     build_ready_site(tmp_path)
     # Ordinary Astro/JSX braces must not read as unfilled stubs.
