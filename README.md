@@ -173,6 +173,10 @@ output is deterministic and standards-correct:
 - `check_meta_quality.py` - SERP snippet gate over dist: title and
   meta-description presence and length bounds, plus cross-page
   duplicate titles; part of seo_report.py's offline battery.
+- `check_image_attrs.py` - every `<img>` in dist must carry alt text
+  (empty alt is the decorative marker) and explicit width/height so
+  layouts never shift while images load; part of seo_report.py's
+  offline battery.
 - `check_launch_ready.py` - one-shot launch checklist for a site root:
   template placeholders gone, robots/llms/sitemap/favicons/logo/OG
   image present, trust pages filled, launch content pack complete.
