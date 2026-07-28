@@ -11,7 +11,7 @@ instead of site by site.
 from __future__ import annotations
 
 import html
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -23,11 +23,15 @@ class SiteReport:
         name: Display name of the site (usually its directory name).
         gates: Gate name to pass/fail from the most recent run.
         scores: Score of every run in history order, latest last.
+        previous_gates: Gate name to pass/fail from the run before the
+            latest (empty when there is only one run) - regression
+            detection compares the two.
     """
 
     name: str
     gates: dict[str, bool]
     scores: list[int]
+    previous_gates: dict[str, bool] = field(default_factory=dict)
 
     @property
     def score(self) -> int:
@@ -50,6 +54,29 @@ class SiteReport:
     def is_green(self) -> bool:
         """True when every gate in the latest run passed."""
         return self.total > 0 and all(self.gates.values())
+
+    @property
+    def regressions(self) -> list[str]:
+        """Gates that passed in the previous run and fail now."""
+        return sorted(
+            gate
+            for gate, ok in self.gates.items()
+            if not ok and self.previous_gates.get(gate) is True
+        )
+
+    @property
+    def recoveries(self) -> list[str]:
+        """Gates that failed in the previous run and pass now."""
+        return sorted(
+            gate
+            for gate, ok in self.gates.items()
+            if ok and self.previous_gates.get(gate) is False
+        )
+
+    @property
+    def failing(self) -> list[str]:
+        """Every failing gate in the latest run."""
+        return sorted(gate for gate, ok in self.gates.items() if not ok)
 
 
 def site_report(name: str, runs: list[dict[str, object]]) -> SiteReport:
@@ -81,7 +108,19 @@ def site_report(name: str, runs: list[dict[str, object]]) -> SiteReport:
         if isinstance(run, dict)
         and isinstance(run_results := run.get("results"), dict)
     ]
-    return SiteReport(name=name, gates=gates, scores=scores)
+    previous_gates: dict[str, bool] = {}
+    for run in reversed(runs[:-1]):
+        if not isinstance(run, dict):
+            continue
+        candidate = run.get("results")
+        if isinstance(candidate, dict):
+            previous_gates = {
+                str(gate): bool(ok) for gate, ok in candidate.items()
+            }
+            break
+    return SiteReport(
+        name=name, gates=gates, scores=scores, previous_gates=previous_gates
+    )
 
 
 def discover(root: Path) -> dict[str, Path]:
@@ -116,6 +155,49 @@ def _trend(scores: list[int]) -> str:
     return " ".join(str(score) for score in scores[-8:])
 
 
+def maintenance_order(reports: list[SiteReport]) -> list[tuple[SiteReport, str]]:
+    """Rank the sites that need attention this week, worst first.
+
+    Regressions outrank standing failures (something that USED to work
+    just broke - freshest trail, cheapest fix), then total failing
+    gates, then the score ratio. Green sites without regressions are
+    excluded: the list IS the week's to-do list.
+
+    Args:
+        reports: One report per site.
+
+    Returns:
+        ``(report, reason)`` pairs, most urgent first; empty when the
+        whole fleet is green.
+    """
+    needy = [r for r in reports if not r.is_green or r.regressions]
+    needy.sort(
+        key=lambda r: (
+            -len(r.regressions),
+            -len(r.failing),
+            r.score / r.total if r.total else 0.0,
+            r.name,
+        )
+    )
+    ranked: list[tuple[SiteReport, str]] = []
+    for report in needy:
+        parts: list[str] = []
+        if report.regressions:
+            parts.append(
+                f"{len(report.regressions)} regressed: "
+                + ", ".join(report.regressions)
+            )
+        still_failing = [
+            gate for gate in report.failing if gate not in report.regressions
+        ]
+        if still_failing:
+            parts.append(
+                f"{len(still_failing)} still failing: " + ", ".join(still_failing)
+            )
+        ranked.append((report, "; ".join(parts) or "regression recovered"))
+    return ranked
+
+
 _STYLE = """
 body { font-family: system-ui, sans-serif; margin: 2rem auto;
        max-width: 72rem; padding: 0 1rem; color: #111827; }
@@ -126,7 +208,11 @@ th, td { border: 1px solid #d1d5db; padding: 0.4rem 0.6rem;
 th { background: #f6f8fa; }
 .pass { background: #dcfce7; }
 .fail { background: #fee2e2; font-weight: 600; }
+.regressed { outline: 2px solid #dc2626; outline-offset: -2px; }
+.recovered { outline: 2px solid #16a34a; outline-offset: -2px; }
 .muted { color: #6b7280; }
+ol.maintenance { padding-left: 1.4rem; }
+ol.maintenance li { margin-bottom: 0.3rem; }
 """.strip()
 
 
@@ -152,6 +238,10 @@ def build_html(reports: list[SiteReport], title: str = "Fleet SEO report") -> st
             ok = report.gates.get(gate)
             if ok is None:
                 cells.append('<td class="muted">-</td>')
+            elif not ok and gate in report.regressions:
+                cells.append('<td class="fail regressed">FAIL (new)</td>')
+            elif ok and gate in report.recoveries:
+                cells.append('<td class="pass recovered">PASS (fixed)</td>')
             else:
                 cells.append(
                     f'<td class="{"pass" if ok else "fail"}">'
@@ -168,6 +258,19 @@ def build_html(reports: list[SiteReport], title: str = "Fleet SEO report") -> st
             "</tr>"
         )
 
+    ranked = maintenance_order(reports)
+    maintenance = ""
+    if ranked:
+        items = "\n".join(
+            f"<li><strong>{html.escape(report.name)}</strong> - "
+            f"{html.escape(reason)}</li>"
+            for report, reason in ranked
+        )
+        maintenance = (
+            "<h2>Maintenance order</h2>\n"
+            f'<ol class="maintenance">\n{items}\n</ol>\n'
+        )
+
     return (
         "<!doctype html>\n"
         '<html lang="en">\n<head>\n<meta charset="utf-8">\n'
@@ -175,8 +278,11 @@ def build_html(reports: list[SiteReport], title: str = "Fleet SEO report") -> st
         f"<title>{html.escape(title)}</title>\n"
         f"<style>\n{_STYLE}\n</style>\n</head>\n<body>\n"
         f"<h1>{html.escape(title)}</h1>\n"
-        f"<p>{len(reports)} site(s), {green} fully green.</p>\n"
-        "<table>\n<thead><tr><th>Site</th><th>Score</th>"
+        f"<p>{len(reports)} site(s), {green} fully green. "
+        '"FAIL (new)" regressed since the previous run; '
+        '"PASS (fixed)" recovered.</p>\n'
+        + maintenance
+        + "<table>\n<thead><tr><th>Site</th><th>Score</th>"
         + head
         + "<th>Trend</th></tr></thead>\n<tbody>\n"
         + "\n".join(rows)

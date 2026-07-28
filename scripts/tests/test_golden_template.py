@@ -312,6 +312,21 @@ def test_directory_pro_and_forum_archetype() -> None:
     assert 'rel="sponsored nofollow noopener"' in panel
 
 
+def test_composition_recipes() -> None:
+    recipes = (ROOT / "skills" / "design-theme" / "recipes.md").read_text()
+    # One recipe per group is mandatory; the catalog must actually
+    # contain the advertised recipes and stay on shipped hooks.
+    for recipe_id in (
+        "H1", "H2", "H3", "H4", "N1", "N2", "N3",
+        "L1", "L2", "L3", "F1", "F2", "F3",
+    ):
+        assert f"### {recipe_id} -" in recipes, f"recipes.md misses {recipe_id}"
+    for hook in (".site-hero", "header.container", ".post-list", ".site-footer"):
+        assert hook in recipes
+    skill = (ROOT / "skills" / "design-theme" / "SKILL.md").read_text()
+    assert "recipes.md" in skill and "H2+N1+L2+F3" in skill
+
+
 def test_claude_md_encodes_the_workflow() -> None:
     # CLAUDE.md is what keeps builder sessions on the toolkit path -
     # it must name the load-bearing skills and the gate rule.
