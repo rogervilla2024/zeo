@@ -28,7 +28,8 @@ when work is done. If unsure where the toolkit lives, ask; then run
    ```
 
    Every line of the card must be PASS - including `meta-quality`
-   (title/description bounds, duplicate titles) and the source gates
+   (title/description bounds, duplicate titles), `image-attrs`
+   (every img needs alt plus width/height), and the source gates
    `article-images`, `internal-links`, and `category`, which fail any
    article missing its hero, short of `images.min` body images or
    `content.min_internal_links` in-body links, or lacking a

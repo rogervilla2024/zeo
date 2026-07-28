@@ -26,6 +26,7 @@ GATES: tuple[tuple[str, list[str]], ...] = (
     ("broken-links", ["check_broken_links.py", "--dist", "{dist}"]),
     ("media-budget", ["check_media_budget.py", "--dist", "{dist}"]),
     ("meta-quality", ["check_meta_quality.py", "--dist", "{dist}"]),
+    ("image-attrs", ["check_image_attrs.py", "--dist", "{dist}"]),
 )
 # Source gates enabled automatically at site roots (dist next to
 # src/content/blog/): each reads the content collection, not dist.

@@ -24,6 +24,7 @@ py-modules = [
     "content_calendar", "queue_refresh_candidates", "check_toolkit_version",
     "check_affiliate_links", "check_article_images", "check_internal_links",
     "check_article_categories", "check_meta_quality", "check_launch_ready",
+    "check_image_attrs",
 ]
 packages = ["seo_content_forge"]
 
