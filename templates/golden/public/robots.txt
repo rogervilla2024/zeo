@@ -5,6 +5,12 @@
 
 User-agent: *
 Allow: /
+# Content Signals (contentsignals.org): machine-readable usage
+# preferences for search, AI answers, and model training. Keep them
+# consistent with the per-bot rules below - this template allows all
+# three, so all three say yes; flip ai-train=no if you flip the
+# training crawlers to Disallow.
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 # Crawl control only - robots.txt does not deindex. Pages that must stay
 # out of results need a noindex meta tag instead. Internal search
 # results are thin pages; keep crawlers out of them.

@@ -189,6 +189,10 @@ output is deterministic and standards-correct:
   (the signature of a CDN-managed robots block, e.g. Cloudflare AI
   Crawl Control, fighting the site's own AI-ready rules); part of
   seo_report.py's `--live` battery.
+- `check_freshness_live.py` - live gate: newest content date from the
+  live sitemap's lastmod (RSS pubDate fallback) must be within
+  `--max-age-days` (default 45); a stalled publishing rhythm becomes
+  a red gate instead of a slow discovery. Part of `--live`.
 - `check_toolkit_version.py` - warn when this toolkit clone is behind
   upstream (commit count, plugin version, optional HEAD age), so
   process improvements actually reach every site

@@ -12,6 +12,7 @@ from seo_content_forge.agent_ready import (
 _GOOD_ROBOTS = """
 User-agent: *
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 User-agent: GPTBot
 Allow: /
@@ -48,6 +49,15 @@ def test_good_robots_passes_all() -> None:
     assert all(check.passed for check in checks)
     ai_check = _by_id(checks, "robots-ai-bot-rules")
     assert "GPTBot" in ai_check.detail and "ClaudeBot" in ai_check.detail
+    assert _by_id(checks, "robots-content-signals").passed
+    # Without the directive, the content-signals check (and only it)
+    # goes red - mirroring the isitagentready.com audit item.
+    without = _GOOD_ROBOTS.replace(
+        "Content-Signal: search=yes, ai-input=yes, ai-train=yes\n", ""
+    )
+    assert not _by_id(
+        analyze_robots(without), "robots-content-signals"
+    ).passed
 
 
 def test_missing_robots_fails_with_fixes() -> None:
