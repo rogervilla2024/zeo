@@ -17,10 +17,12 @@ render unstyled - and this skill builds the site's identity on top.
 - `site.config.json`: niche, audience, brand voice, current theme
   section. The design must express THIS site's topic, not a generic
   "clean blog" default.
-- The layout variant (`theme.variant`): minimal, editorial, guide, or
-  review. Chosen by content type: reading-first blog -> minimal;
-  magazine/feature writing -> editorial; topic-cluster knowledge site
-  -> guide; product/comparison site -> review.
+- The layout variant (`theme.variant`): one of FORTY aesthetic
+  baselines cataloged in variants.md (reading-first, magazine/news,
+  guides, product/conversion, warm/lifestyle, bold/loud,
+  structured/technical groups). Pick by the niche's mood per the
+  catalog's choosing rules; the classic four (minimal, editorial,
+  guide, review) are just the first entries, not the menu.
 
 ## The bar
 
@@ -139,9 +141,15 @@ if yours is 30 lines, you restyled nothing.
 5. Choose the site's COMPOSITION deliberately - layout is part of the
    identity, and two sites must not share it any more than they share
    a palette. Pick one recipe per group from recipes.md (hero H1-H4,
-   header N1-N3, listing L1-L3, footer F1-F3), record the combo
-   (e.g. `H2+N1+L2+F3`) in the design brief, and never repeat a
-   fleet site's exact combo - change at least two letters. Concretely:
+   header N1-N6, listing L1-L3, footer F1-F3, type pairing T1-T5,
+   block order B1-B12 or custom), record the combo (e.g.
+   `H2+N1+L2+F3+T2 / B5`) in the design brief AND in `theme.recipe`
+   (site.config.json) so fleet_report.py can flag identity clashes,
+   and never repeat a fleet site's exact combo - change at least two
+   letters. Functional blocks (`cta_banner`, `newsletter`, `faq` in
+   homepage.blocks) and `theme.category_colors` (per-category accent
+   chips on strips and archive headings) are part of the composition
+   toolbox. Concretely:
    - header: nav style from the `nav` array in site.config.json
      (fill it with the site's real sections) - inline links, centered
      masthead, or pill/button links; style `.site-nav` accordingly

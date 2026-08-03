@@ -14,10 +14,26 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-VARIANTS: tuple[str, ...] = ("minimal", "editorial", "guide", "review")
-_VARIANT_DIR = (
-    Path(__file__).resolve().parents[2] / "templates" / "theme" / "variants"
+# Forty aesthetic baselines. Each variants/<name>.css is the
+# CHARACTER layer only (type stance, header, hero, cards, footer);
+# the functional surfaces every variant shares (archetype blocks,
+# directory-pro, forum, pagination, block styles) live once in
+# templates/theme/components.css and are composed in between the
+# token base and the variant layer.
+VARIANTS: tuple[str, ...] = (
+    "minimal", "editorial", "guide", "review",
+    "magazine", "news", "docs", "landing",
+    "luxe", "noir", "pastel", "brutal",
+    "terminal", "paper", "atlas", "folio",
+    "gazette", "studio", "arcade", "botanic",
+    "marine", "alpine", "ember", "velvet",
+    "chrome", "retro", "zen", "bazaar",
+    "ledger", "clinic", "atelier", "orbit",
+    "prairie", "cinema", "forge", "harbor",
+    "bloom", "mosaic", "quartz", "tundra",
 )
+_THEME_DIR = Path(__file__).resolve().parents[2] / "templates" / "theme"
+_VARIANT_DIR = _THEME_DIR / "variants"
 
 _DEFAULT_PALETTE: dict[str, str] = {
     "primary": "#0f766e",
@@ -109,8 +125,22 @@ def variant_css(variant: str) -> str:
     return (_VARIANT_DIR / f"{variant}.css").read_text(encoding="utf-8")
 
 
+def components_css() -> str:
+    """The shared functional layer every variant inherits.
+
+    Archetype blocks, directory-pro, forum, pagination, and block
+    styles are identical across variants - they live once here so a
+    new feature is styled once, not forty times.
+
+    Returns:
+        The components stylesheet content.
+    """
+    return (_THEME_DIR / "components.css").read_text(encoding="utf-8")
+
+
 def compose_css(tokens: ThemeTokens) -> str:
-    """Tokens plus the variant layer: the site's complete stylesheet.
+    """Tokens + shared components + the variant layer: the complete
+    stylesheet.
 
     The design baseline ships with the toolkit so no site can render
     as an unstyled skeleton; the per-site design pass (design-theme
@@ -122,7 +152,13 @@ def compose_css(tokens: ThemeTokens) -> str:
     Returns:
         The full tokens.css content.
     """
-    return build_css(tokens) + "\n" + variant_css(tokens.variant)
+    return (
+        build_css(tokens)
+        + "\n"
+        + components_css()
+        + "\n"
+        + variant_css(tokens.variant)
+    )
 
 
 def _vars(colors: dict[str, str]) -> str:

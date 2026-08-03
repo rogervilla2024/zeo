@@ -79,6 +79,43 @@ body > header.container nav { display: flex; gap: 0.25rem; width: 100%;
   padding-top: 0.4rem; }
 ```
 
+### N4 - Mega panel
+Nav items open a full-width category panel on hover/focus - pure CSS,
+no JavaScript. For portals with many category archives.
+```css
+.site-nav li { position: relative; }
+.site-nav li > ul { position: absolute; left: 0; top: 100%; z-index: 20;
+  min-width: 16rem; padding: 1rem; display: none;
+  background: var(--color-background); border: 1px solid
+  color-mix(in srgb, var(--color-text) 15%, transparent);
+  border-radius: var(--radius); }
+.site-nav li:hover > ul, .site-nav li:focus-within > ul { display: grid;
+  gap: 0.4rem; }
+```
+
+### N5 - Double-deck masthead
+Utility row (tagline, theme toggle) above a centered brand, nav row
+below between two rules. Newspaper gravity.
+```css
+body > header.container { display: grid; justify-items: center;
+  gap: 0.5rem; }
+body > header.container nav { width: 100%; display: flex;
+  justify-content: center; gap: 1.4rem; padding-block: 0.5rem;
+  border-block: 1px solid
+  color-mix(in srgb, var(--color-text) 25%, transparent); }
+```
+
+### N6 - Sticky slim bar
+The header sticks and shrinks; content scrolls under it. For long
+guides and docs-style sites.
+```css
+body > header.container { position: sticky; top: 0; z-index: 30;
+  padding-block: 0.6rem; background:
+  color-mix(in srgb, var(--color-background) 92%, transparent);
+  backdrop-filter: blur(6px); border-bottom: 1px solid
+  color-mix(in srgb, var(--color-text) 12%, transparent); }
+```
+
 ## Listings (L)
 
 ### L1 - Uniform card grid
@@ -132,6 +169,34 @@ newsletter CTA row. Big-portal feel.
   color: var(--color-background); }
 .site-footer a { color: color-mix(in srgb, var(--color-background) 85%, transparent); }
 ```
+
+## Type pairings (T)
+
+Self-hosted woff2 pairings (Fontsource or equivalent), set in
+`theme.fonts` and preloaded per the design-theme rules: subset,
+`font-display: swap`, no runtime fetches from third parties. System
+stacks remain the fallback in every pairing. Record the T letter in
+the combo (e.g. `H3+N1+L2+F3+T2 / B5`).
+
+### T1 - Classic authority
+Heading: Playfair Display (serif display). Body: Source Serif 4.
+For: finance, law, luxury, legacy-feel magazines.
+
+### T2 - Modern product
+Heading: Space Grotesk. Body: Inter. For: tech, tools, SaaS-ish
+product sites, crypto/gaming guides.
+
+### T3 - Terminal precision
+Heading: JetBrains Mono. Body: Inter. For: developer content,
+data-heavy references, terminal/brutal variants.
+
+### T4 - Humanist comfort
+Heading: Source Sans 3. Body: Charter or Georgia stack. For: health,
+family, lifestyle - warm and highly readable.
+
+### T5 - Display punch
+Heading: Archivo Black. Body: Archivo. For: news, sport, cinema,
+arcade - loud fronts with a matched workhorse body.
 
 ## Block orders (B)
 
