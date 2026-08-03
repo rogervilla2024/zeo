@@ -20,6 +20,14 @@ export async function getStaticPaths({ paginate }) {
 }
 
 const ui = config.ui ?? {};
+
+// Category chips on the hub cards, colored via theme.category_colors.
+const categoryColors: Record<string, string> =
+  config.theme?.category_colors ?? {};
+const catStyle = (name?: string) =>
+  name && categoryColors[name]
+    ? `--category-color: ${categoryColors[name]}`
+    : undefined;
 const { page } = Astro.props;
 const blogTitle = ui.blog ?? "Blog";
 // Later pages need distinct titles - duplicate titles fail the
@@ -72,6 +80,8 @@ const breadcrumb = {
           url={`/${post.id}/`}
           description={post.data.description}
           image={post.data.image}
+          category={post.data.category}
+          categoryStyle={catStyle(post.data.category)}
         />
       ))}
     </ul>

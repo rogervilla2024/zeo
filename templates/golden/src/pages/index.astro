@@ -258,8 +258,8 @@ const faqJsonLd =
 // as --category-color (fallback: the primary color).
 const categoryColors: Record<string, string> =
   config.theme?.category_colors ?? {};
-const catStyle = (name: string) =>
-  categoryColors[name]
+const catStyle = (name?: string) =>
+  name && categoryColors[name]
     ? `--category-color: ${categoryColors[name]}`
     : undefined;
 
@@ -518,6 +518,8 @@ const website = {
                     url={`/${post.id}/`}
                     description={post.data.description}
                     image={post.data.image}
+                    category={post.data.category}
+                    categoryStyle={catStyle(post.data.category)}
                   />
                 ))}
               </ul>
@@ -546,6 +548,8 @@ const website = {
                       url={`/${post.id}/`}
                       description={post.data.description}
                       image={post.data.image}
+                      category={post.data.category}
+                      categoryStyle={catStyle(post.data.category)}
                     />
                   ))}
                 </ul>

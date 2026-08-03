@@ -72,8 +72,15 @@ differ.
 
 ## Choosing
 
+0. LOOK first: `python scripts/fleet_preview.py --output preview`
+   renders all forty (light AND dark, same sample content) into
+   preview/index.html - pass `--config site.config.json` to see them
+   in the site's own palette.
 1. Shortlist 3 by mood group, pick the one whose signature detail
-   (each file's last block) matches the niche's temperament.
+   (each file's last block) matches the niche's temperament - and
+   check the shortlist's DARK previews before committing: a
+   signature that vanishes on the dark palette disqualifies the
+   pick (visual-review fails it later anyway).
 2. The palette, T pairing, H/N/L/F recipes, and B block order do the
    rest of the differentiation - a variant shared between two sites
    with different everything-else is acceptable; identical combos
