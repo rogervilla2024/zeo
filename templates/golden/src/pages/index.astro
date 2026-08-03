@@ -11,8 +11,10 @@
 import { getCollection } from "astro:content";
 import config from "../../site.config.json";
 import EntityCard from "../components/EntityCard.astro";
+import FaqAccordion from "../components/FaqAccordion.astro";
 import Hero from "../components/Hero.astro";
 import HowToSteps from "../components/HowToSteps.astro";
+import NewsletterCta from "../components/NewsletterCta.astro";
 import PostCard from "../components/PostCard.astro";
 import QuickFacts from "../components/QuickFacts.astro";
 import Sidebar from "../components/Sidebar.astro";
@@ -43,9 +45,21 @@ const answersLabel = (count: number) =>
 // width above the fold, main blocks sit in the article column next
 // to the sidebar. With 8 orderable blocks the composition space is
 // in the thousands before recipes, variants, or palettes even move.
+interface CtaBanner {
+  text?: string;
+  label?: string;
+  url?: string;
+  sponsored?: boolean;
+}
+interface FaqItem {
+  question: string;
+  answer: string;
+}
 interface HomepageConfig {
   blocks: string[];
   hero_stats?: boolean;
+  cta_banner?: CtaBanner;
+  faq?: FaqItem[];
 }
 const homepage: HomepageConfig = config.homepage ?? { blocks: [] };
 // A block id may carry a view modifier after a colon - the same
@@ -54,8 +68,15 @@ const homepage: HomepageConfig = config.homepage ?? { blocks: [] };
 // "feature:split" halves the card, "latest:rows" is a dense digest.
 const blockBase = (block: string) => block.split(":")[0];
 const blockStyle = (block: string) => block.split(":")[1] ?? "";
-const LEAD_BLOCK_IDS = ["quick_facts", "how_to", "directory", "comparison"];
-const MAIN_BLOCK_IDS = ["threads", "feature", "latest", "strips"];
+const LEAD_BLOCK_IDS = [
+  "quick_facts",
+  "how_to",
+  "directory",
+  "comparison",
+  "cta_banner",
+];
+const MAIN_BLOCK_IDS = ["threads", "feature", "latest", "strips",
+  "newsletter", "faq"];
 const blockDefaults =
   siteType === "product"
     ? ["quick_facts", "how_to", "feature", "latest"]
@@ -205,6 +226,43 @@ const firstFacetValues = new Set(
     )
     .filter(Boolean),
 );
+// Functional blocks: campaign banner (external offer links declare
+// themselves sponsored unless explicitly opted out), homepage FAQ
+// (visible answers mirrored 1:1 in FAQPage JSON-LD - never one
+// without the other), and the newsletter box (renders only when
+// config.newsletter.enabled is true).
+const ctaBanner: CtaBanner = homepage.cta_banner ?? {};
+const bannerReady = Boolean(ctaBanner.text && ctaBanner.label && ctaBanner.url);
+const bannerRel =
+  ctaBanner.url?.startsWith("http") && ctaBanner.sponsored !== false
+    ? "sponsored nofollow noopener"
+    : undefined;
+const homepageFaq: FaqItem[] = (homepage.faq ?? []).filter(
+  (item) => item.question && item.answer,
+);
+const faqJsonLd =
+  mainIds.includes("faq") && homepageFaq.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: homepageFaq.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: { "@type": "Answer", text: item.answer },
+        })),
+      }
+    : null;
+
+// Category color coding: theme.category_colors maps a category name
+// to its accent; strips and the category archive heading pick it up
+// as --category-color (fallback: the primary color).
+const categoryColors: Record<string, string> =
+  config.theme?.category_colors ?? {};
+const catStyle = (name: string) =>
+  categoryColors[name]
+    ? `--category-color: ${categoryColors[name]}`
+    : undefined;
+
 const heroStats: string[] = [];
 if (homepage.hero_stats) {
   if (entities.length > 0) {
@@ -254,7 +312,7 @@ const website = {
   description={config.niche}
   canonical={new URL("/", config.domain).href}
   lang={config.default_language}
-  jsonLd={[organization, website]}
+  jsonLd={[organization, website, ...(faqJsonLd ? [faqJsonLd] : [])]}
 >
   <Hero title={config.site_name} tagline={config.niche} {...heroCta}>
     {heroStats.length > 0 && (
@@ -347,6 +405,12 @@ const website = {
         </ul>
       )}
     </section>
+      )}
+      {blockBase(block) === "cta_banner" && bannerReady && (
+        <aside class="cta-banner">
+          <p>{ctaBanner.text}</p>
+          <a href={ctaBanner.url} rel={bannerRel}>{ctaBanner.label}</a>
+        </aside>
       )}
       {blockBase(block) === "comparison" &&
         groups.length === 0 &&
@@ -459,9 +523,19 @@ const website = {
               </ul>
             </>
           )}
+          {blockBase(block) === "newsletter" && (
+            <NewsletterCta
+              title={ui.newsletter_title}
+              description={ui.newsletter_text}
+              buttonLabel={ui.newsletter_button}
+            />
+          )}
+          {blockBase(block) === "faq" && homepageFaq.length > 0 && (
+            <FaqAccordion items={homepageFaq} title={ui.faq_title} />
+          )}
           {blockBase(block) === "strips" &&
             strips.map((strip) => (
-              <section class="category-strip">
+              <section class="category-strip" style={catStyle(strip.name)}>
                 <h2 class="section-title">
                   <a href={strip.url}>{strip.name}</a>
                 </h2>

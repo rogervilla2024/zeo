@@ -164,7 +164,15 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   default and unknown ids are ignored. A block id takes an optional
   `:style` view modifier (`directory:list`, `feature:overlay`,
   `feature:split`, `latest:rows`); the design-theme skill's
-  recipes.md names ready-made block orders (B1-B12).
+  recipes.md names ready-made block orders (B1-B12). Functional
+  blocks: `cta_banner` (homepage.cta_banner config; external offer
+  links render rel="sponsored nofollow noopener" unless sponsored is
+  explicitly false), `newsletter` (renders only when
+  config.newsletter.enabled), and `faq` (homepage.faq Q/A pairs,
+  mirrored 1:1 into FAQPage JSON-LD). `theme.category_colors` gives
+  each category an accent chip on strips and archive headings.
+  `theme.variant` picks one of 40 aesthetic baselines (catalog:
+  design-theme variants.md) over the shared component layer.
   `homepage.hero_stats: true` renders a build-time stat line in the
   hero from real counts (entities, first-facet values, articles)
   via the `ui.stat_*` templates. Facet archives additionally

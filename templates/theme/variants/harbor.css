@@ -1,0 +1,100 @@
+/* Variant: harbor - calm nautical order. Character layer only; the
+   functional surfaces (archetype blocks, directory, forum,
+   pagination, block styles) come from components.css. */
+
+/* Type scale and rhythm */
+h1 { font-size: 2.2rem; font-weight: 700; line-height: 1.15; }
+h2 { font-size: 1.45rem; font-weight: 700; }
+h1, h2, h3 {
+  margin-block: 0 0.6em;
+}
+
+/* Header: brand left, inline nav right */
+header.container { display: flex; align-items: center; gap: 2rem;
+  padding-block: 1.1rem; border-bottom: 1px solid
+  color-mix(in srgb, var(--color-text) 12%, transparent); }
+header.container .site-nav { margin-left: auto; }
+.site-nav { display: flex; flex-wrap: wrap; gap: 1.4rem; }
+.site-nav a { text-decoration: none; color: var(--color-text); }
+.site-nav a:hover { color: var(--color-primary); }
+
+/* Hero: tinted panel */
+.site-hero { margin-block: 2rem 2.6rem; padding: 3rem 2.4rem;
+  border-radius: calc(var(--radius) * 1.5);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--color-primary) 14%, var(--color-background)),
+    color-mix(in srgb, var(--color-accent) 7%, var(--color-background))); }
+.site-hero h1 { margin: 0 0 0.4em; }
+.site-hero p { max-width: 46rem; color: var(--color-muted); }
+
+/* Post list: bordered cards */
+.post-list { list-style: none; margin: 0; padding: 0; display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1.3rem; }
+.post-list li { border: 1px solid
+  color-mix(in srgb, var(--color-text) 12%, transparent);
+  border-radius: var(--radius); overflow: hidden;
+  background: var(--color-background); }
+.post-list li a { display: block; padding: 1rem 1rem 0.25rem;
+  text-decoration: none; color: var(--color-text);
+  font-family: var(--font-heading); font-weight: 650; }
+.post-list li a:hover { color: var(--color-primary); }
+.post-list li p { margin: 0 1rem 1rem; color: var(--color-muted);
+  font-size: 0.95rem; }
+.post-list li img { width: 100%; height: auto; display: block; }
+
+/* Section titles: uppercase kicker over a rule */
+.section-title { display: flex; align-items: baseline; gap: 0.75rem;
+  margin: 2.6rem 0 1.1rem; font-size: 0.85rem; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--color-muted); }
+.section-title::after { content: ""; flex: 1; height: 1px;
+  background: color-mix(in srgb, var(--color-text) 15%, transparent); }
+.section-title a { color: inherit; text-decoration: none; }
+.section-title a:hover { color: var(--color-primary); }
+
+/* Feature card: framed lead story */
+.feature-card { display: block; border: 1px solid
+  color-mix(in srgb, var(--color-text) 14%, transparent);
+  border-radius: var(--radius); overflow: hidden;
+  text-decoration: none; color: var(--color-text); }
+.feature-card img { display: block; width: 100%; height: auto; }
+.feature-card .feature-body { padding: 1.2rem 1.3rem 1.3rem; }
+.feature-card h2 { margin: 0 0 0.3em; }
+.feature-card p { margin: 0; color: var(--color-muted); }
+.feature-card:hover h2 { color: var(--color-primary); }
+
+/* Content blocks: takeaways, toc, category strips */
+.takeaways { padding: 1.1rem 1.3rem; border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-primary) 8%,
+  var(--color-background)); }
+.takeaways h2 { margin-top: 0; font-size: 1.05rem; }
+.toc { padding: 1rem 1.2rem; border: 1px solid
+  color-mix(in srgb, var(--color-text) 12%, transparent);
+  border-radius: var(--radius); font-size: 0.95rem; }
+.toc ul { margin: 0.4rem 0 0; padding-left: 1.1rem; }
+.category-strip { margin-top: 2.4rem; }
+
+/* Sidebar */
+.site-aside { padding: 1.2rem 1.3rem; border-radius: var(--radius);
+  background: var(--color-surface); font-size: 0.95rem; }
+.site-aside h2 { margin-top: 0; font-size: 0.85rem;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--color-muted); }
+.site-aside ul { list-style: none; margin: 0; padding: 0; }
+.site-aside li { padding-block: 0.45rem; border-bottom: 1px solid
+  color-mix(in srgb, var(--color-text) 9%, transparent); }
+.site-aside li:last-child { border-bottom: none; }
+.site-aside a { text-decoration: none; color: var(--color-text); }
+.site-aside a:hover { color: var(--color-primary); }
+
+/* Footer: surface band */
+.site-footer { margin-top: 4rem; padding-block: 2.4rem;
+  background: var(--color-surface); color: var(--color-muted);
+  font-size: 0.95rem; }
+.site-footer a { color: var(--color-text); text-decoration: none; }
+.site-footer a:hover { color: var(--color-primary); }
+
+/* Signature: rope rules */
+.section-title::after { background: repeating-linear-gradient(90deg,
+  color-mix(in srgb, var(--color-text) 30%, transparent) 0 6px,
+  transparent 6px 10px); height: 3px; }

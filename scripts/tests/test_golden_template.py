@@ -101,7 +101,8 @@ def test_ui_strings_config_and_wiring() -> None:
         "answers_count", "view_all", "page", "pagination_prev",
         "pagination_next", "not_found_title", "not_found_text",
         "editor_score", "stat_entities", "stat_facet_values",
-        "stat_articles",
+        "stat_articles", "newsletter_title", "newsletter_text",
+        "newsletter_button",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
@@ -367,10 +368,29 @@ def test_dynamic_archetype_blocks_and_card_conversion() -> None:
         assert hook in index, f"homepage misses {hook}"
 
     config = json.loads((GOLDEN / "site.config.json").read_text())
-    assert config["homepage"] == {"blocks": [], "hero_stats": False}
+    homepage = config["homepage"]
+    assert homepage["blocks"] == [] and homepage["hero_stats"] is False
+    assert homepage["faq"] == []
+    banner = homepage["cta_banner"]
+    assert set(banner) == {"text", "label", "url", "sponsored"}
+    assert banner["sponsored"] is True, (
+        "offer banners must default to declaring themselves sponsored"
+    )
     # theme.recipe is the machine-readable design identity the fleet
-    # uniqueness check compares.
+    # uniqueness check compares; category_colors drives the strips'
+    # accent chips.
     assert config["theme"]["recipe"] == ""
+    assert config["theme"]["category_colors"] == {}
+
+    # Functional blocks: banner (lead), newsletter + faq (main). The
+    # FAQ's visible answers and its FAQPage JSON-LD come from the
+    # same config list, so they can never drift apart.
+    for hook in ('"cta_banner"', '"newsletter"', '"faq"', "cta-banner",
+                 "bannerRel", "NewsletterCta", "FaqAccordion",
+                 '"FAQPage"', "acceptedAnswer", "category_colors",
+                 "catStyle"):
+        assert hook in index, f"homepage misses {hook}"
+    assert "sponsored nofollow noopener" in index
 
     # Booking-style conversion surface on the card itself: editorial
     # rating (labelled as the editor's, never fake user votes) and a
@@ -401,8 +421,9 @@ def test_composition_recipes() -> None:
     # One recipe per group is mandatory; the catalog must actually
     # contain the advertised recipes and stay on shipped hooks.
     for recipe_id in (
-        "H1", "H2", "H3", "H4", "N1", "N2", "N3",
+        "H1", "H2", "H3", "H4", "N1", "N2", "N3", "N4", "N5", "N6",
         "L1", "L2", "L3", "F1", "F2", "F3",
+        "T1", "T2", "T3", "T4", "T5",
         "B1", "B2", "B3", "B4", "B5", "B6",
         "B7", "B8", "B9", "B10", "B11", "B12",
     ):
