@@ -80,6 +80,23 @@ const breadcrumb = {
     { "@type": "ListItem", position: 2, name: valueLabel, item: canonical },
   ],
 };
+
+// The archive is a ranked list of entities - say so to machines.
+// Items point at the entity's review article when it has one.
+const itemList = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: `${valueLabel} - ${facetLabel}`,
+  numberOfItems: entities.length,
+  itemListElement: entities.map((entity, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: entity.data.title,
+    ...(entity.data.article
+      ? { url: new URL(entity.data.article, config.domain).href }
+      : {}),
+  })),
+};
 ---
 
 <BaseLayout
@@ -87,7 +104,7 @@ const breadcrumb = {
   description={description}
   canonical={canonical}
   lang={config.default_language}
-  jsonLd={[breadcrumb]}
+  jsonLd={[breadcrumb, itemList]}
 >
   <section class="listing">
     <Breadcrumbs
@@ -101,7 +118,7 @@ const breadcrumb = {
           title={entity.data.title}
           url={entity.data.article}
           description={entity.data.description}
-          image={entity.data.image}
+          image={entity.data.image ?? entity.data.images[0]}
           badge={entity.data.badge}
           price={entity.data.price}
           rating={entity.data.rating}

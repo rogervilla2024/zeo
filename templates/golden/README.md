@@ -154,11 +154,15 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   entities collection, grouped by the first facet past a dozen
   entries), or `forum` (search hero + thread list with answer
   counts). Flip the key and rebuild - no template surgery. The
-  archetype is a default, not a cage: `homepage.blocks` reorders or
-  mixes the lead blocks (`quick_facts`, `how_to`, `directory`) on
-  any site_type - e.g. a hotel portal adds `["directory"]` to get
-  the booking surface without switching archetypes; an empty list
-  keeps the archetype's default.
+  archetype is a default, not a cage: `homepage.blocks` composes
+  the whole homepage from 8 orderable blocks on any site_type -
+  lead zone `quick_facts` / `how_to` / `directory` / `comparison`
+  (full width), main zone `threads` / `feature` / `latest` /
+  `strips` (article column) - e.g. a hotel portal adds
+  `["directory", "feature", "latest"]` to get the booking surface
+  without switching archetypes; an empty list keeps the archetype's
+  default and unknown ids are ignored. Facet archives additionally
+  carry ItemList JSON-LD naming each entry.
   `EmbedFrame.astro` hosts third-party demos on a dedicated page
   (e.g. `/demo/`), never the homepage. Directory entities carry
   `images` (gallery), `price`, an affiliate `cta_url`, and an
