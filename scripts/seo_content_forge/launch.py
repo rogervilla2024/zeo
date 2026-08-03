@@ -14,6 +14,8 @@ from pathlib import Path
 
 import orjson
 
+from seo_content_forge.article_images import parse_frontmatter
+
 # Values copied verbatim from site.config.example.json that must not
 # survive into a real site's config.
 _CONFIG_PLACEHOLDERS = ("example.com", "Example Site", "Jane Doe")
@@ -125,6 +127,45 @@ def check_launch(root: Path) -> list[str]:
                 problems.append(
                     f"src/pages/{page.name}: unfilled placeholder "
                     "(generate-trust-pages skill)"
+                )
+
+    # Directory surfaces convert through entity data: a card with no
+    # editorial rating and nothing to offer (neither price nor
+    # cta_url) renders as the bare blog card the archetype exists to
+    # avoid - the exact production failure this gate blocks.
+    site_type = config.get("site_type") if isinstance(config, dict) else ""
+    homepage = config.get("homepage") if isinstance(config, dict) else None
+    raw_blocks = homepage.get("blocks") if isinstance(homepage, dict) else None
+    blocks = raw_blocks if isinstance(raw_blocks, list) else []
+    directory_active = (
+        site_type == "directory"
+        or "directory" in blocks
+        or "comparison" in blocks
+    )
+    entities_dir = root / "src" / "content" / "entities"
+    entity_files = (
+        sorted(entities_dir.rglob("*.md")) if entities_dir.is_dir() else []
+    )
+    if directory_active and not entity_files:
+        problems.append(
+            "directory surface is active but src/content/entities/ has no "
+            "entries - the homepage would render an empty catalog"
+        )
+    if directory_active:
+        for entity in entity_files:
+            fields = parse_frontmatter(entity.read_text(encoding="utf-8"))
+            no_rating = not fields.get("rating")
+            no_offer = not fields.get("price") and not fields.get("cta_url")
+            if no_rating or no_offer:
+                empty = [
+                    key
+                    for key in ("rating", "price", "cta_url")
+                    if not fields.get(key)
+                ]
+                problems.append(
+                    f"entity {entity.name}: empty {', '.join(empty)} - the "
+                    "card ships without its conversion surface (needs a "
+                    "rating plus at least one of price/cta_url)"
                 )
 
     content = root / "src" / "content" / "blog"

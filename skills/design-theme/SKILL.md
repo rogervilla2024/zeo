@@ -48,7 +48,8 @@ if yours is 30 lines, you restyled nothing.
      fill `src/content/entities/` with attribute-typed entries
      (photos in `images`, display `price`, affiliate `cta_url`,
      editorial `rating`); the homepage renders a search hero, entity
-     cards with price, editor's score, and an offer CTA button,
+     cards with photo (`image` or the first gallery entry), price,
+     editor's score, and an offer CTA button,
      and a comparison table (grouping by the first facet past a
      dozen entities), each card linking to its review article, where
      the EntityPanel shows the gallery, attributes, and offer CTA
@@ -67,15 +68,29 @@ if yours is 30 lines, you restyled nothing.
    A single-product niche shipped as a generic article portal is a
    composition failure, whatever the colors look like.
 
-   Archetypes are DEFAULTS, not cages. `homepage.blocks` in
-   site.config.json reorders or mixes the lead blocks on any
-   site_type - valid ids: `quick_facts`, `how_to`, `directory`.
-   A hotel portal can pull in the directory block
-   (`"blocks": ["directory"]` plus filled entities), a product site
-   can drop how_to, a forum can add quick_facts above its threads.
-   An empty list means the archetype's default. Pick the archetype
-   closest to what the visitor DOES, then mix blocks until the
-   homepage fits the topic - "the archetype didn't have it" is
+   Archetypes are DEFAULTS, not cages - the 4 site_types are 4
+   starting block lists, not 4 looks. `homepage.blocks` in
+   site.config.json composes the whole homepage on any site_type
+   from 8 orderable blocks, in two zones rendered in list order:
+   - lead zone (full width): `quick_facts`, `how_to`, `directory`,
+     `comparison`
+   - main zone (article column beside the sidebar): `threads`,
+     `feature`, `latest`, `strips`
+   A hotel portal pulls in the booking surface with
+   `["directory", "feature", "latest"]`; a product site drops
+   how_to; a forum leads with quick_facts above its threads; a
+   review site runs comparison-first with
+   `["comparison", "feature", "latest", "strips"]`. An empty list
+   means the archetype's default; unknown ids are ignored.
+   Do the math before calling the system limiting: 8 blocks chosen
+   and ORDERED give thousands of homepage compositions, times 108
+   recipe combos (H*N*L*F), times 4 variants, times a per-site
+   palette and type pairing - no two sites need ever share a
+   skeleton. Record the chosen block list in the design brief like
+   the recipe combo, and never ship a fleet site with BOTH the same
+   block order and the same recipe combo as another. Pick the
+   archetype closest to what the visitor DOES, then mix blocks until
+   the homepage fits the topic - "the archetype didn't have it" is
    never a reason a surface is missing.
 
 2. Write the design brief from the niche before touching code: the

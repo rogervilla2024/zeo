@@ -126,6 +126,60 @@ def test_missing_config_exits_2(tmp_path: Path) -> None:
     assert main(["--root", str(tmp_path)]) == 2
 
 
+def _write_entity(root: Path, name: str, frontmatter: str) -> None:
+    entities = root / "src" / "content" / "entities"
+    entities.mkdir(parents=True, exist_ok=True)
+    (entities / name).write_text(f"---\n{frontmatter}\n---\n")
+
+
+def test_directory_site_requires_entity_conversion_data(tmp_path: Path) -> None:
+    build_ready_site(tmp_path)
+    config = dict(CONFIG)
+    config["site_type"] = "directory"
+    (tmp_path / "site.config.json").write_bytes(orjson.dumps(config))
+
+    # No entities at all: the homepage would render an empty catalog.
+    problems = check_launch(tmp_path)
+    assert any("no entries" in p for p in problems)
+
+    # A bare entity ships a card with no conversion surface - the
+    # empty fields are itemized by name.
+    _write_entity(tmp_path, "bare.md", 'title: "Bare Inn"')
+    problems = check_launch(tmp_path)
+    assert any(
+        "bare.md" in p and "rating, price, cta_url" in p for p in problems
+    )
+
+    # rating plus at least one of price/cta_url clears the gate.
+    _write_entity(
+        tmp_path,
+        "bare.md",
+        'title: "Bare Inn"\nrating: "8.4"\nprice: "from 90 EUR"',
+    )
+    assert check_launch(tmp_path) == []
+
+    # rating alone is not enough - there is nothing to convert to.
+    _write_entity(tmp_path, "scoreless.md", 'title: "Quiet Inn"\nrating: "7.9"')
+    problems = check_launch(tmp_path)
+    assert any(
+        "scoreless.md" in p and "price, cta_url" in p for p in problems
+    )
+
+
+def test_entity_audit_only_runs_when_directory_is_active(tmp_path: Path) -> None:
+    build_ready_site(tmp_path)
+    # A portal keeping an unused entities folder must not be blocked.
+    _write_entity(tmp_path, "draft.md", 'title: "Draft"')
+    assert check_launch(tmp_path) == []
+
+    # Mixing the directory block in via homepage.blocks activates it.
+    config = dict(CONFIG)
+    config["homepage"] = {"blocks": ["directory", "latest"]}
+    (tmp_path / "site.config.json").write_bytes(orjson.dumps(config))
+    problems = check_launch(tmp_path)
+    assert any("draft.md" in p for p in problems)
+
+
 def test_search_rename_requires_matching_robots_disallow(tmp_path: Path) -> None:
     build_ready_site(tmp_path)
     config = dict(CONFIG)

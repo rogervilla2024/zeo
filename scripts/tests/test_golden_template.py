@@ -334,15 +334,25 @@ def test_directory_pro_and_forum_archetype() -> None:
 
 def test_dynamic_archetype_blocks_and_card_conversion() -> None:
     index = (GOLDEN / "src" / "pages" / "index.astro").read_text()
-    # Archetypes are defaults, not cages: homepage.blocks reorders or
-    # mixes the lead blocks on any site_type, so a hotel portal can
-    # pull in the directory block without switching archetypes.
-    for hook in ("homepage.blocks", "leadBlocks", "wantsDirectory",
-                 "LEAD_BLOCK_IDS", "leadDefaults"):
+    # Archetypes are defaults, not cages: homepage.blocks composes
+    # the whole homepage from 8 orderable blocks on any site_type,
+    # so a hotel portal can pull in the directory block without
+    # switching archetypes and a forum can lead with quick facts.
+    for hook in ("homepage.blocks", "leadBlocks", "mainBlocks",
+                 "wantsDirectory", "LEAD_BLOCK_IDS", "MAIN_BLOCK_IDS",
+                 "blockDefaults", '"comparison"', '"threads"',
+                 '"feature"', '"latest"', '"strips"'):
         assert hook in index, f"homepage misses {hook}"
+    # Every zone renders from the resolved list, so order and
+    # omission both work; the comparison table is its own block.
+    assert "leadBlocks.map((block)" in index
+    assert "mainBlocks.map((block)" in index
+    assert 'block === "comparison"' in index
     # Grouped cards suppress the facet row they are grouped under -
     # repeating the group heading on every card reads as filler.
     assert "hideAttribute={firstFacet}" in index
+    # Cards show a photo: explicit image or the gallery's first shot.
+    assert "entity.data.image ?? entity.data.images[0]" in index
 
     config = json.loads((GOLDEN / "site.config.json").read_text())
     assert config["homepage"]["blocks"] == []
@@ -365,6 +375,10 @@ def test_dynamic_archetype_blocks_and_card_conversion() -> None:
     ).read_text()
     assert "hideAttribute={facetLabel}" in facet_route
     assert "rating={entity.data.rating}" in facet_route
+    assert "entity.data.image ?? entity.data.images[0]" in facet_route
+    # Facet archives declare themselves as ranked lists to machines.
+    for hook in ('"ItemList"', "numberOfItems", "itemListElement"):
+        assert hook in facet_route, f"facet route misses {hook}"
 
 
 def test_composition_recipes() -> None:
