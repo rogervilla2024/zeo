@@ -66,11 +66,21 @@ done because it builds; it is done when its screenshots pass review.
   background treatment, display title, tagline), never a bare h1
   above a list.
 - Archetype match: the homepage does the niche's PRIMARY JOB
-  (`site_type`). A single-game/product niche rendered as a generic
-  article portal - no quick-facts panel, no how-it-works, no demo
-  CTA - is an automatic fail; so is an entity-catalog niche (hotels,
-  tools, venues) with no entity cards or comparison table, and a
-  Q&A/discussion niche with no thread list or answer threads.
+  (`site_type`, mixed via `homepage.blocks`). A single-game/product
+  niche rendered as a generic article portal - no quick-facts panel,
+  no how-it-works, no demo CTA - is an automatic fail; so is an
+  entity-catalog niche (hotels, tools, venues) with no entity cards
+  or comparison table, and a Q&A/discussion niche with no thread
+  list or answer threads.
+- Directory auto-fails (check the entity cards, not just the grid):
+  cards with no price, no editor's score, and no CTA button while
+  the entity files carry the data - or entity files left with those
+  fields empty - is a fail (the surface exists to convert); a card
+  attribute row repeating the facet the group is already headed by
+  is a fail (redundant filler); a hero search band that reads as an
+  afterthought (input narrower than the cards, no visual weight) is
+  a fail; `badge` used for the grouping facet instead of a real
+  differentiator is a fail.
 
 ## Output
 

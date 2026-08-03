@@ -100,6 +100,7 @@ def test_ui_strings_config_and_wiring() -> None:
         "facet_description", "entity_cta", "thread_replies",
         "answers_count", "view_all", "page", "pagination_prev",
         "pagination_next", "not_found_title", "not_found_text",
+        "editor_score",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
@@ -329,6 +330,41 @@ def test_directory_pro_and_forum_archetype() -> None:
     # The offer CTA is an affiliate link and must say so.
     panel = (GOLDEN / "src" / "components" / "EntityPanel.astro").read_text()
     assert 'rel="sponsored nofollow noopener"' in panel
+
+
+def test_dynamic_archetype_blocks_and_card_conversion() -> None:
+    index = (GOLDEN / "src" / "pages" / "index.astro").read_text()
+    # Archetypes are defaults, not cages: homepage.blocks reorders or
+    # mixes the lead blocks on any site_type, so a hotel portal can
+    # pull in the directory block without switching archetypes.
+    for hook in ("homepage.blocks", "leadBlocks", "wantsDirectory",
+                 "LEAD_BLOCK_IDS", "leadDefaults"):
+        assert hook in index, f"homepage misses {hook}"
+    # Grouped cards suppress the facet row they are grouped under -
+    # repeating the group heading on every card reads as filler.
+    assert "hideAttribute={firstFacet}" in index
+
+    config = json.loads((GOLDEN / "site.config.json").read_text())
+    assert config["homepage"]["blocks"] == []
+
+    # Booking-style conversion surface on the card itself: editorial
+    # rating (labelled as the editor's, never fake user votes) and a
+    # visible offer CTA that declares itself sponsored.
+    card = (GOLDEN / "src" / "components" / "EntityCard.astro").read_text()
+    for hook in ("rating", "scoreLabel", "entity-score", "entity-cta",
+                 "hideAttribute", "visibleAttributes",
+                 'rel="sponsored nofollow noopener"'):
+        assert hook in card, f"EntityCard misses {hook}"
+
+    schema = (GOLDEN / "src" / "content.config.ts").read_text()
+    assert "rating" in schema and "EDITORIAL" in schema
+
+    facet_route = (
+        GOLDEN / "src" / "pages" / "[directory_base]" / "[facet]"
+        / "[value].astro"
+    ).read_text()
+    assert "hideAttribute={facetLabel}" in facet_route
+    assert "rating={entity.data.rating}" in facet_route
 
 
 def test_composition_recipes() -> None:

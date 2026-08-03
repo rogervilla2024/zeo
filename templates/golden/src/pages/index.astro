@@ -74,6 +74,26 @@ interface ProductConfig {
   steps: { title: string; text: string }[];
 }
 const product: ProductConfig = config.product ?? { facts: [], steps: [] };
+
+// Archetypes are defaults, not cages: homepage.blocks reorders or
+// MIXES the lead blocks on any site_type - a hotel portal can pull
+// in the directory block, a product site can drop how_to. Unknown
+// ids are ignored; an empty list means the archetype's default.
+interface HomepageConfig {
+  blocks: string[];
+}
+const homepage: HomepageConfig = config.homepage ?? { blocks: [] };
+const LEAD_BLOCK_IDS = ["quick_facts", "how_to", "directory"];
+const leadDefaults =
+  siteType === "product"
+    ? ["quick_facts", "how_to"]
+    : siteType === "directory"
+      ? ["directory"]
+      : [];
+const leadBlocks = (
+  homepage.blocks.length ? homepage.blocks : leadDefaults
+).filter((block) => LEAD_BLOCK_IDS.includes(block));
+const wantsDirectory = leadBlocks.includes("directory");
 const heroCta =
   siteType === "product" && product.cta_label
     ? {
@@ -85,7 +105,7 @@ const heroCta =
 // Directory data from the entities collection; each card links to
 // the entity's in-depth article.
 const entities =
-  siteType === "directory"
+  wantsDirectory
     ? (await getCollection("entities")).sort(
         (a, b) =>
           a.data.order - b.data.order ||
@@ -105,7 +125,7 @@ interface DirectoryConfig {
 const directoryConfig: DirectoryConfig = config.directory ?? { facets: [] };
 const directoryBase = directoryConfig.base || "directory";
 const facetLinks =
-  siteType === "directory"
+  wantsDirectory
     ? directoryConfig.facets.flatMap((label) => {
         const facetSlug = slugify(label);
         const values = new Map<string, string>();
@@ -132,7 +152,7 @@ const facetLinks =
 const GROUP_LIMIT = 12;
 const firstFacet = directoryConfig.facets[0];
 const groupsMap = new Map<string, typeof entities>();
-if (siteType === "directory" && entities.length > GROUP_LIMIT && firstFacet) {
+if (wantsDirectory && entities.length > GROUP_LIMIT && firstFacet) {
   for (const entity of entities) {
     const match = entity.data.attributes.find(
       (attr) => attr.label === firstFacet,
@@ -188,7 +208,7 @@ const website = {
   jsonLd={[organization, website]}
 >
   <Hero title={config.site_name} tagline={config.niche} {...heroCta}>
-    {(siteType === "directory" || isForum) && (
+    {(wantsDirectory || isForum) && (
       <form class="hero-search" action="/search" method="get">
         <input
           type="search"
@@ -200,13 +220,15 @@ const website = {
       </form>
     )}
   </Hero>
-  {siteType === "product" && product.facts.length > 0 && (
-    <QuickFacts title={ui.quick_facts} facts={product.facts} />
-  )}
-  {siteType === "product" && product.steps.length > 0 && (
-    <HowToSteps title={ui.how_to_title} steps={product.steps} />
-  )}
-  {siteType === "directory" && entities.length > 0 && (
+  {leadBlocks.map((block) => (
+    <>
+      {block === "quick_facts" && product.facts.length > 0 && (
+        <QuickFacts title={ui.quick_facts} facts={product.facts} />
+      )}
+      {block === "how_to" && product.steps.length > 0 && (
+        <HowToSteps title={ui.how_to_title} steps={product.steps} />
+      )}
+      {block === "directory" && entities.length > 0 && (
     <section class="directory">
       <h2 class="section-title">{ui.directory_title ?? "Browse the directory"}</h2>
       {facetLinks.length > 0 && (
@@ -232,6 +254,11 @@ const website = {
                   image={entity.data.image}
                   badge={entity.data.badge}
                   price={entity.data.price}
+                  rating={entity.data.rating}
+                  scoreLabel={ui.editor_score}
+                  ctaUrl={entity.data.cta_url}
+                  ctaLabel={ui.entity_cta}
+                  hideAttribute={firstFacet}
                   attributes={entity.data.attributes}
                 />
               ))}
@@ -248,6 +275,10 @@ const website = {
               image={entity.data.image}
               badge={entity.data.badge}
               price={entity.data.price}
+              rating={entity.data.rating}
+              scoreLabel={ui.editor_score}
+              ctaUrl={entity.data.cta_url}
+              ctaLabel={ui.entity_cta}
               attributes={entity.data.attributes}
             />
           ))}
@@ -286,7 +317,9 @@ const website = {
         </div>
       )}
     </section>
-  )}
+      )}
+    </>
+  ))}
   <div class="with-aside">
     <section class="home-main">
       {isForum && (

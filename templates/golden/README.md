@@ -153,10 +153,18 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   `directory` (search hero, entity cards + comparison from the
   entities collection, grouped by the first facet past a dozen
   entries), or `forum` (search hero + thread list with answer
-  counts). Flip the key and rebuild - no template surgery.
+  counts). Flip the key and rebuild - no template surgery. The
+  archetype is a default, not a cage: `homepage.blocks` reorders or
+  mixes the lead blocks (`quick_facts`, `how_to`, `directory`) on
+  any site_type - e.g. a hotel portal adds `["directory"]` to get
+  the booking surface without switching archetypes; an empty list
+  keeps the archetype's default.
   `EmbedFrame.astro` hosts third-party demos on a dedicated page
   (e.g. `/demo/`), never the homepage. Directory entities carry
-  `images` (gallery), `price`, and an affiliate `cta_url`; when an
+  `images` (gallery), `price`, an affiliate `cta_url`, and an
+  editorial `rating` (surfaced on cards as the editor's score with
+  a visible offer CTA button; `badge` is a differentiator like
+  "Editor's pick", never the grouping facet); when an
   article is an entity's review, the article page opens with the
   booking-style `EntityPanel` (gallery, attributes, price, offer
   CTA, rel="sponsored nofollow"). Forum threads are articles with

@@ -61,7 +61,8 @@
     "pagination_prev": "Newer",
     "pagination_next": "Older",
     "not_found_title": "Page not found",
-    "not_found_text": "The address may have changed - try the search below or start from the homepage."
+    "not_found_text": "The address may have changed - try the search below or start from the homepage.",
+    "editor_score": "Editor's score"
   },
   "organization": {
     "name": "Example Site",
@@ -157,5 +158,8 @@
   "directory": {
     "base": "directory",
     "facets": []
+  },
+  "homepage": {
+    "blocks": []
   }
 }

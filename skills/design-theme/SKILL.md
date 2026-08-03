@@ -46,11 +46,18 @@ if yours is 30 lines, you restyled nothing.
      EmbedFrame.astro, never the homepage.
    - `directory`: choose among entities (hotels, tools, venues) -
      fill `src/content/entities/` with attribute-typed entries
-     (photos in `images`, display `price`, affiliate `cta_url`); the
-     homepage renders a search hero, entity cards, and a comparison
-     table (grouping by the first facet past a dozen entities), each
-     card linking to its review article, where the EntityPanel shows
-     the gallery, attributes, and offer CTA booking-style.
+     (photos in `images`, display `price`, affiliate `cta_url`,
+     editorial `rating`); the homepage renders a search hero, entity
+     cards with price, editor's score, and an offer CTA button,
+     and a comparison table (grouping by the first facet past a
+     dozen entities), each card linking to its review article, where
+     the EntityPanel shows the gallery, attributes, and offer CTA
+     booking-style. A directory whose cards show no price, no
+     rating, and no CTA is an EMPTY-DATA failure, not a style
+     choice: fill the entity fields before restyling anything.
+     `badge` is a per-entity differentiator ("Editor's pick",
+     "Best value") - NEVER the facet the cards are grouped under;
+     repeating the group heading on every card is filler.
    - `forum`: a question-and-answer board - articles with `replies`
      frontmatter render as threads (question + editorial answers +
      QAPage JSON-LD) and the homepage becomes a thread list with
@@ -59,6 +66,17 @@ if yours is 30 lines, you restyled nothing.
      community members, votes, or activity.
    A single-product niche shipped as a generic article portal is a
    composition failure, whatever the colors look like.
+
+   Archetypes are DEFAULTS, not cages. `homepage.blocks` in
+   site.config.json reorders or mixes the lead blocks on any
+   site_type - valid ids: `quick_facts`, `how_to`, `directory`.
+   A hotel portal can pull in the directory block
+   (`"blocks": ["directory"]` plus filled entities), a product site
+   can drop how_to, a forum can add quick_facts above its threads.
+   An empty list means the archetype's default. Pick the archetype
+   closest to what the visitor DOES, then mix blocks until the
+   homepage fits the topic - "the archetype didn't have it" is
+   never a reason a surface is missing.
 
 2. Write the design brief from the niche before touching code: the
    mood in one sentence, then concrete choices. Anchor on an
