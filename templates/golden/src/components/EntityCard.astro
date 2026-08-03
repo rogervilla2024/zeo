@@ -14,6 +14,14 @@ interface Props {
   image?: string;
   badge?: string;
   price?: string;
+  rating?: string;
+  scoreLabel?: string;
+  ctaUrl?: string;
+  ctaLabel?: string;
+  // When the card sits inside a section already grouped by this
+  // attribute (e.g. a "Coast" region group), hide its row -
+  // repeating the group heading on every card is noise.
+  hideAttribute?: string;
   attributes?: Attribute[];
 }
 const {
@@ -23,8 +31,16 @@ const {
   image,
   badge,
   price,
+  rating,
+  scoreLabel = "Editor's score",
+  ctaUrl,
+  ctaLabel = "See prices",
+  hideAttribute,
   attributes = [],
 } = Astro.props;
+const visibleAttributes = attributes.filter(
+  (attr) => attr.label !== hideAttribute,
+);
 ---
 
 <li class="entity-card">
@@ -38,14 +54,26 @@ const {
     <span class="entity-title">{title}</span>
   )}
   {description && <p>{description}</p>}
+  {rating && (
+    <p class="entity-score"><span>{scoreLabel}</span> {rating}</p>
+  )}
   {price && <p class="entity-price">{price}</p>}
-  {attributes.length > 0 && (
+  {visibleAttributes.length > 0 && (
     <ul class="entity-attrs">
-      {attributes.map((attr) => (
+      {visibleAttributes.map((attr) => (
         <li>
           <span>{attr.label}</span> {attr.value}
         </li>
       ))}
     </ul>
+  )}
+  {ctaUrl && (
+    <a
+      class="entity-cta"
+      href={ctaUrl}
+      rel="sponsored nofollow noopener"
+    >
+      {ctaLabel}
+    </a>
   )}
 </li>

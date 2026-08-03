@@ -52,7 +52,8 @@ when work is done. If unsure where the toolkit lives, ask; then run
 
 | Task | Use |
 | --- | --- |
-| Homepage archetype | `site_type` in site.config.json: portal / product (`product` config: facts, steps, demo CTA) / directory (`src/content/entities/` catalog + `directory.facets` filter archives + gallery/price/cta per entity) / forum (threads via `replies` frontmatter - editorial answers, truthfully attributed, QAPage schema) |
+| Homepage archetype | `site_type` in site.config.json: portal / product (`product` config: facts, steps, demo CTA) / directory (`src/content/entities/` catalog + `directory.facets` filter archives + gallery/price/cta/rating per entity) / forum (threads via `replies` frontmatter - editorial answers, truthfully attributed, QAPage schema) |
+| Mix archetype blocks | `homepage.blocks` in site.config.json reorders/mixes `quick_facts`, `how_to`, `directory` on any site_type; empty = archetype default |
 | Sitemap / llms.txt | built-in dynamic endpoints (`src/pages/sitemap.xml.js`, `llms.txt.js`) - NEVER hand-write public/ copies, they go stale |
 | Agent discovery | built-in: `/api/articles.json` read API, `/.well-known/api-catalog` (replace `{{SITE_URL}}`), Link headers in `public/_headers` |
 | New article | write-article skill (ends by running the gates) |

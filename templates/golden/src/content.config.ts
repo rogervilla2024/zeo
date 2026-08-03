@@ -57,6 +57,9 @@ const entities = defineCollection({
     // link (affiliate URL; rendered rel="sponsored nofollow").
     price: z.string().default(""),
     cta_url: z.string().default(""),
+    // EDITORIAL score (e.g. "8.7") - shown as the editor's rating,
+    // never dressed up as user votes the site does not have.
+    rating: z.string().default(""),
     order: z.number().default(999),
     attributes: z
       .array(z.object({ label: z.string(), value: z.string() }))
