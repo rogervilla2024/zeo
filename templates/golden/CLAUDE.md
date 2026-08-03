@@ -53,7 +53,9 @@ when work is done. If unsure where the toolkit lives, ask; then run
 | Task | Use |
 | --- | --- |
 | Homepage archetype | `site_type` in site.config.json: portal / product (`product` config: facts, steps, demo CTA) / directory (`src/content/entities/` catalog + `directory.facets` filter archives + gallery/price/cta/rating per entity) / forum (threads via `replies` frontmatter - editorial answers, truthfully attributed, QAPage schema) |
-| Mix archetype blocks | `homepage.blocks` in site.config.json composes the homepage from 8 orderable blocks on any site_type - lead: `quick_facts`, `how_to`, `directory`, `comparison`; main: `threads`, `feature`, `latest`, `strips`; empty = archetype default |
+| Mix archetype blocks | `homepage.blocks` in site.config.json composes the homepage from 8 orderable blocks on any site_type - lead: `quick_facts`, `how_to`, `directory`, `comparison`; main: `threads`, `feature`, `latest`, `strips`; empty = archetype default; `:style` view modifiers (`directory:list`, `feature:overlay`, `feature:split`, `latest:rows`); named orders in design-theme recipes.md (B1-B12) |
+| Hero stat line | `homepage.hero_stats: true` + `ui.stat_*` templates - build-time counts, never hand-written numbers |
+| Design identity | record the combo in `theme.recipe` (e.g. `H3+N1+L2+F3`) - fleet_report.py flags two sites sharing recipe + block order |
 | Sitemap / llms.txt | built-in dynamic endpoints (`src/pages/sitemap.xml.js`, `llms.txt.js`) - NEVER hand-write public/ copies, they go stale |
 | Agent discovery | built-in: `/api/articles.json` read API, `/.well-known/api-catalog` (replace `{{SITE_URL}}`), Link headers in `public/_headers` |
 | New article | write-article skill (ends by running the gates) |

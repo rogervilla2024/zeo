@@ -133,14 +133,76 @@ newsletter CTA row. Big-portal feel.
 .site-footer a { color: color-mix(in srgb, var(--color-background) 85%, transparent); }
 ```
 
+## Block orders (B)
+
+Named homepage.blocks sequences for site.config.json. The B recipe
+composes WHAT the homepage is; H/N/L/F compose how it looks. Pick
+one (or write a custom list), record it with the combo (e.g.
+`H2+N1+L2+F3 / B5`), and set `theme.recipe` in site.config.json so
+fleet_report.py can flag two sites sharing both a recipe combo and a
+block order. `id:style` modifiers vary a block's view: `directory:list`
+(booking rows), `feature:overlay` (title on image), `feature:split`
+(half image, half text), `latest:rows` (dense digest).
+
+### B1 - Classic portal
+`["feature", "latest", "strips"]` - feature card, latest grid, one
+strip per category. The portal default.
+
+### B2 - Magazine lead
+`["feature:overlay", "latest", "strips"]` - full-bleed cover story
+with the title on the image, then the grid.
+
+### B3 - Dense digest
+`["latest:rows", "strips"]` - no feature, straight into a compact
+text list. News-wire feel.
+
+### B4 - Booking home
+`["directory", "comparison", "feature", "latest"]` - catalog first,
+comparison table, then editorial. The directory default.
+
+### B5 - Booking list
+`["directory:list", "feature", "latest"]` - entities as full-width
+rows with photo left, booking-results style.
+
+### B6 - Comparison-first review
+`["comparison", "feature:split", "latest"]` - the table IS the
+pitch; a split feature card follows.
+
+### B7 - Product tour
+`["quick_facts", "how_to", "feature", "latest"]` - the product
+default: facts panel, steps, then guides.
+
+### B8 - Product magazine
+`["quick_facts", "feature:overlay", "latest", "strips"]` - facts up
+top, then magazine-style editorial.
+
+### B9 - Answer board
+`["threads"]` - the forum default: nothing but the board.
+
+### B10 - Board with context
+`["quick_facts", "threads"]` - a facts panel above the threads;
+good when the niche has hard rules worth pinning.
+
+### B11 - Hybrid portal catalog
+`["directory", "feature:split", "latest", "strips"]` - a portal
+that sells: catalog lead, split feature, full editorial body.
+
+### B12 - Catalog digest
+`["directory:list", "comparison", "latest:rows"]` - all inventory,
+minimal editorial; for pure comparison plays.
+
 ## Using the recipes
 
 1. Pick H + N + L + F from the niche's mood (step 2 brief), not at
    random: a casino resort site might run H3+N1+L2+F3; a clinical
-   health site H4+N2+L1+F2.
-2. Record the combo in the design brief and the handoff note.
+   health site H4+N2+L1+F2. Then pick the B block order the same
+   way - what the visitor DOES decides B, the mood decides the rest.
+2. Record the combo in the design brief and the handoff note, and
+   write it into `theme.recipe` in site.config.json (e.g.
+   `"H3+N1+L2+F3"`) - fleet_report.py reads it and flags identity
+   clashes across the portfolio automatically.
 3. Check the fleet: if another site already uses the same combo,
-   change at least two letters.
+   change at least two letters or the block order.
 4. The sketches are STARTING points - the identity layer (site.css)
    still restyles surfaces, spacing, and accents on top. A recipe
    combo with the example palette is still a distinctiveness fail.

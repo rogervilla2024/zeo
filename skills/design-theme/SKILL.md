@@ -82,6 +82,15 @@ if yours is 30 lines, you restyled nothing.
    review site runs comparison-first with
    `["comparison", "feature", "latest", "strips"]`. An empty list
    means the archetype's default; unknown ids are ignored.
+   A block id takes an optional `:style` view modifier -
+   `directory:list` (booking rows, photo left), `feature:overlay`
+   (title on the image), `feature:split` (half image, half text),
+   `latest:rows` (dense digest) - the same block, composed
+   differently per site. recipes.md names ready-made block orders
+   (B1-B12). `homepage.hero_stats: true` adds a build-time stat
+   line to the hero ("128 hotels / 6 regions / 42 guides") from
+   real counts - the ui.stat_* templates supply the site's own
+   nouns; never hand-write inventory numbers into a hero.
    Do the math before calling the system limiting: 8 blocks chosen
    and ORDERED give thousands of homepage compositions, times 108
    recipe combos (H*N*L*F), times 4 variants, times a per-site
