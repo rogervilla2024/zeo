@@ -32,6 +32,12 @@ class SiteReport:
     gates: dict[str, bool]
     scores: list[int]
     previous_gates: dict[str, bool] = field(default_factory=dict)
+    # Design identity from the site's config: "variant | recipe |
+    # blocks" for display, and the (recipe, blocks) key two sites must
+    # never share. Empty when no site.config.json sat next to the
+    # history file or no recipe was recorded.
+    combo: str = ""
+    combo_key: str = ""
 
     @property
     def score(self) -> int:
@@ -120,6 +126,63 @@ def site_report(name: str, runs: list[dict[str, object]]) -> SiteReport:
             break
     return SiteReport(
         name=name, gates=gates, scores=scores, previous_gates=previous_gates
+    )
+
+
+def site_combo(config: dict[str, object]) -> tuple[str, str]:
+    """Derive a site's design identity from its parsed config.
+
+    The fleet rule: two sites must never share BOTH the recipe combo
+    (``theme.recipe``, e.g. ``"H2+N1+L2+F3"``, recorded by the
+    design-theme skill) and the homepage block order
+    (``homepage.blocks``; an empty list is the archetype default, so
+    the site_type stands in for it).
+
+    Args:
+        config: Parsed site.config.json content.
+
+    Returns:
+        ``(display, key)`` - a human-readable identity string for the
+        report, and the clash-detection key (empty when no recipe is
+        recorded, since uniqueness cannot be judged without one).
+    """
+    theme = config.get("theme")
+    theme_map = theme if isinstance(theme, dict) else {}
+    variant = str(theme_map.get("variant") or "")
+    recipe = str(theme_map.get("recipe") or "")
+    homepage = config.get("homepage")
+    homepage_map = homepage if isinstance(homepage, dict) else {}
+    raw_blocks = homepage_map.get("blocks")
+    blocks = raw_blocks if isinstance(raw_blocks, list) else []
+    site_type = str(config.get("site_type") or "portal")
+    block_part = (
+        ">".join(str(block) for block in blocks)
+        if blocks
+        else f"default:{site_type}"
+    )
+    display = " | ".join(part for part in (variant, recipe, block_part) if part)
+    key = f"{recipe}|{block_part}" if recipe else ""
+    return display, key
+
+
+def combo_clashes(reports: list[SiteReport]) -> list[tuple[str, list[str]]]:
+    """Group sites that share a design identity key.
+
+    Args:
+        reports: One report per site.
+
+    Returns:
+        ``(key, site names)`` pairs for every identity shared by two
+        or more sites, sorted by key; empty when the fleet is unique.
+    """
+    by_key: dict[str, list[str]] = {}
+    for report in reports:
+        if report.combo_key:
+            by_key.setdefault(report.combo_key, []).append(report.name)
+    return sorted(
+        (key, sorted(names))
+        for key, names in by_key.items()
+        if len(names) > 1
     )
 
 
@@ -229,6 +292,7 @@ def build_html(reports: list[SiteReport], title: str = "Fleet SEO report") -> st
     ordered = sorted(reports, key=lambda r: (r.score / r.total if r.total else 0.0))
     columns = gate_columns(ordered)
     green = sum(report.is_green for report in reports)
+    show_combo = any(report.combo for report in reports)
 
     head = "".join(f"<th>{html.escape(gate)}</th>" for gate in columns)
     rows: list[str] = []
@@ -249,13 +313,33 @@ def build_html(reports: list[SiteReport], title: str = "Fleet SEO report") -> st
                 )
         delta = report.delta
         delta_text = "" if delta is None else f" ({delta:+d})"
+        combo_cell = (
+            f'<td class="muted">{html.escape(report.combo or "-")}</td>'
+            if show_combo
+            else ""
+        )
         rows.append(
             "<tr>"
             f"<td>{html.escape(report.name)}</td>"
             f"<td>{report.score}/{report.total}{delta_text}</td>"
+            + combo_cell
             + "".join(cells)
             + f'<td class="muted">{html.escape(_trend(report.scores))}</td>'
             "</tr>"
+        )
+
+    clashes = combo_clashes(reports)
+    clash_section = ""
+    if clashes:
+        clash_items = "\n".join(
+            f"<li><strong>{html.escape(', '.join(names))}</strong> share "
+            f"<code>{html.escape(key)}</code> - change the recipe combo or "
+            "the block order on one of them.</li>"
+            for key, names in clashes
+        )
+        clash_section = (
+            "<h2>Identity clashes</h2>\n"
+            f'<ol class="maintenance">\n{clash_items}\n</ol>\n'
         )
 
     ranked = maintenance_order(reports)
@@ -281,8 +365,10 @@ def build_html(reports: list[SiteReport], title: str = "Fleet SEO report") -> st
         f"<p>{len(reports)} site(s), {green} fully green. "
         '"FAIL (new)" regressed since the previous run; '
         '"PASS (fixed)" recovered.</p>\n'
+        + clash_section
         + maintenance
         + "<table>\n<thead><tr><th>Site</th><th>Score</th>"
+        + ("<th>Identity</th>" if show_combo else "")
         + head
         + "<th>Trend</th></tr></thead>\n<tbody>\n"
         + "\n".join(rows)

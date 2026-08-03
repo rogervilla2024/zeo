@@ -23,8 +23,10 @@ import orjson
 from seo_content_forge.fleet import (
     SiteReport,
     build_html,
+    combo_clashes,
     discover,
     maintenance_order,
+    site_combo,
     site_report,
 )
 
@@ -54,9 +56,22 @@ def load_reports(entries: dict[str, Path]) -> tuple[list[SiteReport], list[str]]
             runs = orjson.loads(path.read_bytes())
             if not isinstance(runs, list):
                 raise ValueError("history is not a list of runs")
-            reports.append(site_report(name, runs))
+            report = site_report(name, runs)
         except (OSError, ValueError, orjson.JSONDecodeError) as exc:
             errors.append(f"{name}: {exc}")
+            continue
+        # The site config sits next to the history file; it carries
+        # the design identity (variant, theme.recipe, homepage.blocks)
+        # the fleet uniqueness rule compares.
+        config_path = path.parent / "site.config.json"
+        if config_path.is_file():
+            try:
+                config = orjson.loads(config_path.read_bytes())
+            except (OSError, orjson.JSONDecodeError):
+                config = None
+            if isinstance(config, dict):
+                report.combo, report.combo_key = site_combo(config)
+        reports.append(report)
     return reports, errors
 
 
@@ -113,9 +128,20 @@ def main(argv: list[str] | None = None) -> int:
         for position, (report, reason) in enumerate(ranked, start=1):
             print(f"  {position}. {report.name}  {reason}")
 
+    # Two sites sharing recipe combo AND block order violates the
+    # fleet uniqueness rule - flag it like any other failing gate.
+    clashes = combo_clashes(reports)
+    for key, names in clashes:
+        print(
+            f"IDENTITY CLASH: {', '.join(names)} share {key} - change "
+            "the recipe combo or the block order on one of them.",
+            file=sys.stderr,
+        )
+
     args.output.write_text(build_html(reports, title=args.title), encoding="utf-8")
     print(f"\nReport written: {args.output}")
-    return 0 if all(report.is_green for report in reports) and not errors else 1
+    green = all(report.is_green for report in reports)
+    return 0 if green and not errors and not clashes else 1
 
 
 if __name__ == "__main__":

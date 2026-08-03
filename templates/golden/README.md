@@ -161,7 +161,13 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   `strips` (article column) - e.g. a hotel portal adds
   `["directory", "feature", "latest"]` to get the booking surface
   without switching archetypes; an empty list keeps the archetype's
-  default and unknown ids are ignored. Facet archives additionally
+  default and unknown ids are ignored. A block id takes an optional
+  `:style` view modifier (`directory:list`, `feature:overlay`,
+  `feature:split`, `latest:rows`); the design-theme skill's
+  recipes.md names ready-made block orders (B1-B12).
+  `homepage.hero_stats: true` renders a build-time stat line in the
+  hero from real counts (entities, first-facet values, articles)
+  via the `ui.stat_*` templates. Facet archives additionally
   carry ItemList JSON-LD naming each entry.
   `EmbedFrame.astro` hosts third-party demos on a dedicated page
   (e.g. `/demo/`), never the homepage. Directory entities carry

@@ -10,8 +10,10 @@ import pytest
 from fleet_report import main
 from seo_content_forge.fleet import (
     build_html,
+    combo_clashes,
     discover,
     gate_columns,
+    site_combo,
     site_report,
 )
 
@@ -174,6 +176,77 @@ def test_build_html_marks_regressions_and_maintenance() -> None:
     # A green fleet renders no maintenance section.
     green = build_html([site_report("ok", [{"results": {"a": True}}])])
     assert "Maintenance order" not in green
+
+
+def test_site_combo_display_and_key() -> None:
+    config: dict[str, object] = {
+        "site_type": "directory",
+        "theme": {"variant": "review", "recipe": "H3+N1+L2+F3"},
+        "homepage": {"blocks": ["directory:list", "latest"]},
+    }
+    display, key = site_combo(config)
+    assert display == "review | H3+N1+L2+F3 | directory:list>latest"
+    assert key == "H3+N1+L2+F3|directory:list>latest"
+
+    # Empty blocks fall back to the archetype default marker, so two
+    # default-layout sites of the same type stay comparable.
+    display, key = site_combo(
+        {"site_type": "portal", "theme": {"recipe": "H1+N2+L1+F1"}}
+    )
+    assert display.endswith("default:portal")
+    assert key == "H1+N2+L1+F1|default:portal"
+
+    # Without a recorded recipe uniqueness cannot be judged.
+    assert site_combo({"theme": {"variant": "minimal"}})[1] == ""
+
+
+def test_combo_clashes_and_html_identity_column() -> None:
+    a = site_report("alpha", [{"results": {"x": True}}])
+    b = site_report("beta", [{"results": {"x": True}}])
+    c = site_report("gamma", [{"results": {"x": True}}])
+    a.combo = b.combo = "minimal | H1+N1+L1+F1 | default:portal"
+    a.combo_key = b.combo_key = "H1+N1+L1+F1|default:portal"
+    c.combo = "guide | H2+N2+L2+F2 | default:portal"
+    c.combo_key = "H2+N2+L2+F2|default:portal"
+    clashes = combo_clashes([a, b, c])
+    assert clashes == [("H1+N1+L1+F1|default:portal", ["alpha", "beta"])]
+
+    page = build_html([a, b, c])
+    assert "<th>Identity</th>" in page
+    assert "Identity clashes" in page
+    assert "alpha, beta" in page
+    # Reports without combos keep the old table shape.
+    plain = build_html([site_report("solo", [{"results": {"x": True}}])])
+    assert "<th>Identity</th>" not in plain
+    assert "Identity clashes" not in plain
+
+
+def test_main_reads_config_and_gates_on_identity_clash(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    config = {
+        "site_type": "portal",
+        "theme": {"variant": "minimal", "recipe": "H1+N1+L1+F1"},
+        "homepage": {"blocks": []},
+    }
+    for site in ("blog", "docs"):
+        _write_history(
+            tmp_path / site / ".seo-history.json",
+            [{"results": {"a": True}, "score": 1}],
+        )
+        (tmp_path / site / "site.config.json").write_text(json.dumps(config))
+    output = tmp_path / "fleet.html"
+    code = main(["--scan", str(tmp_path), "--output", str(output)])
+    # Both sites green, but they share recipe + block order.
+    assert code == 1
+    err = capsys.readouterr().err
+    assert "IDENTITY CLASH" in err and "blog, docs" in err
+    assert "Identity clashes" in output.read_text()
+
+    # Distinct recipes clear the gate.
+    config["theme"] = {"variant": "guide", "recipe": "H2+N2+L2+F2"}
+    (tmp_path / "docs" / "site.config.json").write_text(json.dumps(config))
+    assert main(["--scan", str(tmp_path), "--output", str(output)]) == 0
 
 
 def test_main_prints_maintenance_order(tmp_path: Path, capsys) -> None:  # type: ignore[no-untyped-def]

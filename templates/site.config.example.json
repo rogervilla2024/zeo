@@ -62,7 +62,10 @@
     "pagination_next": "Older",
     "not_found_title": "Page not found",
     "not_found_text": "The address may have changed - try the search below or start from the homepage.",
-    "editor_score": "Editor's score"
+    "editor_score": "Editor's score",
+    "stat_entities": "{count} entries",
+    "stat_facet_values": "{count} areas",
+    "stat_articles": "{count} guides"
   },
   "organization": {
     "name": "Example Site",
@@ -139,7 +142,8 @@
     },
     "radius": "8px",
     "max_width": "72ch",
-    "site_width": "1200px"
+    "site_width": "1200px",
+    "recipe": ""
   },
   "images": {
     "strategy": "svg-first",
@@ -160,6 +164,7 @@
     "facets": []
   },
   "homepage": {
-    "blocks": []
+    "blocks": [],
+    "hero_stats": false
   }
 }

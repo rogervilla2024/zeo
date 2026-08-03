@@ -100,7 +100,8 @@ def test_ui_strings_config_and_wiring() -> None:
         "facet_description", "entity_cta", "thread_replies",
         "answers_count", "view_all", "page", "pagination_prev",
         "pagination_next", "not_found_title", "not_found_text",
-        "editor_score",
+        "editor_score", "stat_entities", "stat_facet_values",
+        "stat_articles",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
@@ -347,15 +348,29 @@ def test_dynamic_archetype_blocks_and_card_conversion() -> None:
     # omission both work; the comparison table is its own block.
     assert "leadBlocks.map((block)" in index
     assert "mainBlocks.map((block)" in index
-    assert 'block === "comparison"' in index
+    assert 'blockBase(block) === "comparison"' in index
     # Grouped cards suppress the facet row they are grouped under -
     # repeating the group heading on every card reads as filler.
     assert "hideAttribute={firstFacet}" in index
     # Cards show a photo: explicit image or the gallery's first shot.
     assert "entity.data.image ?? entity.data.images[0]" in index
+    # id:style view modifiers vary a block without a new template:
+    # directory:list, feature:overlay, feature:split, latest:rows.
+    for hook in ("blockBase", "blockStyle", "entity-grid--list",
+                 "feature-card--overlay", "feature-card--split",
+                 "post-list--rows"):
+        assert hook in index, f"homepage misses {hook}"
+    # The hero stat line renders build-time counts, never hand-typed
+    # numbers, and only when the config asks for it.
+    for hook in ("hero_stats", "hero-stats", "heroStats",
+                 "ui.stat_entities", "ui.stat_articles"):
+        assert hook in index, f"homepage misses {hook}"
 
     config = json.loads((GOLDEN / "site.config.json").read_text())
-    assert config["homepage"]["blocks"] == []
+    assert config["homepage"] == {"blocks": [], "hero_stats": False}
+    # theme.recipe is the machine-readable design identity the fleet
+    # uniqueness check compares.
+    assert config["theme"]["recipe"] == ""
 
     # Booking-style conversion surface on the card itself: editorial
     # rating (labelled as the editor's, never fake user votes) and a
@@ -388,10 +403,17 @@ def test_composition_recipes() -> None:
     for recipe_id in (
         "H1", "H2", "H3", "H4", "N1", "N2", "N3",
         "L1", "L2", "L3", "F1", "F2", "F3",
+        "B1", "B2", "B3", "B4", "B5", "B6",
+        "B7", "B8", "B9", "B10", "B11", "B12",
     ):
         assert f"### {recipe_id} -" in recipes, f"recipes.md misses {recipe_id}"
     for hook in (".site-hero", "header.container", ".post-list", ".site-footer"):
         assert hook in recipes
+    # Block orders are recipes too: named lists plus the recorded
+    # identity that fleet_report.py compares across the portfolio.
+    for hook in ("homepage.blocks", "theme.recipe", "directory:list",
+                 "feature:overlay", "latest:rows"):
+        assert hook in recipes, f"recipes.md misses {hook}"
     skill = (ROOT / "skills" / "design-theme" / "SKILL.md").read_text()
     assert "recipes.md" in skill and "H2+N1+L2+F3" in skill
 

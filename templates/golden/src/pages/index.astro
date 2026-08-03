@@ -45,8 +45,15 @@ const answersLabel = (count: number) =>
 // in the thousands before recipes, variants, or palettes even move.
 interface HomepageConfig {
   blocks: string[];
+  hero_stats?: boolean;
 }
 const homepage: HomepageConfig = config.homepage ?? { blocks: [] };
+// A block id may carry a view modifier after a colon - the same
+// block, composed differently: "directory:list" renders the catalog
+// as booking rows, "feature:overlay" puts the title on the image,
+// "feature:split" halves the card, "latest:rows" is a dense digest.
+const blockBase = (block: string) => block.split(":")[0];
+const blockStyle = (block: string) => block.split(":")[1] ?? "";
 const LEAD_BLOCK_IDS = ["quick_facts", "how_to", "directory", "comparison"];
 const MAIN_BLOCK_IDS = ["threads", "feature", "latest", "strips"];
 const blockDefaults =
@@ -59,24 +66,26 @@ const blockDefaults =
         : ["feature", "latest", "strips"];
 const activeBlocks = homepage.blocks.length ? homepage.blocks : blockDefaults;
 const leadBlocks = activeBlocks.filter((block) =>
-  LEAD_BLOCK_IDS.includes(block),
+  LEAD_BLOCK_IDS.includes(blockBase(block)),
 );
 const mainBlocks = activeBlocks.filter((block) =>
-  MAIN_BLOCK_IDS.includes(block),
+  MAIN_BLOCK_IDS.includes(blockBase(block)),
 );
+const leadIds = leadBlocks.map(blockBase);
+const mainIds = mainBlocks.map(blockBase);
 // Directory data powers both the card grid and the comparison table.
 const wantsDirectory =
-  leadBlocks.includes("directory") || leadBlocks.includes("comparison");
+  leadIds.includes("directory") || leadIds.includes("comparison");
 
 // The threads board: question rows with answer counts, newest first.
-const threads = mainBlocks.includes("threads") ? posts.slice(0, 12) : [];
+const threads = mainIds.includes("threads") ? posts.slice(0, 12) : [];
 
 // One strip per pillar/category (strips block), biggest clusters
 // first, three most recent articles each; titles link to the
 // category archives.
 const categoryBase = config.seo.category_base ?? "category";
 const byCategory = new Map<string, typeof posts>();
-if (mainBlocks.includes("strips")) {
+if (mainIds.includes("strips")) {
   for (const post of posts) {
     const category = post.data.category;
     if (!category) continue;
@@ -179,6 +188,36 @@ const groups = [...groupsMap.entries()].map(([value, list]) => ({
   entities: list.slice(0, 6),
 }));
 
+// Hero stat line (homepage.hero_stats): real counts from the build -
+// entities, distinct first-facet values, and articles - rendered as
+// "128 hotels / 6 regions / 42 guides". Nouns come from
+// config.ui so every site states its own inventory; a count of zero
+// simply drops its segment. Never hand-write numbers into the hero:
+// this line can never go stale, a hardcoded one always does.
+const statLine = (template: string | undefined, count: number) =>
+  (template ?? "{count}").replace("{count}", String(count));
+const firstFacetValues = new Set(
+  entities
+    .map(
+      (entity) =>
+        entity.data.attributes.find((attr) => attr.label === firstFacet)
+          ?.value,
+    )
+    .filter(Boolean),
+);
+const heroStats: string[] = [];
+if (homepage.hero_stats) {
+  if (entities.length > 0) {
+    heroStats.push(statLine(ui.stat_entities, entities.length));
+  }
+  if (firstFacetValues.size > 0) {
+    heroStats.push(statLine(ui.stat_facet_values, firstFacetValues.size));
+  }
+  if (posts.length > 0) {
+    heroStats.push(statLine(ui.stat_articles, posts.length));
+  }
+}
+
 const organization = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -218,7 +257,10 @@ const website = {
   jsonLd={[organization, website]}
 >
   <Hero title={config.site_name} tagline={config.niche} {...heroCta}>
-    {(leadBlocks.includes("directory") || mainBlocks.includes("threads")) && (
+    {heroStats.length > 0 && (
+      <p class="hero-stats">{heroStats.join(" \u00B7 ")}</p>
+    )}
+    {(leadIds.includes("directory") || mainIds.includes("threads")) && (
       <form class="hero-search" action="/search" method="get">
         <input
           type="search"
@@ -232,13 +274,13 @@ const website = {
   </Hero>
   {leadBlocks.map((block) => (
     <>
-      {block === "quick_facts" && product.facts.length > 0 && (
+      {blockBase(block) === "quick_facts" && product.facts.length > 0 && (
         <QuickFacts title={ui.quick_facts} facts={product.facts} />
       )}
-      {block === "how_to" && product.steps.length > 0 && (
+      {blockBase(block) === "how_to" && product.steps.length > 0 && (
         <HowToSteps title={ui.how_to_title} steps={product.steps} />
       )}
-      {block === "directory" && entities.length > 0 && (
+      {blockBase(block) === "directory" && entities.length > 0 && (
     <section class="directory">
       <h2 class="section-title">{ui.directory_title ?? "Browse the directory"}</h2>
       {facetLinks.length > 0 && (
@@ -255,7 +297,12 @@ const website = {
               <a href={group.url}>{group.value}</a>
               <a class="view-all" href={group.url}>{ui.view_all ?? "View all"}</a>
             </h2>
-            <ul class="entity-grid">
+            <ul
+              class:list={[
+                "entity-grid",
+                blockStyle(block) === "list" && "entity-grid--list",
+              ]}
+            >
               {group.entities.map((entity) => (
                 <EntityCard
                   title={entity.data.title}
@@ -276,7 +323,12 @@ const website = {
           </section>
         ))
       ) : (
-        <ul class="entity-grid">
+        <ul
+          class:list={[
+            "entity-grid",
+            blockStyle(block) === "list" && "entity-grid--list",
+          ]}
+        >
           {entities.map((entity) => (
             <EntityCard
               title={entity.data.title}
@@ -296,7 +348,7 @@ const website = {
       )}
     </section>
       )}
-      {block === "comparison" &&
+      {blockBase(block) === "comparison" &&
         groups.length === 0 &&
         comparisonLabels.length > 0 && (
         <div class="comparison">
@@ -336,7 +388,7 @@ const website = {
     <section class="home-main">
       {mainBlocks.map((block) => (
         <>
-          {block === "threads" && threads.length > 0 && (
+          {blockBase(block) === "threads" && threads.length > 0 && (
             <>
               <h2 class="section-title">
                 {ui.latest_articles ?? "Latest threads"}
@@ -361,8 +413,15 @@ const website = {
               </ol>
             </>
           )}
-          {block === "feature" && featured && (
-            <a class="feature-card" href={`/${featured.id}/`}>
+          {blockBase(block) === "feature" && featured && (
+            <a
+              class:list={[
+                "feature-card",
+                blockStyle(block) === "overlay" && "feature-card--overlay",
+                blockStyle(block) === "split" && "feature-card--split",
+              ]}
+              href={`/${featured.id}/`}
+            >
               {featured.data.image && (
                 <img
                   src={featured.data.image}
@@ -378,12 +437,17 @@ const website = {
               </div>
             </a>
           )}
-          {block === "latest" && latest.length > 0 && (
+          {blockBase(block) === "latest" && latest.length > 0 && (
             <>
               <h2 class="section-title">
                 {ui.latest_articles ?? "Latest articles"}
               </h2>
-              <ul class="post-list">
+              <ul
+                class:list={[
+                  "post-list",
+                  blockStyle(block) === "rows" && "post-list--rows",
+                ]}
+              >
                 {latest.map((post) => (
                   <PostCard
                     title={post.data.title}
@@ -395,7 +459,7 @@ const website = {
               </ul>
             </>
           )}
-          {block === "strips" &&
+          {blockBase(block) === "strips" &&
             strips.map((strip) => (
               <section class="category-strip">
                 <h2 class="section-title">
