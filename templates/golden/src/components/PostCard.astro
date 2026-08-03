@@ -1,21 +1,29 @@
 ---
 // One post card for .post-list grids (homepage latest, category
 // strips, blog listing). Renders the article's hero image when the
-// frontmatter carries one. Zero JavaScript; the variant CSS styles
-// .post-list li and its img.
+// frontmatter carries one, and an optional category chip whose
+// accent comes from theme.category_colors (pass the inline
+// --category-color via categoryStyle). Zero JavaScript; the variant
+// CSS styles .post-list li and its img.
 interface Props {
   title: string;
   url: string;
   description?: string;
   image?: string;
+  category?: string;
+  categoryStyle?: string;
 }
 
-const { title, url, description, image } = Astro.props;
+const { title, url, description, image, category, categoryStyle } =
+  Astro.props;
 ---
 
 <li>
   {image && (
     <img src={image} alt="" width="640" height="360" loading="lazy" />
+  )}
+  {category && (
+    <span class="post-category" style={categoryStyle}>{category}</span>
   )}
   <a href={url}>{title}</a>
   {description && <p>{description}</p>}

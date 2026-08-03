@@ -80,9 +80,20 @@ try {
 mkdirSync("shots", { recursive: true });
 const problems = [];
 
-for (const path of pages) {
-  for (const [label, width] of WIDTHS) {
-    const page = await browser.newPage({ viewport: { width, height: 950 } });
+// Every page is also captured in dark mode at desktop width - the
+// visual-review checklist requires both schemes, and a variant's
+// signature detail that vanishes on a dark background is a fail.
+const CAPTURES = pages.flatMap((path) => [
+  ...WIDTHS.map(([label, width]) => [path, label, width, "light"]),
+  [path, "desktop-dark", 1440, "dark"],
+]);
+
+for (const [path, label, width, scheme] of CAPTURES) {
+  {
+    const page = await browser.newPage({
+      viewport: { width, height: 950 },
+      colorScheme: scheme,
+    });
     page.on("console", (message) => {
       if (message.type() === "error") {
         problems.push(`console error @ ${path} (${label}): ${message.text()}`);
@@ -117,4 +128,4 @@ if (problems.length > 0) {
   for (const problem of problems) console.error("  FAIL " + problem);
   process.exit(1);
 }
-console.log(`Clean: ${pages.length} page(s) x ${WIDTHS.length} widths, no console/page/network errors. Screenshots in shots/.`);
+console.log(`Clean: ${pages.length} page(s) x ${WIDTHS.length} widths + dark desktop, no console/page/network errors. Screenshots in shots/.`);

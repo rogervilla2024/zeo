@@ -53,6 +53,13 @@ done because it builds; it is done when its screenshots pass review.
   cramped or orphaned blocks.
 - Text contrast passes at a glance in light AND dark mode; accent
   color appears sparingly but visibly.
+- Dark-mode signature check (read the *-desktop-dark.png shots the
+  harness now captures): the variant's signature detail - hero
+  treatment, card borders/shadows, section-title rules, category
+  chips - must still READ on the dark background. A shadow that
+  disappears, a tint that turns to mud, or a dark hero band that
+  merges into the page is an automatic fail; fix with dark-palette
+  tuning or a variant override, never by dropping dark mode.
 - Mobile: no horizontal scroll, tap targets comfortable, nav usable.
 - Nothing overlaps, wraps awkwardly, or renders as unstyled HTML.
 - The article page shows real images (diagrams or photos) in the body;
@@ -90,6 +97,7 @@ done because it builds; it is done when its screenshots pass review.
 ## Quality checklist
 
 - Every checklist item verified on screenshots, not assumed from code.
-- Both light and dark mode checked at least on desktop.
+- Both light and dark mode checked on desktop - the harness shoots
+  *-desktop-dark.png automatically; they must be READ, not skipped.
 - The user sees the final screenshots, not a text claim that it looks
   good.

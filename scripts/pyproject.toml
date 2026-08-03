@@ -21,7 +21,7 @@ py-modules = [
     "generate_theme_css", "suggest_internal_links", "check_agent_ready",
     "check_pagespeed", "check_rich_results", "check_ai_patterns",
     "check_originality", "check_js_budget", "export_toolkit", "fetch_stock_images", "generate_logo", "check_broken_links", "mine_questions", "check_media_budget", "check_canonical_host", "seo_report", "fleet_report",
-    "content_calendar", "queue_refresh_candidates", "check_toolkit_version",
+    "content_calendar", "queue_refresh_candidates", "check_toolkit_version", "fleet_preview",
     "check_affiliate_links", "check_article_images", "check_internal_links",
     "check_article_categories", "check_meta_quality", "check_launch_ready",
     "check_image_attrs", "check_robots_live", "check_freshness_live",

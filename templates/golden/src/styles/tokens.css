@@ -636,6 +636,19 @@ img, video {
   border-radius: 3px;
   background: var(--category-color, var(--color-primary)); }
 
+/* Post category chip (PostCard): colored by theme.category_colors
+   via --category-color, falling back to the primary color. */
+.post-category { display: inline-block; margin: 0.6rem 1rem 0;
+  padding: 0.12rem 0.6rem; border-radius: 999px; font-size: 0.75rem;
+  font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--category-color, var(--color-primary));
+  background: color-mix(in srgb,
+    var(--category-color, var(--color-primary)) 12%,
+    var(--color-background));
+  border: 1px solid color-mix(in srgb,
+    var(--category-color, var(--color-primary)) 35%, transparent); }
+.post-list li > .post-category + a { display: block; }
+
 /* Variant: minimal - reading-first blog (spec: minimal.md).
    Appended after the token block by generate_theme_css.py; every value
    derives from the tokens so the design-theme skill can restyle a site
