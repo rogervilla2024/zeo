@@ -710,6 +710,107 @@ img, video {
   padding-bottom: 0.9rem; }
 .entity-grid.entity-grid--shelves > .entity-card { scroll-snap-align: start; }
 
+/* Anatomy set 2: cover and signup heroes, headline ticker, compact
+   feed, tile wall, A-Z directory index, rail extras. Modifier
+   selectors carry doubled specificity so they outrank the variant
+   layer that composes after this file. */
+.site-hero.hero--cover { position: relative; overflow: hidden;
+  padding: 0; border: none; background: none; }
+.site-hero.hero--cover .site-hero-cover { display: block;
+  width: 100%; height: auto; min-height: 18rem; max-height: 30rem;
+  object-fit: cover; }
+.site-hero.hero--cover .site-hero-title,
+.site-hero.hero--cover .site-hero-tagline,
+.site-hero.hero--cover .hero-stats,
+.site-hero.hero--cover .hero-search {
+  position: absolute; left: 2rem; right: 2rem; z-index: 1; }
+.site-hero.hero--cover .site-hero-title { bottom: 4.6rem;
+  color: #f8fafc; margin: 0; }
+.site-hero.hero--cover .site-hero-tagline { bottom: 2.2rem;
+  color: color-mix(in srgb, #f8fafc 85%, transparent); margin: 0; }
+.site-hero.hero--cover .hero-stats { bottom: 0.8rem;
+  color: color-mix(in srgb, #f8fafc 70%, transparent); margin: 0; }
+.site-hero.hero--cover::after { content: ""; position: absolute;
+  inset: 40% 0 0 0;
+  background: linear-gradient(transparent, rgba(8, 10, 14, 0.82)); }
+.site-hero.hero--cover > * { z-index: 1; }
+.site-hero.hero--cover::after { z-index: 0; }
+.site-hero.hero--signup { text-align: center; }
+.site-hero.hero--signup .newsletter-cta { max-width: 34rem;
+  margin: 1.4rem auto 0; text-align: left; }
+.ticker { display: flex; align-items: center; gap: 1rem;
+  margin-block: 1rem; padding: 0.5rem 0.9rem;
+  border-block: 1px solid
+  color-mix(in srgb, var(--color-text) 14%, transparent);
+  overflow: hidden; }
+.ticker-label { flex: 0 0 auto; font-size: 0.75rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--color-on-primary); background: var(--color-primary);
+  padding: 0.2rem 0.6rem; border-radius: var(--radius); }
+.ticker ul { display: flex; gap: 2rem; list-style: none; margin: 0;
+  padding: 0; overflow-x: auto; white-space: nowrap;
+  scrollbar-width: thin; }
+.ticker a { text-decoration: none; color: var(--color-text);
+  font-size: 0.95rem; }
+.ticker a:hover { color: var(--color-primary); }
+.feed.feed--compact { counter-reset: feedrow; }
+.feed.feed--compact .feed-item { grid-template-columns: 2rem 1fr;
+  padding-block: 0.45rem; border-bottom: none; }
+.feed.feed--compact .feed-item::before { counter-increment: feedrow;
+  content: counter(feedrow) "."; grid-column: 1;
+  color: var(--color-muted); font-variant-numeric: tabular-nums; }
+.feed.feed--compact .feed-item > img { display: none; }
+.feed.feed--compact .feed-body { grid-column: 2; }
+.feed.feed--compact .feed-body > a { font-size: 1rem; }
+.feed.feed--compact .feed-body p { display: inline; margin: 0;
+  font-size: 0.85rem; }
+.feed.feed--compact .feed-body p.feed-meta { display: inline;
+  margin-left: 0.5rem; }
+.feed.feed--compact .post-category { display: none; }
+.post-list.post-list--tiles { grid-template-columns:
+  repeat(auto-fill, minmax(14rem, 1fr)); gap: 0.9rem; }
+.post-list.post-list--tiles li { position: relative; overflow: hidden;
+  border-radius: var(--radius); min-height: 11rem; }
+.post-list.post-list--tiles li img { width: 100%; height: 100%;
+  position: absolute; inset: 0; object-fit: cover; }
+.post-list.post-list--tiles li a { position: absolute; z-index: 1;
+  left: 0.9rem; right: 0.9rem; bottom: 0.8rem; color: #f8fafc;
+  text-decoration: none; font-family: var(--font-heading);
+  font-weight: 700; text-shadow: 0 1px 3px rgba(8, 10, 14, 0.8); }
+.post-list.post-list--tiles li::after { content: ""; position: absolute;
+  inset: 35% 0 0 0;
+  background: linear-gradient(transparent, rgba(8, 10, 14, 0.78)); }
+.post-list.post-list--tiles li a { z-index: 2; }
+.post-list.post-list--tiles li p,
+.post-list.post-list--tiles li .post-category { display: none; }
+.entity-grid.entity-grid--index { display: block;
+  columns: 3 14rem; column-gap: 2rem; }
+.entity-grid.entity-grid--index .entity-card { display: block;
+  break-inside: avoid; margin: 0 0 0.35rem; padding: 0.15rem 0;
+  border: none; background: none; box-shadow: none; }
+.entity-grid.entity-grid--index .entity-card > img,
+.entity-grid.entity-grid--index .entity-card > p,
+.entity-grid.entity-grid--index .entity-card > .entity-badge,
+.entity-grid.entity-grid--index .entity-card > .entity-attrs,
+.entity-grid.entity-grid--index .entity-card > .entity-cta {
+  display: none; }
+.rail-count { color: var(--color-muted); font-size: 0.85rem; }
+
+/* Filter-rail fallback: lead-zone-only pages dock the rail beside
+   the content (rail-beside), instead of under an empty main column. */
+@media (min-width: 1024px) {
+  .rail-beside { display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px; gap: 0 2.5rem;
+    align-items: start; }
+  .rail-beside.left { grid-template-columns: 280px minmax(0, 1fr); }
+  .rail-beside > * { grid-column: 1; min-width: 0; }
+  .rail-beside.left > * { grid-column: 2; }
+  .rail-beside > .with-aside { grid-column: 2; grid-row: 1 / span 40;
+    display: block; position: sticky; top: 1rem; }
+  .rail-beside.left > .with-aside { grid-column: 1; }
+  .rail-beside > .with-aside .home-main { display: none; }
+}
+
 /* Variant: minimal - reading-first blog (spec: minimal.md).
    Appended after the token block by generate_theme_css.py; every value
    derives from the tokens so the design-theme skill can restyle a site

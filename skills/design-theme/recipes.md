@@ -210,6 +210,43 @@ No chrome noise, one column, type first.
 `"hero": "standard", "aside": "none"`, blocks
 `["feature", "latest"]` on minimal/zen/folio/tundra.
 
+### A7 - Cover story
+A full-bleed image IS the first screen, title over the scrim
+(magazine cover anatomy). `"hero": "cover",
+"hero_image": "/img/cover.jpg"`, blocks B2; travel/food/culture.
+
+### A8 - Signup first
+The newsletter box IS the hero (substack anatomy). `"hero":
+"signup"` (requires newsletter.enabled), `"aside": "none"`, blocks
+`["latest:rows"]`; essay and briefing sites.
+
+### A9 - Wire
+Headline ticker over a numbered compact feed (hacker-news/agency
+wire anatomy). `"hero": "compact"`, blocks
+`["ticker", "feed:compact"]`, `"header": {"search": true}`.
+
+### A10 - Filter rail
+The directory's facet filters live in a LEFT rail beside the list
+(booking results-page anatomy). `"hero": "compact",
+"aside": "left", "rail": "facets"`, blocks
+`["directory:list", "comparison"]`.
+
+### A11 - A-Z index
+The whole catalog as alphabetical text columns (classifieds/index
+anatomy). `"hero": "compact"`, blocks
+`["directory:index", "latest:rows"]`; big utilitarian directories.
+
+### A12 - Tile wall
+Image tiles with overlaid titles, no chrome noise
+(pinterest/gallery anatomy). `"hero": "none", "aside": "none"`,
+blocks `["latest:tiles"]`; visual niches.
+
+## Rail contents
+
+`homepage.rail` decides what the aside holds, independent of side:
+`popular` (default) | `categories` (topic map with counts) |
+`facets` (directory filters) | `newsletter` (signup box).
+
 ## Type pairings (T)
 
 Self-hosted woff2 pairings (Fontsource or equivalent), set in

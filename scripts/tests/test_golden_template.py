@@ -102,7 +102,7 @@ def test_ui_strings_config_and_wiring() -> None:
         "pagination_next", "not_found_title", "not_found_text",
         "editor_score", "stat_entities", "stat_facet_values",
         "stat_articles", "newsletter_title", "newsletter_text",
-        "newsletter_button",
+        "newsletter_button", "ticker_label", "rail_categories",
     }
     assert required <= set(ui), f"missing ui keys: {required - set(ui)}"
     # The category page substitutes the category name into the text.
@@ -379,8 +379,14 @@ def test_dynamic_archetype_blocks_and_card_conversion() -> None:
     assert config["header"] == {"search": False}
     for hook in ("heroMode", "asideMode", "visually-hidden",
                  '"feed"', "feed-item", "entity-grid--shelves",
-                 'mode={heroMode}'):
+                 'mode={heroMode}', '"cover"', '"signup"', "railMode",
+                 '"ticker"', "ticker-label", "feed--compact",
+                 "post-list--tiles", "entity-grid--index",
+                 "railCategories", "homepage.hero_image",
+                 "railBesideLead", "rail-beside"):
         assert hook in index, f"homepage misses {hook}"
+    assert homepage["rail"] == "popular"
+    assert homepage["hero_image"] == ""
     layout = (GOLDEN / "src" / "layouts" / "BaseLayout.astro").read_text()
     for hook in ("header-search", "config.header?.search",
                  "search_url_template"):
@@ -443,6 +449,7 @@ def test_composition_recipes() -> None:
         "L1", "L2", "L3", "F1", "F2", "F3",
         "T1", "T2", "T3", "T4", "T5",
         "A1", "A2", "A3", "A4", "A5", "A6",
+        "A7", "A8", "A9", "A10", "A11", "A12",
         "B1", "B2", "B3", "B4", "B5", "B6",
         "B7", "B8", "B9", "B10", "B11", "B12",
     ):
