@@ -19,6 +19,9 @@
       "href": "/about/"
     }
   ],
+  "header": {
+    "search": false
+  },
   "ui": {
     "latest_articles": "Latest articles",
     "key_takeaways": "Key takeaways",
@@ -157,6 +160,8 @@
   },
   "homepage": {
     "blocks": [],
+    "hero": "standard",
+    "aside": "right",
     "hero_stats": false,
     "cta_banner": {
       "text": "",

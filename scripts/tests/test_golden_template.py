@@ -371,6 +371,24 @@ def test_dynamic_archetype_blocks_and_card_conversion() -> None:
     homepage = config["homepage"]
     assert homepage["blocks"] == [] and homepage["hero_stats"] is False
     assert homepage["faq"] == []
+    # Page anatomy: what the first screen does and where the rail
+    # sits - the difference between a booking funnel, a feed board,
+    # and a marketplace.
+    assert homepage["hero"] == "standard"
+    assert homepage["aside"] == "right"
+    assert config["header"] == {"search": False}
+    for hook in ("heroMode", "asideMode", "visually-hidden",
+                 '"feed"', "feed-item", "entity-grid--shelves",
+                 'mode={heroMode}'):
+        assert hook in index, f"homepage misses {hook}"
+    layout = (GOLDEN / "src" / "layouts" / "BaseLayout.astro").read_text()
+    for hook in ("header-search", "config.header?.search",
+                 "search_url_template"):
+        assert hook in layout, f"BaseLayout misses {hook}"
+    recipes_text = (
+        ROOT / "skills" / "design-theme" / "recipes.md"
+    ).read_text()
+    assert "Page anatomies (A)" in recipes_text
     banner = homepage["cta_banner"]
     assert set(banner) == {"text", "label", "url", "sponsored"}
     assert banner["sponsored"] is True, (
@@ -424,6 +442,7 @@ def test_composition_recipes() -> None:
         "H1", "H2", "H3", "H4", "N1", "N2", "N3", "N4", "N5", "N6",
         "L1", "L2", "L3", "F1", "F2", "F3",
         "T1", "T2", "T3", "T4", "T5",
+        "A1", "A2", "A3", "A4", "A5", "A6",
         "B1", "B2", "B3", "B4", "B5", "B6",
         "B7", "B8", "B9", "B10", "B11", "B12",
     ):

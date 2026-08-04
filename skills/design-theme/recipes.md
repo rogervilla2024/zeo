@@ -170,6 +170,46 @@ newsletter CTA row. Big-portal feel.
 .site-footer a { color: color-mix(in srgb, var(--color-background) 85%, transparent); }
 ```
 
+## Page anatomies (A)
+
+What separates a booking funnel from a feed board from a marketplace
+is not color - it is what the first screen DOES. Pick the anatomy
+from the topic's job before any styling; record the A code with the
+combo. The knobs: `homepage.hero` (standard / search / compact /
+none), `homepage.aside` (right / left / none), `header.search`
+(true puts the search bar in the chrome on every page), plus the
+blocks.
+
+### A1 - Story lead
+Classic publisher: branding hero, feature story, grid.
+`"hero": "standard", "aside": "right"`, blocks B1/B2.
+
+### A2 - Booking funnel
+The search box IS the first screen (booking.com anatomy).
+`"hero": "search", "aside": "none"`, blocks
+`["directory:list", "comparison", "latest"]`, hero_stats true.
+
+### A3 - Marketplace
+Search lives in the header chrome; shelves scroll horizontally
+(amazon anatomy). `"hero": "none", "aside": "none"`,
+`"header": {"search": true}`, blocks
+`["directory:shelves", "comparison", "latest:rows"]`.
+
+### A4 - Feed board
+Straight into the stream (reddit/news-feed anatomy).
+`"hero": "compact", "aside": "right"`,
+`"header": {"search": true}`, blocks `["feed"]`.
+
+### A5 - Dense portal
+Slim strip up top, modules below (yahoo anatomy).
+`"hero": "compact", "aside": "right"`, blocks
+`["latest:rows", "strips", "newsletter"]`.
+
+### A6 - Reading room
+No chrome noise, one column, type first.
+`"hero": "standard", "aside": "none"`, blocks
+`["feature", "latest"]` on minimal/zen/folio/tundra.
+
 ## Type pairings (T)
 
 Self-hosted woff2 pairings (Fontsource or equivalent), set in

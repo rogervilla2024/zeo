@@ -36,9 +36,14 @@ if yours is 30 lines, you restyled nothing.
 
 ## Instructions
 
-1. First decide the site ARCHETYPE - what does the visitor come to
-   DO? Set `site_type` in site.config.json; the homepage composes
-   itself from it:
+1. First decide the site's ANATOMY - what does the visitor come to
+   DO, and what does the FIRST SCREEN do about it? The reference
+   point is how facebook, amazon, reddit, and booking differ: not
+   colors but page structure. Pick an A recipe from recipes.md
+   ("Page anatomies") - `homepage.hero` (standard/search/compact/
+   none), `homepage.aside` (right/left/none), `header.search`, the
+   `feed` block, `directory:shelves` - THEN set the ARCHETYPE (`site_type`) in
+   site.config.json; the homepage composes itself from it:
    - `portal` (default): read across a topic - feature card, latest
      grid, category strips.
    - `product`: see/try ONE game, app, or product - hero CTA (to
@@ -147,10 +152,11 @@ if yours is 30 lines, you restyled nothing.
 
 5. Choose the site's COMPOSITION deliberately - layout is part of the
    identity, and two sites must not share it any more than they share
-   a palette. Pick one recipe per group from recipes.md (hero H1-H4,
-   header N1-N6, listing L1-L3, footer F1-F3, type pairing T1-T5,
-   block order B1-B12 or custom), record the combo (e.g.
-   `H2+N1+L2+F3+T2 / B5`) in the design brief AND in `theme.recipe`
+   a palette. Pick one recipe per group from recipes.md (anatomy
+   A1-A6, hero H1-H4, header N1-N6, listing L1-L3, footer F1-F3,
+   type pairing T1-T5, block order B1-B12 or custom), record the
+   combo (e.g. `A2 / H2+N1+L2+F3+T2 / B5`) in the design brief AND
+   in `theme.recipe`
    (site.config.json) so fleet_report.py can flag identity clashes,
    and never repeat a fleet site's exact combo - change at least two
    letters. Functional blocks (`cta_banner`, `newsletter`, `faq` in
