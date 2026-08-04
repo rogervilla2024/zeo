@@ -125,25 +125,13 @@
   },
   "theme": {
     "variant": "minimal",
-    "palette": {
-      "primary": "#0f766e",
-      "accent": "#f59e0b",
-      "background": "#ffffff",
-      "surface": "#f6f8fa",
-      "text": "#111827",
-      "muted": "#6b7280"
-    },
-    "dark_palette": {
-      "background": "#0b1220",
-      "surface": "#131c2e",
-      "text": "#e5e7eb",
-      "muted": "#9ca3af"
-    },
+    "palette": {},
+    "dark_palette": {},
     "fonts": {
-      "heading": "system-ui, -apple-system, sans-serif",
-      "body": "system-ui, -apple-system, sans-serif"
+      "heading": "",
+      "body": ""
     },
-    "radius": "8px",
+    "radius": "",
     "max_width": "72ch",
     "site_width": "1200px",
     "recipe": "",

@@ -1,13 +1,17 @@
 # Variant catalog
 
-Forty aesthetic baselines (`theme.variant`). Each is a CHARACTER
-layer - type stance, header, hero, cards, titles, footer - composed
-on top of the shared functional layer (components.css), so every
-variant supports every archetype, block, and block style. Pick by
-the niche's mood, then art-direct on top (site.css); the variant is
-the floor, never the finished design. Two fleet sites should not
-share a variant unless palette, recipe combo, AND block order all
-differ.
+Forty full THEMES (`theme.variant`). Each carries its own palette
+(light and dark), font pairing, and corner language
+(VARIANT_IDENTITY in theme_css.py) plus a character layer - type
+stance, header, hero, cards, titles, footer - composed on top of
+the shared functional layer (components.css), so every variant
+supports every archetype, block, and block style. With an empty
+theme.palette the variant renders in its own identity; config
+overrides only what a site explicitly sets. Pick by the niche's
+mood, then art-direct on top (site.css); the variant is the floor,
+never the finished design. Two fleet sites should not share a
+variant unless palette, recipe combo, AND block order all differ -
+and never with the stock palette on both.
 
 ## Reading-first
 
