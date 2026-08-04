@@ -60,8 +60,27 @@ interface HomepageConfig {
   hero_stats?: boolean;
   cta_banner?: CtaBanner;
   faq?: FaqItem[];
+  hero?: string;
+  aside?: string;
 }
 const homepage: HomepageConfig = config.homepage ?? { blocks: [] };
+
+// Page ANATOMY: what the first screen does and where the rail sits.
+// The topic decides this the way it separates a booking funnel from
+// a feed board from a marketplace (recipes.md, "Page anatomies"):
+//   homepage.hero:  "standard" (branding block) | "search" (the
+//                   search box IS the hero) | "compact" (slim strip,
+//                   content leads) | "none" (straight into blocks;
+//                   the h1 stays for SEO, visually hidden)
+//   homepage.aside: "right" | "left" | "none"
+const HERO_MODES = ["standard", "search", "compact", "none"];
+const heroMode = HERO_MODES.includes(homepage.hero ?? "")
+  ? (homepage.hero as string)
+  : "standard";
+const ASIDE_MODES = ["right", "left", "none"];
+const asideMode = ASIDE_MODES.includes(homepage.aside ?? "")
+  ? (homepage.aside as string)
+  : "right";
 // A block id may carry a view modifier after a colon - the same
 // block, composed differently: "directory:list" renders the catalog
 // as booking rows, "feature:overlay" puts the title on the image,
@@ -75,8 +94,8 @@ const LEAD_BLOCK_IDS = [
   "comparison",
   "cta_banner",
 ];
-const MAIN_BLOCK_IDS = ["threads", "feature", "latest", "strips",
-  "newsletter", "faq"];
+const MAIN_BLOCK_IDS = ["threads", "feed", "feature", "latest",
+  "strips", "newsletter", "faq"];
 const blockDefaults =
   siteType === "product"
     ? ["quick_facts", "how_to", "feature", "latest"]
@@ -100,6 +119,10 @@ const wantsDirectory =
 
 // The threads board: question rows with answer counts, newest first.
 const threads = mainIds.includes("threads") ? posts.slice(0, 12) : [];
+
+// The feed: a single-column stream of every recent post, board-style
+// (thumb, chip, title, summary, date) - the community/news anatomy.
+const feedPosts = mainIds.includes("feed") ? posts.slice(0, 20) : [];
 
 // One strip per pillar/category (strips block), biggest clusters
 // first, three most recent articles each; titles link to the
@@ -314,22 +337,33 @@ const website = {
   lang={config.default_language}
   jsonLd={[organization, website, ...(faqJsonLd ? [faqJsonLd] : [])]}
 >
-  <Hero title={config.site_name} tagline={config.niche} {...heroCta}>
-    {heroStats.length > 0 && (
-      <p class="hero-stats">{heroStats.join(" \u00B7 ")}</p>
-    )}
-    {(leadIds.includes("directory") || mainIds.includes("threads")) && (
-      <form class="hero-search" action="/search" method="get">
-        <input
-          type="search"
-          name="q"
-          placeholder={ui.search_placeholder ?? "Search this site"}
-          aria-label={ui.search ?? "Search"}
-        />
-        <button type="submit">{ui.search ?? "Search"}</button>
-      </form>
-    )}
-  </Hero>
+  {heroMode === "none" ? (
+    <h1 class="visually-hidden">{config.site_name}</h1>
+  ) : (
+    <Hero
+      title={config.site_name}
+      tagline={config.niche}
+      mode={heroMode}
+      {...heroCta}
+    >
+      {heroStats.length > 0 && (
+        <p class="hero-stats">{heroStats.join(" \u00B7 ")}</p>
+      )}
+      {(heroMode === "search" ||
+        leadIds.includes("directory") ||
+        mainIds.includes("threads")) && (
+        <form class="hero-search" action="/search" method="get">
+          <input
+            type="search"
+            name="q"
+            placeholder={ui.search_placeholder ?? "Search this site"}
+            aria-label={ui.search ?? "Search"}
+          />
+          <button type="submit">{ui.search ?? "Search"}</button>
+        </form>
+      )}
+    </Hero>
+  )}
   {leadBlocks.map((block) => (
     <>
       {blockBase(block) === "quick_facts" && product.facts.length > 0 && (
@@ -359,6 +393,7 @@ const website = {
               class:list={[
                 "entity-grid",
                 blockStyle(block) === "list" && "entity-grid--list",
+                blockStyle(block) === "shelves" && "entity-grid--shelves",
               ]}
             >
               {group.entities.map((entity) => (
@@ -385,6 +420,7 @@ const website = {
           class:list={[
             "entity-grid",
             blockStyle(block) === "list" && "entity-grid--list",
+            blockStyle(block) === "shelves" && "entity-grid--shelves",
           ]}
         >
           {entities.map((entity) => (
@@ -448,7 +484,12 @@ const website = {
       )}
     </>
   ))}
-  <div class="with-aside">
+  <div
+    class:list={[
+      asideMode !== "none" && "with-aside",
+      asideMode === "left" && "left",
+    ]}
+  >
     <section class="home-main">
       {mainBlocks.map((block) => (
         <>
@@ -476,6 +517,40 @@ const website = {
                 ))}
               </ol>
             </>
+          )}
+          {blockBase(block) === "feed" && feedPosts.length > 0 && (
+            <ol class="feed">
+              {feedPosts.map((post) => (
+                <li class="feed-item">
+                  {post.data.image && (
+                    <img
+                      src={post.data.image}
+                      alt=""
+                      width="640"
+                      height="360"
+                      loading="lazy"
+                    />
+                  )}
+                  <div class="feed-body">
+                    {post.data.category && (
+                      <span
+                        class="post-category"
+                        style={catStyle(post.data.category)}
+                      >{post.data.category}</span>
+                    )}
+                    <a href={`/${post.id}/`}>{post.data.title}</a>
+                    <p>{post.data.description}</p>
+                    <p class="feed-meta">
+                      <time
+                        datetime={post.data.pubDate.toISOString().slice(0, 10)}
+                      >
+                        {post.data.pubDate.toISOString().slice(0, 10)}
+                      </time>
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           )}
           {blockBase(block) === "feature" && featured && (
             <a
@@ -558,7 +633,7 @@ const website = {
         </>
       ))}
     </section>
-    {popular.length > 0 && (
+    {asideMode !== "none" && popular.length > 0 && (
       <Sidebar title={ui.popular ?? "Popular"}>
         <ul>
           {popular.map((post) => (

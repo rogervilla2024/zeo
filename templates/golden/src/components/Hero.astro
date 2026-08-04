@@ -4,17 +4,27 @@
 // component gives the design-theme skill a first screen to art-direct
 // (the variants ship a baseline look for .site-hero and the site's
 // design layer builds identity on top). Zero JavaScript.
+// mode ("search" | "compact") switches the first screen's ANATOMY:
+// a booking-style search funnel or a slim strip that hands the page
+// to the content immediately (homepage.hero in site.config.json).
 interface Props {
   title: string;
   tagline?: string;
   ctaLabel?: string;
   ctaHref?: string;
+  mode?: string;
 }
 
-const { title, tagline, ctaLabel, ctaHref } = Astro.props;
+const { title, tagline, ctaLabel, ctaHref, mode } = Astro.props;
 ---
 
-<section class="site-hero">
+<section
+  class:list={[
+    "site-hero",
+    mode === "search" && "hero--search",
+    mode === "compact" && "hero--compact",
+  ]}
+>
   <h1 class="site-hero-title">{title}</h1>
   {tagline && <p class="site-hero-tagline">{tagline}</p>}
   {ctaLabel && ctaHref && (

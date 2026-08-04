@@ -171,6 +171,12 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   config.newsletter.enabled), and `faq` (homepage.faq Q/A pairs,
   mirrored 1:1 into FAQPage JSON-LD). `theme.category_colors` gives
   each category an accent chip on strips and archive headings.
+  Page ANATOMY is config too: `homepage.hero` (standard / search /
+  compact / none - the h1 stays, visually hidden), `homepage.aside`
+  (right / left / none), `header.search` (search bar in the chrome
+  on every page), the `feed` block (single-column stream), and
+  `directory:shelves` (horizontal scroll shelves) - named presets in
+  design-theme recipes.md (A1-A6).
   `theme.variant` picks one of 40 full themes (catalog:
   design-theme variants.md) over the shared component layer - each
   ships its own palette (light+dark), font pairing, and radius;

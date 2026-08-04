@@ -536,6 +536,18 @@ img, video {{
   top: 0.5rem;
   z-index: 100;
 }}
+/* Screen-reader-only text: keeps the homepage h1 for SEO when the
+   hero anatomy is "none". */
+.visually-hidden {{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}}
 .container {{
   max-width: var(--width-site);
   margin-inline: auto;
