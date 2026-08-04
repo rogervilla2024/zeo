@@ -61,7 +61,9 @@ interface HomepageConfig {
   cta_banner?: CtaBanner;
   faq?: FaqItem[];
   hero?: string;
+  hero_image?: string;
   aside?: string;
+  rail?: string;
 }
 const homepage: HomepageConfig = config.homepage ?? { blocks: [] };
 
@@ -73,14 +75,27 @@ const homepage: HomepageConfig = config.homepage ?? { blocks: [] };
 //                   content leads) | "none" (straight into blocks;
 //                   the h1 stays for SEO, visually hidden)
 //   homepage.aside: "right" | "left" | "none"
-const HERO_MODES = ["standard", "search", "compact", "none"];
+const HERO_MODES = [
+  "standard", "search", "compact", "none", "cover", "signup",
+];
 const heroMode = HERO_MODES.includes(homepage.hero ?? "")
   ? (homepage.hero as string)
   : "standard";
 const ASIDE_MODES = ["right", "left", "none"];
+// What the rail holds: reader favorites, the topic map, the
+// directory's filters (booking-style left filter rail with
+// aside: "left"), or the newsletter box.
+const RAIL_MODES = ["popular", "categories", "facets", "newsletter"];
+const railMode = RAIL_MODES.includes(homepage.rail ?? "")
+  ? (homepage.rail as string)
+  : "popular";
 const asideMode = ASIDE_MODES.includes(homepage.aside ?? "")
   ? (homepage.aside as string)
   : "right";
+// Filter-rail fallback: when every active block lives in the lead
+// zone (e.g. a directory list) and a rail is requested, the rail
+// docks BESIDE the lead content instead of dangling under an empty
+// main column - the booking results-page anatomy.
 // A block id may carry a view modifier after a colon - the same
 // block, composed differently: "directory:list" renders the catalog
 // as booking rows, "feature:overlay" puts the title on the image,
@@ -93,6 +108,7 @@ const LEAD_BLOCK_IDS = [
   "directory",
   "comparison",
   "cta_banner",
+  "ticker",
 ];
 const MAIN_BLOCK_IDS = ["threads", "feed", "feature", "latest",
   "strips", "newsletter", "faq"];
@@ -113,6 +129,8 @@ const mainBlocks = activeBlocks.filter((block) =>
 );
 const leadIds = leadBlocks.map(blockBase);
 const mainIds = mainBlocks.map(blockBase);
+const railBesideLead =
+  asideMode !== "none" && mainBlocks.length === 0 && leadBlocks.length > 0;
 // Directory data powers both the card grid and the comparison table.
 const wantsDirectory =
   leadIds.includes("directory") || leadIds.includes("comparison");
@@ -123,6 +141,20 @@ const threads = mainIds.includes("threads") ? posts.slice(0, 12) : [];
 // The feed: a single-column stream of every recent post, board-style
 // (thumb, chip, title, summary, date) - the community/news anatomy.
 const feedPosts = mainIds.includes("feed") ? posts.slice(0, 20) : [];
+
+// The ticker: a one-line scrolling strip of the freshest headlines
+// (newsroom chrome), and the rail's category map with counts.
+const tickerPosts = leadIds.includes("ticker") ? posts.slice(0, 8) : [];
+const railCategories = new Map<string, number>();
+if (railMode === "categories") {
+  for (const post of posts) {
+    if (!post.data.category) continue;
+    railCategories.set(
+      post.data.category,
+      (railCategories.get(post.data.category) ?? 0) + 1,
+    );
+  }
+}
 
 // One strip per pillar/category (strips block), biggest clusters
 // first, three most recent articles each; titles link to the
@@ -344,10 +376,18 @@ const website = {
       title={config.site_name}
       tagline={config.niche}
       mode={heroMode}
+      image={homepage.hero_image}
       {...heroCta}
     >
       {heroStats.length > 0 && (
         <p class="hero-stats">{heroStats.join(" \u00B7 ")}</p>
+      )}
+      {heroMode === "signup" && (
+        <NewsletterCta
+          title={ui.newsletter_title}
+          description={ui.newsletter_text}
+          buttonLabel={ui.newsletter_button}
+        />
       )}
       {(heroMode === "search" ||
         leadIds.includes("directory") ||
@@ -364,6 +404,12 @@ const website = {
       )}
     </Hero>
   )}
+  <div
+    class:list={[
+      railBesideLead && "rail-beside",
+      railBesideLead && asideMode === "left" && "left",
+    ]}
+  >
   {leadBlocks.map((block) => (
     <>
       {blockBase(block) === "quick_facts" && product.facts.length > 0 && (
@@ -394,6 +440,7 @@ const website = {
                 "entity-grid",
                 blockStyle(block) === "list" && "entity-grid--list",
                 blockStyle(block) === "shelves" && "entity-grid--shelves",
+                blockStyle(block) === "index" && "entity-grid--index",
               ]}
             >
               {group.entities.map((entity) => (
@@ -421,6 +468,7 @@ const website = {
             "entity-grid",
             blockStyle(block) === "list" && "entity-grid--list",
             blockStyle(block) === "shelves" && "entity-grid--shelves",
+            blockStyle(block) === "index" && "entity-grid--index",
           ]}
         >
           {entities.map((entity) => (
@@ -441,6 +489,16 @@ const website = {
         </ul>
       )}
     </section>
+      )}
+      {blockBase(block) === "ticker" && tickerPosts.length > 0 && (
+        <div class="ticker">
+          <span class="ticker-label">{ui.ticker_label ?? "Latest"}</span>
+          <ul>
+            {tickerPosts.map((post) => (
+              <li><a href={`/${post.id}/`}>{post.data.title}</a></li>
+            ))}
+          </ul>
+        </div>
       )}
       {blockBase(block) === "cta_banner" && bannerReady && (
         <aside class="cta-banner">
@@ -519,7 +577,12 @@ const website = {
             </>
           )}
           {blockBase(block) === "feed" && feedPosts.length > 0 && (
-            <ol class="feed">
+            <ol
+              class:list={[
+                "feed",
+                blockStyle(block) === "compact" && "feed--compact",
+              ]}
+            >
               {feedPosts.map((post) => (
                 <li class="feed-item">
                   {post.data.image && (
@@ -585,6 +648,7 @@ const website = {
                 class:list={[
                   "post-list",
                   blockStyle(block) === "rows" && "post-list--rows",
+                  blockStyle(block) === "tiles" && "post-list--tiles",
                 ]}
               >
                 {latest.map((post) => (
@@ -633,7 +697,7 @@ const website = {
         </>
       ))}
     </section>
-    {asideMode !== "none" && popular.length > 0 && (
+    {asideMode !== "none" && railMode === "popular" && popular.length > 0 && (
       <Sidebar title={ui.popular ?? "Popular"}>
         <ul>
           {popular.map((post) => (
@@ -642,5 +706,42 @@ const website = {
         </ul>
       </Sidebar>
     )}
+    {asideMode !== "none" && railMode === "categories" &&
+      railCategories.size > 0 && (
+      <Sidebar title={ui.rail_categories ?? "Topics"}>
+        <ul>
+          {[...railCategories.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .map(([name, count]) => (
+              <li>
+                <a href={`/${categoryBase}/${slugify(name)}/`}>
+                  {name}
+                </a>{" "}
+                <span class="rail-count">{count}</span>
+              </li>
+            ))}
+        </ul>
+      </Sidebar>
+    )}
+    {asideMode !== "none" && railMode === "facets" &&
+      facetLinks.length > 0 && (
+      <Sidebar title={ui.directory_title ?? "Browse the directory"}>
+        <ul>
+          {facetLinks.map((link) => (
+            <li><a href={link.url}>{link.label}</a></li>
+          ))}
+        </ul>
+      </Sidebar>
+    )}
+    {asideMode !== "none" && railMode === "newsletter" && (
+      <aside class="site-aside">
+        <NewsletterCta
+          title={ui.newsletter_title}
+          description={ui.newsletter_text}
+          buttonLabel={ui.newsletter_button}
+        />
+      </aside>
+    )}
+  </div>
   </div>
 </BaseLayout>

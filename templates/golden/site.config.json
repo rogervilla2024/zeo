@@ -71,7 +71,9 @@
     "stat_articles": "{count} guides",
     "newsletter_title": "Get new articles by email",
     "newsletter_text": "One email when we publish. No spam.",
-    "newsletter_button": "Subscribe"
+    "newsletter_button": "Subscribe",
+    "ticker_label": "Latest",
+    "rail_categories": "Topics"
   },
   "organization": {
     "name": "Example Site",
@@ -161,7 +163,9 @@
   "homepage": {
     "blocks": [],
     "hero": "standard",
+    "hero_image": "",
     "aside": "right",
+    "rail": "popular",
     "hero_stats": false,
     "cta_banner": {
       "text": "",
