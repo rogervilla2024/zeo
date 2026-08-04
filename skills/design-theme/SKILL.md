@@ -118,18 +118,25 @@ if yours is 30 lines, you restyled nothing.
    - tech/tools: crisp, modern - near-black or paper-white base,
      electric accent, mono details
    The mood must be guessable from a screenshot with the text blurred.
-3. Set the tokens in `site.config.json`:
-   - `theme.palette`: primary (the identity color), accent (used
-     sparingly), background/surface/text/muted tuned to the same
-     temperature; `on-primary` if primary is light. Never leave the
-     example palette in place - unchanged defaults are a fail.
-   - `theme.dark_palette`: same identity in dark; verify contrast.
-   - `theme.fonts`: a real pairing that carries the character -
-     self-hosted woff2 (e.g. from Fontsource) is encouraged for the
-     heading font: preloaded, `font-display: swap`, subset if large.
-     System stacks are the fallback, not the goal.
-   - `theme.variant` and `theme.radius` (sharp for technical, soft
-     for lifestyle).
+3. Set the tokens in `site.config.json`. Every variant is a FULL
+   THEME: it ships its own palette (light and dark), font pairing,
+   and corner radius - an empty `theme.palette` means "the
+   variant's identity", which is why forty variants already look
+   like forty different sites. Your job here is to TUNE, not to
+   rescue:
+   - `theme.palette`: override only the keys that must change for
+     the niche (e.g. shift the primary toward the topic's color
+     world); include `on-primary` if your primary is light. Two
+     fleet sites on the SAME variant must not both keep its stock
+     palette - diverge at least primary and accent on one of them.
+   - `theme.dark_palette`: override only when your light overrides
+     break the theme's dark scheme; verify contrast.
+   - `theme.fonts`: empty = the theme's pairing. Upgrading the
+     heading font to a self-hosted woff2 (T recipes; preloaded,
+     `font-display: swap`, subset if large) is encouraged for
+     flagship sites.
+   - `theme.variant` (the identity pick - see variants.md) and
+     `theme.radius` (empty = the theme's corner language).
 4. Regenerate the stylesheet - tokens plus the variant layer come out
    of one command:
 

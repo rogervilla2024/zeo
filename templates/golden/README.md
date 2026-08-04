@@ -171,8 +171,11 @@ toolkit's own environment (`uv run --project "$ZEO/scripts"`).
   config.newsletter.enabled), and `faq` (homepage.faq Q/A pairs,
   mirrored 1:1 into FAQPage JSON-LD). `theme.category_colors` gives
   each category an accent chip on strips and archive headings.
-  `theme.variant` picks one of 40 aesthetic baselines (catalog:
-  design-theme variants.md) over the shared component layer.
+  `theme.variant` picks one of 40 full themes (catalog:
+  design-theme variants.md) over the shared component layer - each
+  ships its own palette (light+dark), font pairing, and radius;
+  empty `theme.palette`/`fonts`/`radius` keys mean "the theme's
+  identity" and config overrides only what the site sets.
   `homepage.hero_stats: true` renders a build-time stat line in the
   hero from real counts (entities, first-facet values, articles)
   via the `ui.stat_*` templates. Facet archives additionally
