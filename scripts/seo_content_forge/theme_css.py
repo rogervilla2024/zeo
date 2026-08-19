@@ -127,7 +127,7 @@ VARIANT_IDENTITY: dict[str, dict[str, object]] = {
                     "background": "#faf8f4", "surface": "#f1ece2",
                     "text": "#1c1917", "muted": "#8a7d6a"},
         "dark": {"background": "#171412", "surface": "#211d19",
-                 "primary": "#c8a959"},
+                 "primary": "#c8a959", "on-primary": "#171412"},
         "fonts": (_F_PALATINO, _F_HUMANIST), "radius": "0px",
     },
     "noir": {
@@ -156,8 +156,8 @@ VARIANT_IDENTITY: dict[str, dict[str, object]] = {
                     "background": "#fafdf7", "surface": "#ecf4e7",
                     "text": "#14201a", "muted": "#5b6b60"},
         "dark": {"background": "#0a120d", "surface": "#111a14",
-                 "primary": "#4ade80", "text": "#d1fae5",
-                 "muted": "#6ee7b7"},
+                 "primary": "#4ade80", "on-primary": "#0a120d",
+                 "text": "#d1fae5", "muted": "#6ee7b7"},
         "fonts": (_F_MONO, _F_MONO), "radius": "2px",
     },
     "paper": {
@@ -176,7 +176,7 @@ VARIANT_IDENTITY: dict[str, dict[str, object]] = {
     "folio": {
         "palette": {"primary": "#1e293b", "accent": "#b45309",
                     "background": "#ffffff", "surface": "#f8fafc",
-                    "text": "#1e293b", "muted": "#94a3b8"},
+                    "text": "#1e293b", "muted": "#64748b"},
         "fonts": (_F_SERIF, _F_SERIF), "radius": "0px",
     },
     "gazette": {
@@ -246,7 +246,7 @@ VARIANT_IDENTITY: dict[str, dict[str, object]] = {
     "zen": {
         "palette": {"primary": "#57534e", "accent": "#a8a29e",
                     "background": "#fafaf9", "surface": "#f5f5f4",
-                    "text": "#292524", "muted": "#a8a29e"},
+                    "text": "#292524", "muted": "#78716c"},
         "fonts": (_F_SERIF, _F_HUMANIST), "radius": "0px",
     },
     "bazaar": {
@@ -328,7 +328,7 @@ VARIANT_IDENTITY: dict[str, dict[str, object]] = {
     "tundra": {
         "palette": {"primary": "#475569", "accent": "#94a3b8",
                     "background": "#f8fafc", "surface": "#f1f5f9",
-                    "text": "#334155", "muted": "#94a3b8"},
+                    "text": "#334155", "muted": "#64748b"},
         "dark": {"background": "#0f1720", "surface": "#16202b"},
         "fonts": (_F_SYSTEM, _F_HUMANIST), "radius": "2px",
     },

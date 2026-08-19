@@ -187,6 +187,8 @@ def build_variant_preview(
         max_width=tokens.max_width,
         site_width=tokens.site_width,
         variant=variant,
+        motion=tokens.motion,
+        finish=tokens.finish,
     )
     theme_attr = ' data-theme="dark"' if dark else ' data-theme="light"'
     scheme = "dark" if dark else "light"

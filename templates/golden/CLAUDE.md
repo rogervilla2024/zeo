@@ -57,6 +57,8 @@ when work is done. If unsure where the toolkit lives, ask; then run
 | Page anatomy | `homepage.hero` (standard/search/compact/none/cover/signup, cover uses `hero_image`) + `homepage.aside` (right/left/none) + `homepage.rail` (popular/categories/facets/newsletter) + `header.search` + blocks `ticker`/`feed[:compact]` + views `latest:tiles`, `directory:shelves`, `directory:index` - the topic picks the anatomy (recipes.md A1-A12) |
 | Layout variant | `theme.variant`: one of 40 FULL THEMES (own palette/fonts/radius; empty theme keys = the theme's identity) - browse them visually with `$ZEO/scripts/fleet_preview.py --output preview` (light + dark gallery); catalog and choosing rules in design-theme variants.md |
 | Modern pack | `theme.finish` (glass/gradient/soft), `theme.motion` (view transitions + micro-interactions), `header.sticky`, nav `children` = dropdown menus + mobile hamburger (all zero-JS), real webfonts via `$ZEO/scripts/fetch_fonts.py --pairing T2 --root .` |
+| Entity/cover art | `$ZEO/scripts/generate_entity_images.py --root . --style building` illustrates every imageless entity (deterministic, palette-tinted SVG) and patches frontmatter; `generate_cover_image.py` draws the A7 cover hero |
+| Palette contrast | `$ZEO/scripts/check_contrast.py --config site.config.json` after every palette tweak - fails on AA violations in light or dark |
 | Category colors | `theme.category_colors` maps category name -> accent; strips and archive headings show the chip automatically |
 | Hero stat line | `homepage.hero_stats: true` + `ui.stat_*` templates - build-time counts, never hand-written numbers |
 | Design identity | record the combo in `theme.recipe` (e.g. `H3+N1+L2+F3`) - fleet_report.py flags two sites sharing recipe + block order |

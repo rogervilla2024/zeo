@@ -79,7 +79,8 @@ and never with the stock palette on both.
 0. LOOK first: `python scripts/fleet_preview.py --output preview`
    renders all forty (light AND dark, same sample content) into
    preview/index.html - pass `--config site.config.json` to see them
-   in the site's own palette.
+   in the site's own palette, and `--finish glass|gradient|soft` to
+   preview the whole fleet under a surface finish.
 1. Shortlist 3 by mood group, pick the one whose signature detail
    (each file's last block) matches the niche's temperament - and
    check the shortlist's DARK previews before committing: a
