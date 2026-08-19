@@ -79,6 +79,14 @@ done because it builds; it is done when its screenshots pass review.
   entity-catalog niche (hotels, tools, venues) with no entity cards
   or comparison table, and a Q&A/discussion niche with no thread
   list or answer threads.
+- Imagery is not optional: a homepage whose first two screens show
+  no imagery at all (no hero image, no card thumbnails, no entity
+  photos - just text and rules) is an automatic fail on any
+  archetype. Reference sites earn density with SMALL visuals (card
+  thumbs, entity photos, chips), never with none. The toolkit
+  GENERATES imagery on demand - original SVG illustrations via
+  generate-article-images, entity photos or illustrated cards,
+  generate_logo/og - so "no images existed" is never a reason.
 - Directory auto-fails (check the entity cards, not just the grid):
   cards with no price, no editor's score, and no CTA button while
   the entity files carry the data - or entity files left with those
