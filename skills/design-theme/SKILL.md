@@ -154,6 +154,17 @@ if yours is 30 lines, you restyled nothing.
      nav items in config.nav take `children` for CSS-only dropdown
      menus; below 768px the nav collapses into a hamburger drawer -
      all zero-JS.
+   - Imagery on demand: `generate_entity_images.py --root . --style
+     building|product|nature|abstract` draws a palette-tinted,
+     deterministic SVG card for every imageless entity and patches
+     its frontmatter; `generate_cover_image.py --root . --title ...
+     --style ...` fills the A7 cover hero the same way. No stock, no
+     licenses - a text-only catalog is one command from illustrated.
+   - After EVERY palette tweak run `check_contrast.py --config
+     site.config.json` - it resolves the effective light and dark
+     palettes (identity + overrides) and fails on any AA violation;
+     the shipped identities are pinned by the test suite the same
+     way.
    - `theme.variant` (the identity pick - see variants.md) and
      `theme.radius` (empty = the theme's corner language).
 4. Regenerate the stylesheet - tokens plus the variant layer come out

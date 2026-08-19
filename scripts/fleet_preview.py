@@ -20,7 +20,7 @@ from pathlib import Path
 import orjson
 
 from seo_content_forge.preview import write_gallery
-from seo_content_forge.theme_css import ThemeTokens, from_config
+from seo_content_forge.theme_css import FINISHES, ThemeTokens, from_config
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -38,7 +38,21 @@ def main(argv: list[str] | None = None) -> int:
         help="Optional site.config.json whose palette/fonts the "
         "previews should use.",
     )
+    parser.add_argument(
+        "--finish",
+        default="",
+        help="Render every preview with a surface finish: glass, "
+        "gradient, or soft (default: flat).",
+    )
     args = parser.parse_args(argv)
+
+    if args.finish and args.finish not in FINISHES:
+        print(
+            f"Unknown finish {args.finish!r}; choose from "
+            f"{', '.join(FINISHES)}.",
+            file=sys.stderr,
+        )
+        return 2
 
     tokens = ThemeTokens()
     if args.config:
@@ -48,6 +62,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Cannot read {args.config}: {exc}", file=sys.stderr)
             return 2
 
+    if args.finish:
+        tokens.finish = args.finish
     count = write_gallery(args.output, tokens)
     print(f"Gallery written: {args.output}/index.html ({count} files)")
     return 0

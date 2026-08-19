@@ -73,3 +73,10 @@ def test_write_gallery_and_cli(tmp_path: Path) -> None:
 
     missing = tmp_path / "nope.json"
     assert main(["--output", str(out), "--config", str(missing)]) == 2
+
+    # The finish dimension: every preview renders with the surface
+    # treatment applied, and unknown finishes are a clean error.
+    glass = tmp_path / "glass"
+    assert main(["--output", str(glass), "--finish", "glass"]) == 0
+    assert "Finish: glass" in (glass / "noir.html").read_text()
+    assert main(["--output", str(glass), "--finish", "chrome-x"]) == 2
