@@ -152,20 +152,53 @@ def check_launch(root: Path) -> list[str]:
             "entries - the homepage would render an empty catalog"
         )
     if directory_active:
+        parsed: list[tuple[Path, dict[str, str], bool]] = []
         for entity in entity_files:
-            fields = parse_frontmatter(entity.read_text(encoding="utf-8"))
-            no_rating = not fields.get("rating")
-            no_offer = not fields.get("price") and not fields.get("cta_url")
-            if no_rating or no_offer:
-                empty = [
+            raw_entity = entity.read_text(encoding="utf-8")
+            fields = parse_frontmatter(raw_entity)
+            front = raw_entity.split("\n---", 2)[0]
+            # A gallery counts as a card photo: images[0] falls back
+            # onto the card when the scalar image field is empty.
+            has_gallery = bool(
+                re.search(r"^images:\s*\n\s*- ", front, re.MULTILINE)
+            )
+            parsed.append((entity, fields, has_gallery))
+        # A catalog where NO entity carries conversion data is a
+        # REFERENCE catalog (an index of facts): only the visual is
+        # required - never invent ratings or prices for integrity's
+        # sake. The moment one entity is commercial, all must be
+        # complete, or half the cards ship bare.
+        commercial = any(
+            fields.get("rating") or fields.get("price")
+            or fields.get("cta_url")
+            for _, fields, _ in parsed
+        )
+        for entity, fields, has_gallery in parsed:
+            no_image = not fields.get("image") and not has_gallery
+            empty: list[str] = ["image"] if no_image else []
+            if commercial:
+                empty += [
                     key
                     for key in ("rating", "price", "cta_url")
                     if not fields.get(key)
                 ]
+                complete = not no_image and fields.get("rating") and (
+                    fields.get("price") or fields.get("cta_url")
+                )
+                if complete:
+                    continue
                 problems.append(
-                    f"entity {entity.name}: empty {', '.join(empty)} - the "
-                    "card ships without its conversion surface (needs a "
-                    "rating plus at least one of price/cta_url)"
+                    f"entity {entity.name}: empty {', '.join(empty)} - "
+                    "the card ships without its visual and conversion "
+                    "surface (a commercial catalog needs an image or "
+                    "gallery, a rating, and one of price/cta_url on "
+                    "EVERY entity)"
+                )
+            elif no_image:
+                problems.append(
+                    f"entity {entity.name}: empty image - the card "
+                    "ships text-only (a reference catalog still needs "
+                    "an image or gallery per entity)"
                 )
 
     content = root / "src" / "content" / "blog"

@@ -142,28 +142,52 @@ def test_directory_site_requires_entity_conversion_data(tmp_path: Path) -> None:
     problems = check_launch(tmp_path)
     assert any("no entries" in p for p in problems)
 
-    # A bare entity ships a card with no conversion surface - the
-    # empty fields are itemized by name.
+    # A catalog with NO conversion data anywhere is a REFERENCE
+    # catalog: only the visual is required (a poker-hands index must
+    # not be forced to invent prices), and it is still itemized.
     _write_entity(tmp_path, "bare.md", 'title: "Bare Inn"')
     problems = check_launch(tmp_path)
+    assert any(
+        "bare.md" in p and "empty image" in p and "reference" in p
+        for p in problems
+    )
+    assert not any("rating" in p for p in problems)
+
+    # An image alone completes a reference-catalog entity.
+    _write_entity(
+        tmp_path, "bare.md", 'title: "Bare Inn"\nimage: "/img/inn.svg"'
+    )
+    assert check_launch(tmp_path) == []
+
+    # One commercial entity makes the WHOLE catalog commercial: every
+    # entity now needs image + rating + one of price/cta_url.
+    _write_entity(
+        tmp_path, "scoreless.md", 'title: "Quiet Inn"\nrating: "7.9"'
+    )
+    problems = check_launch(tmp_path)
+    assert any(
+        "scoreless.md" in p and "image, price, cta_url" in p
+        for p in problems
+    )
     assert any(
         "bare.md" in p and "rating, price, cta_url" in p for p in problems
     )
 
-    # rating plus at least one of price/cta_url clears the gate.
+    # Complete both (a gallery satisfies the visual without the
+    # scalar) and the gate clears.
     _write_entity(
         tmp_path,
         "bare.md",
-        'title: "Bare Inn"\nrating: "8.4"\nprice: "from 90 EUR"',
+        'title: "Bare Inn"\nimages:\n  - "/img/inn-1.svg"\n'
+        'rating: "8.4"\nprice: "from 90 EUR"',
+    )
+    _write_entity(
+        tmp_path,
+        "scoreless.md",
+        'title: "Quiet Inn"\nimage: "/img/quiet.svg"\n'
+        'rating: "7.9"\ncta_url: "https://offers.example/quiet"',
     )
     assert check_launch(tmp_path) == []
-
-    # rating alone is not enough - there is nothing to convert to.
-    _write_entity(tmp_path, "scoreless.md", 'title: "Quiet Inn"\nrating: "7.9"')
-    problems = check_launch(tmp_path)
-    assert any(
-        "scoreless.md" in p and "price, cta_url" in p for p in problems
-    )
 
 
 def test_entity_audit_only_runs_when_directory_is_active(tmp_path: Path) -> None:
