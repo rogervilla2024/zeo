@@ -136,10 +136,24 @@ if yours is 30 lines, you restyled nothing.
      palette - diverge at least primary and accent on one of them.
    - `theme.dark_palette`: override only when your light overrides
      break the theme's dark scheme; verify contrast.
-   - `theme.fonts`: empty = the theme's pairing. Upgrading the
-     heading font to a self-hosted woff2 (T recipes; preloaded,
-     `font-display: swap`, subset if large) is encouraged for
-     flagship sites.
+   - `theme.fonts`: empty = the theme's system pairing. For the
+     modern look, install REAL webfonts with one command:
+     `python scripts/fetch_fonts.py --pairing T2 --root .` - it
+     downloads the OFL woff2 files into public/fonts/, writes
+     src/styles/fonts.css (@font-face, swap), and prints the
+     theme.fonts values to paste. Nothing is fetched at runtime.
+   - `theme.finish`: the surface treatment over any variant -
+     `glass` (translucent sticky chrome, frosted cards), `gradient`
+     (glow-mesh hero, gradient display type and CTAs), `soft` (big
+     radius, layered shadows, pill buttons). Empty = flat. This is
+     the single fastest "not a 90s page" switch.
+   - `theme.motion` (default true): cross-document view transitions
+     plus calm hover micro-interactions, all behind
+     prefers-reduced-motion.
+   - Dynamic chrome: `header.sticky: true` pins a blurred header;
+     nav items in config.nav take `children` for CSS-only dropdown
+     menus; below 768px the nav collapses into a hamburger drawer -
+     all zero-JS.
    - `theme.variant` (the identity pick - see variants.md) and
      `theme.radius` (empty = the theme's corner language).
 4. Regenerate the stylesheet - tokens plus the variant layer come out

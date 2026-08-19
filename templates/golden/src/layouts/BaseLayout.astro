@@ -19,6 +19,7 @@
 //   a webfont is added, self-host it, preload the woff2 here, and set
 //   font-display: swap.
 import "../styles/tokens.css";
+import "../styles/fonts.css";
 import "../styles/site.css";
 import config from "../../site.config.json";
 import SeoHead from "../components/SeoHead.astro";
@@ -44,6 +45,9 @@ const ui = config.ui ?? {};
 // search form in the header on every page. The action follows
 // seo.search_url_template so a renamed search page keeps working.
 const headerSearch = Boolean(config.header?.search);
+// header.sticky pins a translucent, blurred header to the top -
+// the modern app-chrome feel, still zero JavaScript.
+const headerSticky = Boolean(config.header?.sticky);
 const rawSearchTemplate: string =
   config.seo?.search_url_template ?? "/search?q={search_term_string}";
 let searchPath = rawSearchTemplate.split("?")[0];
@@ -75,7 +79,7 @@ searchPath = searchPath || "/search";
   </head>
   <body>
     <a class="skip-link" href="#main">{ui.skip_to_content ?? "Skip to content"}</a>
-    <header class="container">
+    <header class:list={["container", headerSticky && "header--sticky"]}>
       <a class="site-brand" href="/">{config.site_name}</a>
       <SiteNav />
       {headerSearch && (
