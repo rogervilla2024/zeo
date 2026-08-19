@@ -1,16 +1,26 @@
 ---
 // Primary header navigation, driven by the "nav" array in
 // site.config.json - a header without a real menu reads as an
-// unfinished starter. Zero JavaScript; the current page gets
-// aria-current for styling and accessibility.
+// unfinished starter. Zero JavaScript, still dynamic:
+// - a nav item may carry "children" - it renders as a CSS-only
+//   dropdown (open on hover and :focus-within, keyboard friendly)
+// - below 768px the whole nav collapses into a hamburger drawer
+//   driven by a hidden checkbox (the classic zero-JS toggle)
+// The current page gets aria-current for styling and accessibility.
 import config from "../../site.config.json";
 
-interface NavItem {
+interface NavChild {
   label: string;
   href: string;
 }
+interface NavItem {
+  label: string;
+  href: string;
+  children?: NavChild[];
+}
 
 const items: NavItem[] = config.nav ?? [];
+const ui = config.ui ?? {};
 const path = Astro.url.pathname;
 
 function isCurrent(href: string): boolean {
@@ -20,11 +30,49 @@ function isCurrent(href: string): boolean {
 ---
 
 {items.length > 0 && (
-  <nav class="site-nav" aria-label="Primary">
-    {items.map((item) => (
-      <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>
-        {item.label}
-      </a>
-    ))}
-  </nav>
+  <>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle" />
+    <label
+      for="nav-toggle"
+      class="nav-burger"
+      aria-label={ui.menu ?? "Menu"}
+    >
+      <span></span><span></span><span></span>
+    </label>
+    <nav class="site-nav" aria-label="Primary">
+      {items.map((item) =>
+        item.children && item.children.length > 0 ? (
+          <div class="nav-item has-sub">
+            <a
+              href={item.href}
+              aria-current={isCurrent(item.href) ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+            <ul class="nav-sub">
+              {item.children.map((child) => (
+                <li>
+                  <a
+                    href={child.href}
+                    aria-current={
+                      isCurrent(child.href) ? "page" : undefined
+                    }
+                  >
+                    {child.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <a
+            href={item.href}
+            aria-current={isCurrent(item.href) ? "page" : undefined}
+          >
+            {item.label}
+          </a>
+        ),
+      )}
+    </nav>
+  </>
 )}

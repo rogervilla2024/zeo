@@ -249,11 +249,13 @@ blocks `["latest:tiles"]`; visual niches.
 
 ## Type pairings (T)
 
-Self-hosted woff2 pairings (Fontsource or equivalent), set in
-`theme.fonts` and preloaded per the design-theme rules: subset,
-`font-display: swap`, no runtime fetches from third parties. System
-stacks remain the fallback in every pairing. Record the T letter in
-the combo (e.g. `H3+N1+L2+F3+T2 / B5`).
+Self-hosted woff2 pairings, installed with ONE command:
+`python scripts/fetch_fonts.py --pairing T2 --root .` downloads the
+OFL families (Fontsource CDN) into public/fonts/, writes
+src/styles/fonts.css, and prints the theme.fonts values. System
+stacks remain the fallback in every pairing; nothing is fetched at
+runtime. Record the T letter in the combo (e.g.
+`H3+N1+L2+F3+T2 / B5`).
 
 ### T1 - Classic authority
 Heading: Playfair Display (serif display). Body: Source Serif 4.

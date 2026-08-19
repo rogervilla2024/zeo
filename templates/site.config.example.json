@@ -20,7 +20,8 @@
     }
   ],
   "header": {
-    "search": false
+    "search": false,
+    "sticky": false
   },
   "ui": {
     "latest_articles": "Latest articles",
@@ -73,7 +74,8 @@
     "newsletter_text": "One email when we publish. No spam.",
     "newsletter_button": "Subscribe",
     "ticker_label": "Latest",
-    "rail_categories": "Topics"
+    "rail_categories": "Topics",
+    "menu": "Menu"
   },
   "organization": {
     "name": "Example Site",
@@ -130,6 +132,8 @@
   },
   "theme": {
     "variant": "minimal",
+    "finish": "",
+    "motion": true,
     "palette": {},
     "dark_palette": {},
     "fonts": {

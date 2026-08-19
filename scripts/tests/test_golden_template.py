@@ -376,7 +376,7 @@ def test_dynamic_archetype_blocks_and_card_conversion() -> None:
     # and a marketplace.
     assert homepage["hero"] == "standard"
     assert homepage["aside"] == "right"
-    assert config["header"] == {"search": False}
+    assert config["header"]["search"] is False
     for hook in ("heroMode", "asideMode", "visually-hidden",
                  '"feed"', "feed-item", "entity-grid--shelves",
                  'mode={heroMode}', '"cover"', '"signup"', "railMode",
@@ -389,8 +389,18 @@ def test_dynamic_archetype_blocks_and_card_conversion() -> None:
     assert homepage["hero_image"] == ""
     layout = (GOLDEN / "src" / "layouts" / "BaseLayout.astro").read_text()
     for hook in ("header-search", "config.header?.search",
-                 "search_url_template"):
+                 "search_url_template", "header--sticky",
+                 "styles/fonts.css"):
         assert hook in layout, f"BaseLayout misses {hook}"
+    assert config["header"] == {"search": False, "sticky": False}
+    assert config["theme"]["motion"] is True
+    assert config["theme"]["finish"] == ""
+    assert (GOLDEN / "src" / "styles" / "fonts.css").is_file()
+    # Dynamic nav: dropdown children + the zero-JS hamburger drawer.
+    nav = (GOLDEN / "src" / "components" / "SiteNav.astro").read_text()
+    for hook in ("children", "nav-sub", "nav-toggle", "nav-burger",
+                 "has-sub"):
+        assert hook in nav, f"SiteNav misses {hook}"
     recipes_text = (
         ROOT / "skills" / "design-theme" / "recipes.md"
     ).read_text()

@@ -361,6 +361,13 @@ class ThemeTokens:
     max_width: str = _DEFAULT_MAX_WIDTH
     site_width: str = _DEFAULT_SITE_WIDTH
     variant: str = "minimal"
+    # Motion layer (cross-document view transitions + hover
+    # micro-interactions, reduced-motion safe). On by default; a
+    # site opts out with theme.motion: false.
+    motion: bool = True
+    # Finish layer over the variant: "" (flat) | "glass" | "gradient"
+    # | "soft" - the modern surface treatment.
+    finish: str = ""
 
 
 def from_config(config: dict[str, object]) -> ThemeTokens:
@@ -381,6 +388,10 @@ def from_config(config: dict[str, object]) -> ThemeTokens:
         max_width=str(theme.get("max_width", _DEFAULT_MAX_WIDTH)),
         site_width=str(theme.get("site_width", _DEFAULT_SITE_WIDTH)),
         variant=raw_variant if raw_variant in VARIANTS else "minimal",
+        motion=bool(theme.get("motion", True)),
+        finish=str(theme.get("finish", "")).lower()
+        if str(theme.get("finish", "")).lower() in FINISHES
+        else "",
     )
 
 
@@ -420,6 +431,116 @@ def variant_css(variant: str) -> str:
     return (_VARIANT_DIR / f"{variant}.css").read_text(encoding="utf-8")
 
 
+# Motion layer: cross-document view transitions make every page
+# navigation crossfade (pure CSS, progressive enhancement), and the
+# interactive surfaces get calm micro-interactions. Everything sits
+# behind prefers-reduced-motion, so accessibility wins by default.
+MOTION_CSS = """
+/* Motion layer (theme.motion) */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  a, button, .entity-cta, .site-nav a, .post-category {
+    transition: color 140ms ease, background-color 140ms ease,
+      border-color 140ms ease, box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+  .post-list li, .entity-card, .feature-card, .feed-item img {
+    transition: transform 200ms ease, box-shadow 220ms ease;
+  }
+  .post-list li:hover, .entity-card:hover {
+    transform: translateY(-3px);
+  }
+  .feature-card:hover { transform: translateY(-2px); }
+  .site-nav > a, .site-nav .nav-item > a {
+    background-image: linear-gradient(var(--color-primary),
+      var(--color-primary));
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    background-position: 0 100%;
+    transition: background-size 180ms ease, color 140ms ease;
+  }
+  .site-nav > a:hover, .site-nav .nav-item > a:hover,
+  .site-nav a[aria-current="page"] {
+    background-size: 100% 2px;
+  }
+}
+""".strip()
+
+# Finish layer: the surface treatment applied OVER the variant -
+# the difference between "web page" and "product". Token-driven so
+# it composes with any palette, light or dark.
+FINISHES: dict[str, str] = {
+    "glass": """
+/* Finish: glass */
+body > header.container {
+  position: sticky; top: 0; z-index: 40;
+  background: color-mix(in srgb, var(--color-background) 72%,
+    transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-text) 10%, transparent);
+}
+.post-list li, .entity-card, .site-aside, .newsletter-cta,
+.cta-banner {
+  background: color-mix(in srgb, var(--color-surface) 55%,
+    transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid
+    color-mix(in srgb, var(--color-text) 9%, transparent);
+}
+.hero-search { box-shadow: 0 10px 34px
+  color-mix(in srgb, var(--color-text) 14%, transparent); }
+""".strip(),
+    "gradient": """
+/* Finish: gradient */
+.site-hero { position: relative; overflow: hidden; }
+.site-hero::before {
+  content: ""; position: absolute; inset: -40% -20% auto;
+  height: 130%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38% 55% at 18% 30%,
+      color-mix(in srgb, var(--color-primary) 26%, transparent),
+      transparent 70%),
+    radial-gradient(30% 45% at 82% 18%,
+      color-mix(in srgb, var(--color-accent) 22%, transparent),
+      transparent 70%);
+}
+.site-hero .site-hero-title {
+  background: linear-gradient(100deg, var(--color-text),
+    color-mix(in srgb, var(--color-primary) 70%, var(--color-text)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.entity-cta, .cta-banner a, .hero-search button,
+.newsletter-cta button {
+  background: linear-gradient(120deg, var(--color-primary),
+    color-mix(in srgb, var(--color-primary) 55%, var(--color-accent)));
+}
+""".strip(),
+    "soft": """
+/* Finish: soft */
+.post-list li, .entity-card, .site-aside, .site-hero,
+.newsletter-cta, .cta-banner, .feature-card {
+  border-radius: calc(var(--radius) + 10px);
+}
+.post-list li, .entity-card, .feature-card {
+  border: none;
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--color-text) 8%, transparent),
+    0 12px 32px color-mix(in srgb, var(--color-text) 7%, transparent);
+}
+.entity-cta, .hero-search button, .cta-banner a,
+.newsletter-cta button, .hero-search {
+  border-radius: 999px;
+}
+main.container { padding-block: 0.5rem 1rem; }
+""".strip(),
+}
+
+
 def components_css() -> str:
     """The shared functional layer every variant inherits.
 
@@ -447,13 +568,17 @@ def compose_css(tokens: ThemeTokens) -> str:
     Returns:
         The full tokens.css content.
     """
-    return (
-        build_css(tokens)
-        + "\n"
-        + components_css()
-        + "\n"
-        + variant_css(tokens.variant)
-    )
+    layers = [
+        build_css(tokens),
+        components_css(),
+        variant_css(tokens.variant),
+    ]
+    # Motion and finish compose AFTER the variant so their rules win.
+    if tokens.motion:
+        layers.append(MOTION_CSS + "\n")
+    if tokens.finish in FINISHES:
+        layers.append(FINISHES[tokens.finish] + "\n")
+    return "\n".join(layers)
 
 
 def _vars(colors: dict[str, str]) -> str:

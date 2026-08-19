@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from seo_content_forge.theme_css import (
+    FINISHES,
     VARIANT_IDENTITY,
     VARIANTS,
     ThemeTokens,
     build_css,
+    compose_css,
     from_config,
 )
 
@@ -92,3 +94,28 @@ def test_missing_theme_section_uses_defaults() -> None:
     css = build_css(tokens)
     assert "--radius: 8px;" in css
     assert "--color-text:" in css
+
+
+def test_motion_layer_is_on_by_default_and_reduced_motion_safe() -> None:
+    css = compose_css(ThemeTokens())
+    assert "@view-transition" in css
+    assert "prefers-reduced-motion: no-preference" in css
+    off = compose_css(from_config({"theme": {"motion": False}}))
+    assert "@view-transition" not in off
+
+
+def test_finish_layers_compose_after_the_variant() -> None:
+    assert set(FINISHES) == {"glass", "gradient", "soft"}
+    for name, marker in (
+        ("glass", "backdrop-filter"),
+        ("gradient", "background-clip: text"),
+        ("soft", "border-radius: 999px"),
+    ):
+        css = compose_css(from_config({"theme": {"finish": name}}))
+        assert marker in css, f"{name} finish misses {marker}"
+        # The finish must come after the variant layer so it wins.
+        assert css.index("Variant: minimal") < css.index(f"Finish: {name}")
+    plain = compose_css(ThemeTokens())
+    assert "Finish:" not in plain
+    # Unknown finishes are ignored, never crash the build.
+    assert "Finish:" not in compose_css(from_config({"theme": {"finish": "x"}}))
