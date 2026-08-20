@@ -9,6 +9,7 @@ import { getCollection } from "astro:content";
 import config from "../../../site.config.json";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import PostCard from "../../components/PostCard.astro";
+import Rail from "../../components/Rail.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export async function getStaticPaths({ paginate }) {
@@ -61,6 +62,23 @@ const breadcrumb = {
     },
   ],
 };
+
+// Archive anatomy inheritance (config.archives): the hub carries the
+// site's rail and listing style; defaults keep the plain column.
+interface ArchivesConfig {
+  aside?: string;
+  rail?: string;
+  post_list?: string;
+  entity_list?: string;
+}
+const archives: ArchivesConfig = config.archives ?? {};
+const archiveAside = ["right", "left"].includes(archives.aside ?? "")
+  ? (archives.aside as string)
+  : "none";
+const archiveRail = archives.rail || "popular";
+const postListStyle = ["rows", "tiles"].includes(archives.post_list ?? "")
+  ? (archives.post_list as string)
+  : "";
 ---
 
 <BaseLayout
@@ -70,10 +88,22 @@ const breadcrumb = {
   lang={config.default_language}
   jsonLd={[breadcrumb]}
 >
+  <div
+    class:list={[
+      archiveAside !== "none" && "with-aside",
+      archiveAside === "left" && "left",
+    ]}
+  >
   <section class="listing">
     <Breadcrumbs items={[{ name: ui.home ?? "Home", url: "/" }, { name: blogTitle }]} />
     <h1>{title}</h1>
-    <ul class="post-list">
+    <ul
+      class:list={[
+        "post-list",
+        postListStyle === "rows" && "post-list--rows",
+        postListStyle === "tiles" && "post-list--tiles",
+      ]}
+    >
       {page.data.map((post) => (
         <PostCard
           title={post.data.title}
@@ -107,4 +137,6 @@ const breadcrumb = {
       </nav>
     )}
   </section>
+  {archiveAside !== "none" && <Rail mode={archiveRail} />}
+  </div>
 </BaseLayout>

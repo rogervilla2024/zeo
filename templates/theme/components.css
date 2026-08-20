@@ -761,3 +761,29 @@
     background: none; min-width: 0; }
   .header-search { order: 6; flex-basis: 100%; margin: 0.6rem 0 0; }
 }
+
+/* Anatomy set 3: the reservation-page split. With
+   directory.entity_layout: "split" an entity review reads
+   booking-style: gallery and attributes lead the article column
+   while the offer card (badge, editor's score, price, CTA) rides
+   the rail, sticky beside the whole review. The rail wrapper is the
+   .with-aside grid's second column. */
+.entity-split .entity-rail { display: grid; gap: 1.4rem;
+  align-content: start; }
+@media (min-width: 1024px) {
+  .entity-split .entity-rail { position: sticky; top: 1rem; }
+}
+.entity-offer-card { display: grid; gap: 0.7rem;
+  justify-items: start; padding: 1.2rem 1.3rem;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-text) 14%,
+  transparent);
+  border-radius: var(--radius);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--color-text) 10%,
+  transparent); }
+.entity-offer-card .entity-badge { margin: 0; }
+.entity-offer-card .entity-score { margin: 0; }
+.entity-offer-card .entity-price { margin: 0; font-size: 1.3rem; }
+.entity-offer-card .entity-cta { justify-self: stretch;
+  text-align: center; }
+.entity-panel--bare .entity-panel-body { gap: 0.8rem; }
