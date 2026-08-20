@@ -162,7 +162,8 @@
   },
   "directory": {
     "base": "directory",
-    "facets": []
+    "facets": [],
+    "entity_layout": ""
   },
   "homepage": {
     "blocks": [],
@@ -178,5 +179,11 @@
       "sponsored": true
     },
     "faq": []
+  },
+  "archives": {
+    "aside": "none",
+    "rail": "popular",
+    "post_list": "",
+    "entity_list": ""
   }
 }

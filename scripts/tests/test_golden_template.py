@@ -475,6 +475,55 @@ def test_composition_recipes() -> None:
     assert "recipes.md" in skill and "H2+N1+L2+F3" in skill
 
 
+def test_archive_anatomy_inheritance_and_entity_split() -> None:
+    # Archives inherit the site's anatomy via config.archives instead
+    # of always rendering a bare single column.
+    config = json.loads((GOLDEN / "site.config.json").read_text())
+    assert config["archives"] == {
+        "aside": "none", "rail": "popular", "post_list": "",
+        "entity_list": "",
+    }
+    rail = (GOLDEN / "src" / "components" / "Rail.astro").read_text()
+    for hook in ("popular", "categories", "facets", "newsletter",
+                 "rail-count", "site-aside"):
+        assert hook in rail, f"Rail.astro misses {hook}"
+    category = (
+        GOLDEN / "src" / "pages" / "[category_base]" / "[slug].astro"
+    ).read_text()
+    blog = (GOLDEN / "src" / "pages" / "blog" / "[...page].astro").read_text()
+    facet = (
+        GOLDEN / "src" / "pages" / "[directory_base]" / "[facet]"
+        / "[value].astro"
+    ).read_text()
+    for page, name in ((category, "category"), (blog, "blog"),
+                       (facet, "facet")):
+        for hook in ("config.archives", "with-aside", "archiveAside",
+                     "Rail"):
+            assert hook in page, f"{name} archive misses {hook}"
+    assert "post-list--rows" in category and "post-list--tiles" in blog
+    assert "entity-grid--list" in facet and "entity-grid--shelves" in facet
+
+    # The reservation-page split: directory.entity_layout "split"
+    # moves the offer into a sticky rail card on the review article.
+    assert config["directory"]["entity_layout"] == ""
+    article = (GOLDEN / "src" / "pages" / "[...slug].astro").read_text()
+    for hook in ("entity_layout", "splitEntity", "entity-split",
+                 "entity-rail", "entity-offer-card",
+                 'rel="sponsored nofollow noopener"'):
+        assert hook in article, f"article page misses {hook}"
+    # The rail card labels the rating as the editor's score - never
+    # fake community votes.
+    assert "editor_score" in article
+    panel = (GOLDEN / "src" / "components" / "EntityPanel.astro").read_text()
+    assert "entity-panel--bare" in panel and "layout" in panel
+    components = (
+        ROOT / "templates" / "theme" / "components.css"
+    ).read_text()
+    for hook in (".entity-split .entity-rail", ".entity-offer-card",
+                 "position: sticky"):
+        assert hook in components, f"components.css misses {hook}"
+
+
 def test_claude_md_encodes_the_workflow() -> None:
     # CLAUDE.md is what keeps builder sessions on the toolkit path -
     # it must name the load-bearing skills and the gate rule.

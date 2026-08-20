@@ -39,11 +39,19 @@ if yours is 30 lines, you restyled nothing.
 1. First decide the site's ANATOMY - what does the visitor come to
    DO, and what does the FIRST SCREEN do about it? The reference
    point is how facebook, amazon, reddit, and booking differ: not
-   colors but page structure. Pick an A recipe from recipes.md
+   colors but page structure. LOOK at the twelve options first:
+   `python scripts/fleet_preview.py --anatomy --variant <name>
+   --output anatomies` renders every A recipe on one variant side by
+   side. Pick an A recipe from recipes.md
    ("Page anatomies") - `homepage.hero` (standard/search/compact/
    none), `homepage.aside` (right/left/none), `header.search`, the
    `feed` block, `directory:shelves` - THEN set the ARCHETYPE (`site_type`) in
-   site.config.json; the homepage composes itself from it:
+   site.config.json; the homepage composes itself from it. Carry the
+   anatomy onto the listing pages with `config.archives`
+   (aside/rail/post_list/entity_list - recipes.md "Archive
+   inheritance"), and on directory sites consider
+   `directory.entity_layout: "split"` for reservation-page reviews
+   (sticky offer card beside the article):
    - `portal` (default): read across a topic - feature card, latest
      grid, category strips.
    - `product`: see/try ONE game, app, or product - hero CTA (to
@@ -184,7 +192,11 @@ if yours is 30 lines, you restyled nothing.
    in `theme.recipe`
    (site.config.json) so fleet_report.py can flag identity clashes,
    and never repeat a fleet site's exact combo - change at least two
-   letters. Functional blocks (`cta_banner`, `newsletter`, `faq` in
+   letters. Starting a NEW site next to an existing fleet? Ask for a
+   clash-free identity instead of hunting one:
+   `python scripts/suggest_identity.py --scan ~/sites` proposes a
+   variant, finish, recipe combo, and primary hue band nobody uses
+   yet. Functional blocks (`cta_banner`, `newsletter`, `faq` in
    homepage.blocks) and `theme.category_colors` (per-category accent
    chips on strips and archive headings) are part of the composition
    toolbox. Concretely:

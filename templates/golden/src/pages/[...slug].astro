@@ -63,6 +63,15 @@ const entityEntry = (await getCollection("entities")).find(
     normalizePath(entity.data.article) === normalizePath(`/${post.id}/`),
 );
 
+// Reservation-page layout (directory.entity_layout: "split"): the
+// review reads booking-style - gallery and attributes lead the
+// article column while a sticky offer card (badge, editor's score,
+// price, CTA) rides the rail the whole way down. Default keeps the
+// stacked panel.
+const splitEntity = Boolean(
+  entityEntry && (config.directory ?? {}).entity_layout === "split",
+);
+
 // Breadcrumb level 2: the article's category archive when it has
 // one (tightening the cluster's internal links), the blog hub
 // otherwise. The JSON-LD below mirrors the same trail.
@@ -183,7 +192,7 @@ const faqSchema = post.data.faq.length
   ogType="article"
   jsonLd={[article, breadcrumb, ...faqSchema, ...qaSchema]}
 >
-  <div class="with-aside">
+  <div class:list={["with-aside", splitEntity && "entity-split"]}>
   <article class="prose">
     <Breadcrumbs
       items={[
@@ -213,6 +222,7 @@ const faqSchema = post.data.faq.length
         ctaLabel={ui.entity_cta}
         images={entityEntry.data.images}
         attributes={entityEntry.data.attributes}
+        layout={splitEntity ? "split" : "panel"}
       />
     )}
     {post.data.takeaways.length > 0 && (
@@ -242,14 +252,51 @@ const faqSchema = post.data.faq.length
     />
     <NewsletterCta />
   </article>
-  {related.length > 0 && (
-    <Sidebar title={ui.read_next}>
-      <ul>
-        {related.map((other) => (
-          <li><a href={other.url}>{other.title}</a></li>
-        ))}
-      </ul>
-    </Sidebar>
+  {splitEntity && entityEntry ? (
+    <div class="entity-rail">
+      <aside class="entity-offer-card">
+        {entityEntry.data.badge && (
+          <span class="entity-badge">{entityEntry.data.badge}</span>
+        )}
+        {entityEntry.data.rating && (
+          <p class="entity-score">
+            <span>{ui.editor_score ?? "Editor's score"}</span>{" "}
+            {entityEntry.data.rating}
+          </p>
+        )}
+        {entityEntry.data.price && (
+          <strong class="entity-price">{entityEntry.data.price}</strong>
+        )}
+        {entityEntry.data.cta_url && (
+          <a
+            class="entity-cta"
+            href={entityEntry.data.cta_url}
+            rel="sponsored nofollow noopener"
+          >
+            {ui.entity_cta ?? "See prices"}
+          </a>
+        )}
+      </aside>
+      {related.length > 0 && (
+        <Sidebar title={ui.read_next}>
+          <ul>
+            {related.map((other) => (
+              <li><a href={other.url}>{other.title}</a></li>
+            ))}
+          </ul>
+        </Sidebar>
+      )}
+    </div>
+  ) : (
+    related.length > 0 && (
+      <Sidebar title={ui.read_next}>
+        <ul>
+          {related.map((other) => (
+            <li><a href={other.url}>{other.title}</a></li>
+          ))}
+        </ul>
+      </Sidebar>
+    )
   )}
   </div>
 </BaseLayout>

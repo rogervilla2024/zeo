@@ -10,6 +10,7 @@ import { getCollection } from "astro:content";
 import config from "../../../../site.config.json";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import EntityCard from "../../../components/EntityCard.astro";
+import Rail from "../../../components/Rail.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { slugify } from "../../../lib/slugify";
 
@@ -97,6 +98,25 @@ const itemList = {
       : {}),
   })),
 };
+
+// Archive anatomy inheritance (config.archives): the facet archive
+// carries the site's rail and entity view; defaults stay plain.
+interface ArchivesConfig {
+  aside?: string;
+  rail?: string;
+  post_list?: string;
+  entity_list?: string;
+}
+const archives: ArchivesConfig = config.archives ?? {};
+const archiveAside = ["right", "left"].includes(archives.aside ?? "")
+  ? (archives.aside as string)
+  : "none";
+const archiveRail = archives.rail || "popular";
+const entityListStyle = ["list", "shelves", "index"].includes(
+  archives.entity_list ?? "",
+)
+  ? (archives.entity_list as string)
+  : "";
 ---
 
 <BaseLayout
@@ -106,13 +126,26 @@ const itemList = {
   lang={config.default_language}
   jsonLd={[breadcrumb, itemList]}
 >
+  <div
+    class:list={[
+      archiveAside !== "none" && "with-aside",
+      archiveAside === "left" && "left",
+    ]}
+  >
   <section class="listing">
     <Breadcrumbs
       items={[{ name: ui.home ?? "Home", url: "/" }, { name: valueLabel }]}
     />
     <h1>{valueLabel}</h1>
     <p class="category-intro">{description}</p>
-    <ul class="entity-grid">
+    <ul
+      class:list={[
+        "entity-grid",
+        entityListStyle === "list" && "entity-grid--list",
+        entityListStyle === "shelves" && "entity-grid--shelves",
+        entityListStyle === "index" && "entity-grid--index",
+      ]}
+    >
       {entities.map((entity) => (
         <EntityCard
           title={entity.data.title}
@@ -131,4 +164,6 @@ const itemList = {
       ))}
     </ul>
   </section>
+  {archiveAside !== "none" && <Rail mode={archiveRail} />}
+  </div>
 </BaseLayout>

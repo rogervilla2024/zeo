@@ -9,6 +9,7 @@ import { getCollection } from "astro:content";
 import config from "../../../site.config.json";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import PostCard from "../../components/PostCard.astro";
+import Rail from "../../components/Rail.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { slugify } from "../../lib/slugify";
 
@@ -64,6 +65,25 @@ const breadcrumb = {
     { "@type": "ListItem", position: 2, name, item: canonical },
   ],
 };
+
+// Archive anatomy inheritance (config.archives): archives are pages
+// too - they can carry the site's rail and listing style instead of
+// always being a bare single column. Defaults keep today's plain
+// layout.
+interface ArchivesConfig {
+  aside?: string;
+  rail?: string;
+  post_list?: string;
+  entity_list?: string;
+}
+const archives: ArchivesConfig = config.archives ?? {};
+const archiveAside = ["right", "left"].includes(archives.aside ?? "")
+  ? (archives.aside as string)
+  : "none";
+const archiveRail = archives.rail || "popular";
+const postListStyle = ["rows", "tiles"].includes(archives.post_list ?? "")
+  ? (archives.post_list as string)
+  : "";
 ---
 
 <BaseLayout
@@ -73,19 +93,33 @@ const breadcrumb = {
   lang={config.default_language}
   jsonLd={[breadcrumb]}
 >
-  <section class="listing">
-    <Breadcrumbs items={[{ name: ui.home ?? "Home", url: "/" }, { name }]} />
-    <h1 class="category-heading" style={headingStyle}>{name}</h1>
-    <p class="category-intro">{description}</p>
-    <ul class="post-list">
-      {posts.map((post) => (
-        <PostCard
-          title={post.data.title}
-          url={`/${post.id}/`}
-          description={post.data.description}
-          image={post.data.image}
-        />
-      ))}
-    </ul>
-  </section>
+  <div
+    class:list={[
+      archiveAside !== "none" && "with-aside",
+      archiveAside === "left" && "left",
+    ]}
+  >
+    <section class="listing">
+      <Breadcrumbs items={[{ name: ui.home ?? "Home", url: "/" }, { name }]} />
+      <h1 class="category-heading" style={headingStyle}>{name}</h1>
+      <p class="category-intro">{description}</p>
+      <ul
+        class:list={[
+          "post-list",
+          postListStyle === "rows" && "post-list--rows",
+          postListStyle === "tiles" && "post-list--tiles",
+        ]}
+      >
+        {posts.map((post) => (
+          <PostCard
+            title={post.data.title}
+            url={`/${post.id}/`}
+            description={post.data.description}
+            image={post.data.image}
+          />
+        ))}
+      </ul>
+    </section>
+    {archiveAside !== "none" && <Rail mode={archiveRail} />}
+  </div>
 </BaseLayout>

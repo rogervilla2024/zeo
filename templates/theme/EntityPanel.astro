@@ -19,6 +19,7 @@ interface Props {
   ctaLabel?: string;
   images?: string[];
   attributes?: Attribute[];
+  layout?: string;
 }
 const {
   title,
@@ -28,13 +29,18 @@ const {
   ctaLabel = "See prices",
   images = [],
   attributes = [],
+  layout = "panel",
 } = Astro.props;
+// In the split ("reservation page") layout the offer lives in the
+// page's sticky rail card, so the panel keeps only the gallery and
+// the attribute list.
+const split = layout === "split";
 ---
 
-<aside class="entity-panel">
+<aside class:list={["entity-panel", split && "entity-panel--bare"]}>
   {images.length > 0 && <Gallery images={images} alt={title} />}
   <div class="entity-panel-body">
-    {badge && <span class="entity-badge">{badge}</span>}
+    {!split && badge && <span class="entity-badge">{badge}</span>}
     {attributes.length > 0 && (
       <ul class="entity-attrs">
         {attributes.map((attr) => (
@@ -44,17 +50,19 @@ const {
         ))}
       </ul>
     )}
-    <div class="entity-panel-offer">
-      {price && <strong class="entity-price">{price}</strong>}
-      {ctaUrl && (
-        <a
-          class="entity-cta"
-          href={ctaUrl}
-          rel="sponsored nofollow noopener"
-        >
-          {ctaLabel}
-        </a>
-      )}
-    </div>
+    {!split && (
+      <div class="entity-panel-offer">
+        {price && <strong class="entity-price">{price}</strong>}
+        {ctaUrl && (
+          <a
+            class="entity-cta"
+            href={ctaUrl}
+            rel="sponsored nofollow noopener"
+          >
+            {ctaLabel}
+          </a>
+        )}
+      </div>
+    )}
   </div>
 </aside>

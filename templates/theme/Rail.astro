@@ -1,0 +1,112 @@
+---
+// Reusable archive rail: the homepage's sidebar content (popular /
+// categories / facets / newsletter), packaged so archive pages can
+// inherit the site's anatomy via config.archives instead of always
+// rendering a bare single column. Loads its own data at build time,
+// so a page only passes the mode. Zero JavaScript.
+import { getCollection } from "astro:content";
+import config from "../../site.config.json";
+import { slugify } from "../lib/slugify";
+import NewsletterCta from "./NewsletterCta.astro";
+import Sidebar from "./Sidebar.astro";
+
+interface Props {
+  mode?: string;
+}
+const { mode = "popular" } = Astro.props;
+const ui = config.ui ?? {};
+
+const posts =
+  mode === "popular" || mode === "categories"
+    ? (await getCollection("blog")).sort(
+        (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+      )
+    : [];
+const popular = posts.slice(0, 5);
+
+const categoryBase = config.seo.category_base ?? "category";
+const railCategories = new Map<string, number>();
+if (mode === "categories") {
+  for (const post of posts) {
+    if (!post.data.category) continue;
+    railCategories.set(
+      post.data.category,
+      (railCategories.get(post.data.category) ?? 0) + 1,
+    );
+  }
+}
+
+// Facet links mirror the homepage rail: one link per attribute value
+// of each configured facet, pointing at its pre-rendered archive.
+interface DirectoryConfig {
+  base?: string;
+  facets: string[];
+}
+const directoryConfig: DirectoryConfig = config.directory ?? { facets: [] };
+const directoryBase = directoryConfig.base || "directory";
+const entities =
+  mode === "facets" ? await getCollection("entities") : [];
+const facetLinks =
+  mode === "facets"
+    ? directoryConfig.facets.flatMap((label) => {
+        const facetSlug = slugify(label);
+        const values = new Map<string, string>();
+        for (const entity of entities) {
+          const match = entity.data.attributes.find(
+            (attr) => attr.label === label,
+          );
+          if (match && !values.has(slugify(match.value))) {
+            values.set(slugify(match.value), match.value);
+          }
+        }
+        return [...values.entries()]
+          .filter(([slug]) => facetSlug && slug)
+          .map(([slug, value]) => ({
+            label: value,
+            url: `/${directoryBase}/${facetSlug}/${slug}/`,
+          }));
+      })
+    : [];
+---
+
+{mode === "popular" && popular.length > 0 && (
+  <Sidebar title={ui.popular ?? "Popular"}>
+    <ul>
+      {popular.map((post) => (
+        <li><a href={`/${post.id}/`}>{post.data.title}</a></li>
+      ))}
+    </ul>
+  </Sidebar>
+)}
+{mode === "categories" && railCategories.size > 0 && (
+  <Sidebar title={ui.rail_categories ?? "Topics"}>
+    <ul>
+      {[...railCategories.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(([name, count]) => (
+          <li>
+            <a href={`/${categoryBase}/${slugify(name)}/`}>{name}</a>{" "}
+            <span class="rail-count">{count}</span>
+          </li>
+        ))}
+    </ul>
+  </Sidebar>
+)}
+{mode === "facets" && facetLinks.length > 0 && (
+  <Sidebar title={ui.directory_title ?? "Browse the directory"}>
+    <ul>
+      {facetLinks.map((link) => (
+        <li><a href={link.url}>{link.label}</a></li>
+      ))}
+    </ul>
+  </Sidebar>
+)}
+{mode === "newsletter" && (
+  <aside class="site-aside">
+    <NewsletterCta
+      title={ui.newsletter_title}
+      description={ui.newsletter_text}
+      buttonLabel={ui.newsletter_button}
+    />
+  </aside>
+)}

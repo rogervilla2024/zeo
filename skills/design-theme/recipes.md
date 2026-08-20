@@ -178,7 +178,10 @@ from the topic's job before any styling; record the A code with the
 combo. The knobs: `homepage.hero` (standard / search / compact /
 none), `homepage.aside` (right / left / none), `header.search`
 (true puts the search bar in the chrome on every page), plus the
-blocks.
+blocks. LOOK first here too:
+`python scripts/fleet_preview.py --anatomy --variant <name> --output
+anatomies` renders all twelve A recipes on one variant side by side,
+so the anatomy pick is as visual as the variant pick.
 
 ### A1 - Story lead
 Classic publisher: branding hero, feature story, grid.
@@ -246,6 +249,28 @@ blocks `["latest:tiles"]`; visual niches.
 `homepage.rail` decides what the aside holds, independent of side:
 `popular` (default) | `categories` (topic map with counts) |
 `facets` (directory filters) | `newsletter` (signup box).
+
+## Archive inheritance
+
+Archives are pages too - the anatomy should not stop at the
+homepage. `config.archives` carries the site's rail and listing
+style onto the category archives, the blog hub, and the facet
+archives: `archives.aside` (right / left / none, default none keeps
+today's plain column), `archives.rail` (same modes as
+homepage.rail), `archives.post_list` ("" / rows / tiles) and
+`archives.entity_list` ("" / list / shelves / index) for the view
+modifiers. A dense-portal site runs rows-with-rail archives; a tile
+wall keeps its tiles on every listing page.
+
+## Entity review layout
+
+`directory.entity_layout: "split"` turns an entity's review article
+into a reservation page: the gallery and attribute list lead the
+article column while a sticky offer card (badge, editor's score,
+price, offer CTA - still rel="sponsored nofollow noopener") rides
+the rail beside the whole review, booking-style. Default ("") keeps
+the stacked fact panel. The rating in the card is the editor's
+score - never fake user votes.
 
 ## Type pairings (T)
 
